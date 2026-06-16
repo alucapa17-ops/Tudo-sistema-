@@ -25,13 +25,19 @@
       --red: #e53e3e;
       --nav-h: 64px;
     }
-    html, body { height: 100%; }
+    html, body { 
+      height: 100%; 
+      margin: 0;
+      padding: 0;
+    }
     body {
       font-family: 'Inter', sans-serif;
       background: var(--bg);
       color: var(--text);
-      padding-bottom: calc(var(--nav-h) + 16px);
+      padding-bottom: calc(var(--nav-h) + 30px);
       overflow-x: hidden;
+      overflow-y: auto;
+      min-height: 100vh;
     }
 
     /* ===== TOP BAR ===== */
@@ -290,23 +296,6 @@
     .chart-card h3 { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 14px; }
     .chart-wrap { height: 160px; }
 
-    /* ===== STATS ROW ===== */
-    .stats-row {
-      display: grid; grid-template-columns: 1fr 1fr;
-      gap: 12px; margin: 0 16px;
-    }
-    .stat-card {
-      background: var(--card); border-radius: 12px;
-      padding: 16px; box-shadow: var(--shadow);
-      transition: transform 0.3s ease;
-    }
-    .stat-card:hover { transform: translateY(-5px); }
-    .stat-card-top { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
-    .stat-card-top svg { width: 18px; height: 18px; color: var(--primary); }
-    .stat-card-top span { font-size: 12px; font-weight: 600; color: var(--muted); }
-    .stat-card-val { font-size: 20px; font-weight: 800; color: var(--text); }
-    .stat-card-desc { font-size: 11px; color: var(--muted); margin-top: 3px; }
-
     /* ===== BOTTOM NAV ===== */
     .bottom-nav {
       position: fixed; bottom: 0; left: 0; right: 0;
@@ -398,7 +387,107 @@
     .sim-result-val { font-size: 18px; font-weight: 800; color: var(--primary); }
     .sim-invested { font-size: 12px; color: var(--muted); margin-top: 6px; }
 
-    .page-spacer { height: 20px; }
+    /* ===== FUNCIONALIDADES SECTION ===== */
+    .funcionalidades-section {
+      margin: 0 16px 20px;
+      background: var(--card);
+      border-radius: 14px;
+      padding: 20px;
+      box-shadow: var(--shadow);
+    }
+    .funcionalidades-section h3 {
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+    .funcionalidades-section .subtitle {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 20px;
+    }
+    .func-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-top: 16px;
+    }
+    .func-item {
+      background: #f8f9fc;
+      border-radius: 12px;
+      padding: 16px 14px;
+      border-left: 4px solid var(--primary);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .func-item:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+    .func-item .func-icon {
+      width: 28px;
+      height: 28px;
+      margin-bottom: 8px;
+      display: block;
+      color: var(--primary);
+    }
+    .func-item .func-icon svg {
+      width: 100%;
+      height: 100%;
+    }
+    .func-item h4 {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+    .func-item p {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+    .func-featured-img {
+      width: 100%;
+      border-radius: 12px;
+      margin: 16px 0;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    .func-image-container {
+      margin: 20px 0;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+    }
+    .func-image-container img {
+      width: 100%;
+      display: block;
+    }
+    .func-image-caption {
+      padding: 12px 16px;
+      background: #f8f9fc;
+      font-size: 13px;
+      color: var(--muted);
+      text-align: center;
+      border-top: 1px solid #e8eaf0;
+    }
+    .func-image-caption strong {
+      color: var(--text);
+    }
+    .func-divider {
+      height: 2px;
+      background: linear-gradient(to right, #e8eaf0, var(--primary), #e8eaf0);
+      margin: 24px 0;
+      opacity: 0.3;
+    }
+
+    .page-spacer { 
+      height: 30px; 
+    }
+
+    @media (max-width: 480px) {
+      .func-grid {
+        grid-template-columns: 1fr;
+      }
+    }
   </style>
 </head>
 <body>
@@ -545,8 +634,6 @@
   <div class="slide-dots" id="slide-dots"></div>
 </div>
 
-
-
 <!-- INFO CARDS -->
 <div class="sec-head"><h2>Porque Escolher a Mirae Asset</h2></div>
 <div class="info-cards">
@@ -612,52 +699,13 @@
   </div>
 </div>
 
-<!-- STATS ROW REMOVED -->
-<div class="stats-row" style="display:none;">
-  <div class="stat-card">
-    <div class="stat-card-top">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-      <span>Índice MSCI Asia</span>
-    </div>
-    <div class="stat-card-val" style="color:var(--green);">+12.4%</div>
-    <div class="stat-card-desc">YTD 2025</div>
-  </div>
-  <div class="stat-card">
-    <div class="stat-card-top">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-      <span>AUM Global</span>
-    </div>
-    <div class="stat-card-val">600B+</div>
-    <div class="stat-card-desc">USD em gestão</div>
-  </div>
-  <div class="stat-card">
-    <div class="stat-card-top">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
-      <span>Países Presença</span>
-    </div>
-    <div class="stat-card-val">18+</div>
-    <div class="stat-card-desc">Mercados globais</div>
-  </div>
-  <div class="stat-card">
-    <div class="stat-card-top">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
-      <span>Investidores</span>
-    </div>
-    <div class="stat-card-val">5M+</div>
-    <div class="stat-card-desc">Clientes mundiais</div>
-  </div>
-</div>
-
-<!-- MIRAE INFO — movida para o fundo conforme pedido -->
+<!-- MIRAE INFO SECTION - SEM IMAGEM -->
 <div class="sec-head"><h2>Sobre a Mirae Asset</h2></div>
-<div style="margin:0 16px; background:linear-gradient(135deg,#002f6c,#004a99); border-radius:14px; overflow:hidden; box-shadow:0 6px 20px rgba(0,47,108,0.25);">
-  <div style="padding:20px;">
-    <div style="font-size:16px; font-weight:800; color:#fff; margin-bottom:8px;">Líderes em Gestão de Activos na Ásia</div>
-    <p style="font-size:13px; color:rgba(255,255,255,0.78); line-height:1.65; margin-bottom:10px;">A Mirae Asset é uma das maiores gestoras de activos da Ásia, com presença em mais de 18 países, gerindo mais de 600 mil milhões de USD em activos.</p>
-    <p style="font-size:13px; color:rgba(255,255,255,0.78); line-height:1.65; margin-bottom:10px;">Fundada em 1997 na Coreia do Sul, traz aos investidores africanos acesso privilegiado aos mercados globais com segurança e transparência total.</p>
-    <p style="font-size:13px; color:rgba(255,255,255,0.78); line-height:1.65;">Com mais de 5 milhões de clientes em todo o mundo e escritórios em 18 países, a Mirae Asset é sinónimo de confiança, inovação e resultados sustentados ao longo do tempo.</p>
-  </div>
-  <img src="https://i.postimg.cc/RVRJ4FVf/Background-Eraser-20260615-083818123.png" alt="Mirae Asset" style="width:100%; display:block; object-fit:cover; max-height:200px;" />
+<div style="margin:0 16px; background:linear-gradient(135deg,#002f6c,#004a99); border-radius:14px; padding:24px 20px; box-shadow:0 6px 20px rgba(0,47,108,0.25);">
+  <div style="font-size:16px; font-weight:800; color:#fff; margin-bottom:10px;">Líderes em Gestão de Activos na Ásia</div>
+  <p style="font-size:13px; color:rgba(255,255,255,0.78); line-height:1.65; margin-bottom:10px;">A Mirae Asset é uma das maiores gestoras de activos da Ásia, com presença em mais de 18 países, gerindo mais de 600 mil milhões de USD em activos.</p>
+  <p style="font-size:13px; color:rgba(255,255,255,0.78); line-height:1.65; margin-bottom:10px;">Fundada em 1997 na Coreia do Sul, traz aos investidores africanos acesso privilegiado aos mercados globais com segurança e transparência total.</p>
+  <p style="font-size:13px; color:rgba(255,255,255,0.78); line-height:1.65;">Com mais de 5 milhões de clientes em todo o mundo e escritórios em 18 países, a Mirae Asset é sinónimo de confiança, inovação e resultados sustentados ao longo do tempo.</p>
 </div>
 
 <!-- SIMULATOR -->
@@ -676,6 +724,144 @@
       <div class="sim-result-lbl">Ganho estimado</div>
       <div style="font-size:14px; font-weight:700; color:var(--green);" id="sim-gain">+1.240 (+12,4%)</div>
     </div>
+  </div>
+</div>
+
+<!-- ============================================ -->
+<!-- FUNCIONALIDADES DE INVESTIMENTOS             -->
+<!-- ============================================ -->
+<div class="sec-head"><h2>Funcionalidades de Investimento</h2></div>
+
+<div class="funcionalidades-section">
+  <h3>Invista com Inteligência</h3>
+  <p class="subtitle">Descubra todas as ferramentas que a Mirae Asset oferece para maximizar seus investimentos</p>
+
+  <!-- Primeira Imagem -->
+  <div class="func-image-container">
+    <img src="https://i.postimg.cc/hvrxnrMd/file-00000000c2e872468382ec3266bc32ab.png" alt="Funcionalidades Mirae Asset 1" />
+    <div class="func-image-caption">
+      <strong>Gestão Inteligente de Investimentos</strong> — Acompanhe todos os seus ativos em um só lugar
+    </div>
+  </div>
+
+  <!-- Grid de funcionalidades -->
+  <div class="func-grid">
+    <div class="func-item">
+      <div class="func-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      </div>
+      <h4>Investimento Automatizado</h4>
+      <p>Sistema inteligente que investe automaticamente baseado nos seus objetivos e perfil de risco, otimizando seus retornos.</p>
+    </div>
+    <div class="func-item">
+      <div class="func-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+      </div>
+      <h4>Diversificação Global</h4>
+      <p>Acesso a mercados internacionais com distribuição automática de riscos entre diferentes ativos e regiões.</p>
+    </div>
+    <div class="func-item">
+      <div class="func-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+      </div>
+      <h4>Monitoramento em Tempo Real</h4>
+      <p>Acompanhe a valorização das suas cotas ao vivo com atualizações instantâneas do mercado.</p>
+    </div>
+    <div class="func-item">
+      <div class="func-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12v-2a5 5 0 0 0-5-5H8a5 5 0 0 0-5 5v2"/><circle cx="12" cy="16" r="5"/><path d="M12 11v5"/></svg>
+      </div>
+      <h4>Relatórios Detalhados</h4>
+      <p>Análises completas do desempenho da sua carteira com gráficos, indicadores e projeções personalizadas.</p>
+    </div>
+    <div class="func-item">
+      <div class="func-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      </div>
+      <h4>Segurança Bancária</h4>
+      <p>Proteção total dos seus dados e ativos com encriptação de nível militar e autenticação de dois fatores.</p>
+    </div>
+    <div class="func-item">
+      <div class="func-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+      </div>
+      <h4>Planos Personalizados</h4>
+      <p>Estratégias adaptadas ao seu perfil de investidor com recomendações baseadas em inteligência artificial.</p>
+    </div>
+    <div class="func-item">
+      <div class="func-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17l0-5"/></svg>
+      </div>
+      <h4>Simulador Avançado</h4>
+      <p>Previsões precisas baseadas em dados históricos e tendências de mercado para decisões mais assertivas.</p>
+    </div>
+    <div class="func-item">
+      <div class="func-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+      </div>
+      <h4>Fundos Exclusivos</h4>
+      <p>Acesso a cotas de fundos globais de alto desempenho com rentabilidade acima da média do mercado.</p>
+    </div>
+    <div class="func-item">
+      <div class="func-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.362 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.574 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+      </div>
+      <h4>Suporte Especializado</h4>
+      <p>Atendimento personalizado 24/7 com consultores financeiros qualificados para auxiliar suas decisões.</p>
+    </div>
+    <div class="func-item">
+      <div class="func-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+      </div>
+      <h4>Educação Financeira</h4>
+      <p>Conteúdo formativo exclusivo para investidores de todos os níveis, com webinars, artigos e análises.</p>
+    </div>
+    <div class="func-item">
+      <div class="func-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+      </div>
+      <h4>Interface Intuitiva</h4>
+      <p>Plataforma fácil de usar com design moderno e navegação fluida para todos os perfis de usuário.</p>
+    </div>
+    <div class="func-item">
+      <div class="func-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+      </div>
+      <h4>Rentabilidade Competitiva</h4>
+      <p>Taxas de retorno acima da média do mercado com gestão profissional e estratégias comprovadas.</p>
+    </div>
+  </div>
+
+  <div class="func-divider"></div>
+
+  <!-- Segunda Imagem -->
+  <div class="func-image-container">
+    <img src="https://i.postimg.cc/KYknTtvX/IMG-20260616-WA0000.jpg" alt="Funcionalidades Mirae Asset 2" />
+    <div class="func-image-caption">
+      <strong>Gestão de Carteira Profissional</strong> — Ferramentas avançadas para otimizar seus investimentos
+    </div>
+  </div>
+
+  <!-- Benefícios adicionais -->
+  <div style="margin-top: 20px; background: #f0f6ff; border-radius: 12px; padding: 18px; border-left: 4px solid var(--primary);">
+    <h4 style="font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 8px;">Por que escolher a Mirae Asset?</h4>
+    <ul style="list-style: none; padding: 0; font-size: 13px; color: var(--muted); line-height: 1.8;">
+      <li style="display: flex; align-items: center; gap: 8px; padding: 4px 0;">
+        <span style="color: var(--green); font-size: 16px;">✓</span> Mais de 600 mil milhões USD em activos sob gestão
+      </li>
+      <li style="display: flex; align-items: center; gap: 8px; padding: 4px 0;">
+        <span style="color: var(--green); font-size: 16px;">✓</span> Presença em mais de 18 países com escritórios locais
+      </li>
+      <li style="display: flex; align-items: center; gap: 8px; padding: 4px 0;">
+        <span style="color: var(--green); font-size: 16px;">✓</span> +5 milhões de clientes satisfeitos em todo o mundo
+      </li>
+      <li style="display: flex; align-items: center; gap: 8px; padding: 4px 0;">
+        <span style="color: var(--green); font-size: 16px;">✓</span> Fundada em 1997 com mais de 25 anos de experiência
+      </li>
+      <li style="display: flex; align-items: center; gap: 8px; padding: 4px 0;">
+        <span style="color: var(--green); font-size: 16px;">✓</span> Regulamentação internacional e transparência total
+      </li>
+    </ul>
   </div>
 </div>
 
@@ -755,21 +941,17 @@
       if (!snap.exists) return;
       const data = snap.data();
       const saldo = data.saldo || 0;
-      // Quick stats saldo (laranja)
       document.getElementById('qs-saldo').textContent = saldo.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-      // Pat slide 1 saldo
       if (document.getElementById('pat-saldo'))
         document.getElementById('pat-saldo').textContent = saldo.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
     });
 
-    // Load investments
     db.collection('investimentos_usuarios').where('userId', '==', uid).onSnapshot(snap => {
       let total = 0; let count = 0;
       const promises = [];
       snap.forEach(doc => {
         const inv = doc.data();
         count++;
-        // get current fund price
         promises.push(
           db.collection('fundos').doc(inv.fundoId).get().then(fundDoc => {
             if (fundDoc.exists) {
