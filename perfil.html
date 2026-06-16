@@ -1,0 +1,1036 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mirae Asset — Perfil</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --primary: #007bff; --primary-dark: #0056b3;
+      --bg: #f4f4f7; --card: #fff; --text: #333; --muted: #555;
+      --shadow: 0 4px 10px rgba(0,0,0,0.12);
+      --green: #2b9348; --red: #e53e3e; --orange: #f97316;
+      --nav-h: 64px;
+    }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); padding-bottom: calc(var(--nav-h) + 20px); overflow-x: hidden; }
+
+    /* TOPBAR */
+    .topbar { position: sticky; top: 0; z-index: 200; background: linear-gradient(135deg, #002f6c, #004a99); padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 2px 12px rgba(0,0,0,0.2); }
+    .topbar-brand { display: flex; align-items: center; gap: 10px; }
+    .topbar-brand img { width: 34px; height: 34px; border-radius: 50%; object-fit: contain; }
+    .topbar-title { font-size: 17px; font-weight: 800; color: #fff; }
+    .topbar-sub { font-size: 11px; color: rgba(255,255,255,0.6); }
+
+    /* PROFILE HERO */
+    .profile-hero {
+      background: linear-gradient(135deg, #002f6c, #004a99, #0066cc);
+      padding: 24px 16px 20px; position: relative; overflow: hidden;
+    }
+    .profile-hero::before { content: ''; position: absolute; top: -20px; right: -20px; width: 120px; height: 120px; background: radial-gradient(circle, rgba(255,255,255,0.06), transparent 70%); border-radius: 50%; }
+    .profile-hero-inner { display: flex; align-items: center; gap: 16px; }
+    .avatar-big { width: 64px; height: 64px; border-radius: 50%; background: rgba(255,255,255,0.2); border: 3px solid rgba(255,255,255,0.35); display: flex; align-items: center; justify-content: center; font-size: 26px; font-weight: 800; color: #fff; flex-shrink: 0; }
+    .profile-info h2 { font-size: 18px; font-weight: 800; color: #fff; }
+    .profile-info p { font-size: 12px; color: rgba(255,255,255,0.65); margin-top: 3px; }
+    .profile-badges { display: flex; gap: 6px; margin-top: 8px; }
+    .pbadge { padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; background: rgba(255,255,255,0.15); color: #fff; }
+    .pbadge.id-red { background: rgba(255,0,0,0.3); color: #ff6b6b; }
+
+    /* BALANCE CARD */
+    .balance-row {
+      display: grid; grid-template-columns: 1fr;
+      gap: 12px; margin: 14px 16px 0;
+    }
+    .balance-card {
+      background: var(--card); border-radius: 14px;
+      padding: 16px; box-shadow: var(--shadow);
+      transition: transform 0.3s;
+    }
+    .balance-card:hover { transform: translateY(-4px); }
+    .bc-icon { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-bottom: 8px; }
+    .bc-icon svg { width: 18px; height: 18px; }
+    .bc-lbl { font-size: 11px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+    .bc-val { font-size: 20px; font-weight: 800; color: var(--text); margin-top: 4px; }
+
+    /* MENU LIST */
+    .menu-section { margin: 20px 16px 0; }
+    .menu-label { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+    .menu-list { background: var(--card); border-radius: 14px; box-shadow: var(--shadow); overflow: hidden; }
+    .menu-item {
+      display: flex; align-items: center; gap: 14px;
+      padding: 16px; cursor: pointer;
+      border-bottom: 1px solid #f0f2f8;
+      transition: background 0.2s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .menu-item:last-child { border-bottom: none; }
+    .menu-item:hover { background: #f8f9ff; }
+    .menu-item:active { background: #f0f4ff; }
+    .menu-icon { width: 40px; height: 40px; border-radius: 11px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .menu-icon svg { width: 20px; height: 20px; }
+    .menu-text { flex: 1; }
+    .menu-text .title { font-size: 14px; font-weight: 700; color: var(--text); }
+    .menu-text .sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+    .menu-arrow { color: #c7d2e0; }
+    .menu-arrow svg { width: 16px; height: 16px; }
+
+    /* FULL SCREEN PANELS */
+    .panel {
+      position: fixed; inset: 0; background: var(--bg); z-index: 500;
+      display: none; flex-direction: column; overflow: hidden;
+    }
+    .panel.open { display: flex; animation: panel-in 0.3s cubic-bezier(0.16,1,0.3,1); }
+    @keyframes panel-in { from { transform: translateX(100%); } to { transform: translateX(0); } }
+    .panel-header {
+      background: linear-gradient(135deg, #002f6c, #004a99);
+      padding: 14px 16px; display: flex; align-items: center; gap: 12px;
+      flex-shrink: 0;
+    }
+    .panel-back { background: rgba(255,255,255,0.12); border: none; border-radius: 50%; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #fff; flex-shrink: 0; }
+    .panel-back svg { width: 18px; height: 18px; }
+    .panel-title { font-size: 16px; font-weight: 800; color: #fff; }
+    .panel-body { flex: 1; overflow-y: auto; padding: 16px; }
+
+    /* ===== HISTORY PANEL ===== */
+    .filter-row { display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
+    .filter-input {
+      flex: 1; min-width: 130px; padding: 10px 12px;
+      border: 1.5px solid #e2e8f0; border-radius: 8px;
+      font-size: 13px; color: var(--text); background: #fff;
+      outline: none; font-family: 'Inter', sans-serif;
+    }
+    .filter-input:focus { border-color: var(--primary); }
+    .filter-btn {
+      padding: 10px 16px; background: var(--primary); color: #fff;
+      border: none; border-radius: 8px; font-size: 13px; font-weight: 700;
+      cursor: pointer; font-family: 'Inter', sans-serif;
+    }
+    .tx-list { display: flex; flex-direction: column; gap: 8px; }
+    .tx-item {
+      background: #fff; border-radius: 12px; padding: 14px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.07);
+      display: flex; align-items: center; gap: 12px;
+    }
+    .tx-icon { width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .tx-icon svg { width: 20px; height: 20px; }
+    .tx-icon.deposit { background: #dcfce7; color: var(--green); }
+    .tx-icon.withdraw { background: #ffe4e2; color: var(--red); }
+    .tx-icon.invest { background: #dbeafe; color: var(--primary); }
+    .tx-icon.resgate { background: #fff7ed; color: var(--orange); }
+    .tx-info { flex: 1; }
+    .tx-desc { font-size: 13px; font-weight: 700; color: var(--text); }
+    .tx-date { font-size: 11px; color: var(--muted); margin-top: 2px; }
+    .tx-status { display: inline-block; padding: 2px 7px; border-radius: 4px; font-size: 10px; font-weight: 700; margin-top: 3px; }
+    .tx-status.ok { background: #dcfce7; color: var(--green); }
+    .tx-status.pending { background: #fff7ed; color: var(--orange); }
+    .tx-status.fail { background: #ffe4e2; color: var(--red); }
+    .tx-val { font-size: 15px; font-weight: 800; text-align: right; }
+    .tx-val.pos { color: var(--green); }
+    .tx-val.neg { color: var(--red); }
+
+    /* ===== WITHDRAW PANEL ===== */
+    .input-group { margin-bottom: 14px; }
+    .input-group label { display: block; font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+    .mask-wrap { position: relative; }
+    .mask-wrap svg { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; color: #9ca3af; }
+    .mask-wrap input { width: 100%; padding: 13px 14px 13px 38px; border: 1.5px solid #e2e8f0; border-radius: 8px; font-size: 20px; font-weight: 800; color: var(--primary); background: #f8faff; outline: none; font-family: 'Inter', sans-serif; }
+    .mask-wrap input:focus { border-color: var(--primary); }
+    .fee-calc { background: #fff; border-radius: 10px; padding: 14px; margin-bottom: 14px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+    .fee-row { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid #f0f0f5; }
+    .fee-row:last-child { border-bottom: none; padding-top: 10px; }
+    .fee-lbl { font-size: 12px; color: var(--muted); }
+    .fee-val { font-size: 13px; font-weight: 700; color: var(--text); }
+    .fee-val.total { color: var(--green); font-size: 15px; }
+    .fee-val.red { color: var(--red); }
+    .btn-primary-full { width: 100%; padding: 14px; background: var(--primary); color: #fff; border: none; border-radius: 10px; font-size: 15px; font-weight: 700; cursor: pointer; font-family: 'Inter', sans-serif; opacity: 0.4; pointer-events: none; transition: opacity 0.3s, background 0.25s; }
+    .btn-primary-full.ready { opacity: 1; pointer-events: auto; }
+    .btn-primary-full.ready:hover { background: var(--primary-dark); }
+    .btn-primary-full.danger { background: var(--red); }
+    .btn-primary-full.danger:hover { background: #b91c1c; }
+
+    /* ===== DEPOSIT PANEL ===== */
+    .deposit-tabs { display: flex; gap: 4px; background: #f0f2f8; border-radius: 12px; padding: 4px; margin-bottom: 14px; }
+    .deposit-tab { flex: 1; padding: 9px; border: none; border-radius: 9px; font-size: 12px; font-weight: 700; cursor: pointer; font-family: 'Inter', sans-serif; color: var(--muted); background: transparent; transition: all 0.25s; }
+    .deposit-tab.active { background: #fff; color: var(--primary); box-shadow: var(--shadow); }
+    .deposit-section { display: none; }
+    .deposit-section.active { display: block; }
+    .deposit-illus { text-align: center; margin-bottom: 16px; }
+    .deposit-illus img { width: 100%; max-width: 280px; height: auto; object-fit: contain; }
+    .account-card { background: #fff; border-radius: 12px; padding: 16px; box-shadow: var(--shadow); margin-bottom: 12px; }
+    .account-name { font-size: 14px; font-weight: 800; color: var(--text); margin-bottom: 4px; display: flex; align-items: center; gap: 8px; }
+    .account-number { font-size: 15px; font-weight: 800; color: var(--primary); letter-spacing: 1px; margin: 8px 0; word-break: break-all; }
+    .btn-reveal { padding: 8px 14px; background: var(--primary); color: #fff; border: none; border-radius: 8px; font-size: 12px; font-weight: 700; cursor: pointer; font-family: 'Inter', sans-serif; transition: all 0.2s; }
+    .btn-reveal:hover { background: var(--primary-dark); }
+    .btn-reveal:disabled { background: #9ca3af; cursor: not-allowed; }
+    .countdown-text { font-size: 12px; color: var(--orange); font-weight: 700; margin-top: 4px; }
+    .upload-zone { border: 2px dashed #c7d2e0; border-radius: 12px; padding: 24px; text-align: center; cursor: pointer; transition: border-color 0.25s; margin-bottom: 14px; margin-top: 14px; }
+    .upload-zone:hover { border-color: var(--primary); }
+    .upload-zone input { display: none; }
+    .upload-zone svg { width: 36px; height: 36px; color: #9ca3af; margin-bottom: 8px; }
+    .upload-zone .uz-title { font-size: 14px; font-weight: 700; color: var(--text); }
+    .upload-zone .uz-sub { font-size: 12px; color: var(--muted); margin-top: 4px; }
+    .upload-preview { display: none; width: 100%; height: 160px; object-fit: cover; border-radius: 10px; margin-bottom: 14px; }
+    .info-steps { display: flex; flex-direction: column; gap: 10px; }
+    .step-item { display: flex; gap: 12px; align-items: flex-start; background: #fff; border-radius: 10px; padding: 14px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+    .step-num { width: 28px; height: 28px; border-radius: 50%; background: var(--primary); color: #fff; font-size: 13px; font-weight: 800; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .step-text { font-size: 13px; color: var(--muted); line-height: 1.6; }
+    .step-text strong { color: var(--text); }
+
+    /* ===== FRIENDS PANEL ===== */
+    .ref-hero { background: linear-gradient(135deg, #002f6c, #004a99); border-radius: 14px; padding: 20px; margin-bottom: 14px; text-align: center; }
+    .ref-hero h3 { font-size: 18px; font-weight: 800; color: #fff; margin-bottom: 6px; }
+    .ref-hero p { font-size: 13px; color: rgba(255,255,255,0.75); }
+    .ref-pct { font-size: 44px; font-weight: 800; color: #fff; margin: 10px 0; }
+    .ref-link-box { background: #fff; border-radius: 10px; border: 1.5px solid #e2e8f0; padding: 12px 14px; display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+    .ref-link-box span { flex: 1; font-size: 12px; color: var(--primary); font-weight: 600; word-break: break-all; }
+    .btn-copy { padding: 8px 14px; background: var(--primary); color: #fff; border: none; border-radius: 8px; font-size: 12px; font-weight: 700; cursor: pointer; white-space: nowrap; font-family: 'Inter', sans-serif; }
+    .ref-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+    .ref-stat { background: #fff; border-radius: 12px; padding: 14px; box-shadow: var(--shadow); text-align: center; }
+    .ref-stat-val { font-size: 22px; font-weight: 800; color: var(--primary); }
+    .ref-stat-lbl { font-size: 11px; color: var(--muted); margin-top: 3px; }
+
+    /* ===== PASSWORD PANEL ===== */
+    .pass-input-wrap { position: relative; }
+    .pass-input-wrap svg.icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; color: #9ca3af; }
+    .pass-input-wrap input { width: 100%; padding: 12px 42px 12px 38px; border: 1.5px solid #e2e8f0; border-radius: 8px; font-size: 18px; font-weight: 800; color: var(--text); background: #fafbff; outline: none; font-family: 'Inter', sans-serif; letter-spacing: 6px; text-align: center; }
+    .pass-input-wrap input:focus { border-color: var(--primary); }
+    .pass-input-wrap .eye-btn { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: #9ca3af; display: flex; }
+    .pass-input-wrap .eye-btn svg { position: static; width: 16px; height: 16px; }
+
+    /* LOGOUT */
+    .logout-section { margin: 20px 16px 0; }
+    .btn-logout { width: 100%; padding: 14px; background: #fff; color: var(--red); border: 1.5px solid #fecaca; border-radius: 12px; font-size: 14px; font-weight: 700; cursor: pointer; font-family: 'Inter', sans-serif; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.25s; box-shadow: var(--shadow); }
+    .btn-logout:hover { background: var(--red); color: #fff; border-color: var(--red); }
+    .btn-logout svg { width: 18px; height: 18px; }
+
+    /* PROCESSING */
+    #processing-overlay { position: fixed; inset: 0; background: rgba(0,20,60,0.85); backdrop-filter: blur(8px); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; }
+    #processing-overlay.active { display: flex; }
+    #proc-logo { width: 80px; height: 80px; border-radius: 50%; object-fit: contain; animation: spin 1.2s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    #proc-text { margin-top: 16px; color: #fff; font-size: 14px; font-weight: 500; }
+
+    /* BOTTOM NAV */
+    .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; height: var(--nav-h); background: var(--card); display: flex; align-items: stretch; box-shadow: 0 -2px 16px rgba(0,0,0,0.1); z-index: 300; border-top: 1px solid #e8eaf0; }
+    .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; cursor: pointer; text-decoration: none; color: #9ca3af; border: none; background: none; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
+    .nav-item.active { color: var(--primary); }
+    .nav-item svg { width: 22px; height: 22px; }
+    .nav-item span { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+
+    /* TOAST */
+    #toast-container { position: fixed; top: 20px; right: 20px; z-index: 99999; display: flex; flex-direction: column; gap: 10px; max-width: 320px; width: calc(100% - 40px); }
+    .toast { display: flex; align-items: flex-start; gap: 12px; padding: 13px 15px; border-radius: 10px; border-left: 4px solid; backdrop-filter: blur(8px); box-shadow: 0 4px 16px rgba(0,0,0,0.12); cursor: pointer; animation: toast-in 0.4s cubic-bezier(0.16,1,0.3,1) forwards; }
+    .toast.removing { animation: toast-out 0.35s ease forwards; }
+    .toast.success { background: #dcfce7; border-color: #2b9348; }
+    .toast.error { background: #ffe4e2; border-color: #e53e3e; }
+    .toast.warning { background: #fff0db; border-color: #ed8936; }
+    .toast-icon svg { width: 20px; height: 20px; }
+    .toast.success .toast-icon svg { color: #2b9348; }
+    .toast.error .toast-icon svg { color: #e53e3e; }
+    .toast.warning .toast-icon svg { color: #ed8936; }
+    .toast-body { flex: 1; }
+    .toast-title { font-size: 13px; font-weight: 700; }
+    .toast-msg { font-size: 12px; color: var(--muted); margin-top: 2px; }
+    @keyframes toast-in { from { opacity: 0; transform: translateX(50px) scale(0.92); } to { opacity: 1; transform: translateX(0); } }
+    @keyframes toast-out { from { opacity: 1; } to { opacity: 0; transform: translateX(50px); } }
+
+    /* WA FLOAT */
+    #wa-float { position: fixed; bottom: 80px; right: 16px; z-index: 6666; cursor: grab; touch-action: none; user-select: none; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.25)); }
+    #wa-float img { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; transition: transform 0.2s; }
+    #wa-float:hover img { transform: scale(1.08); }
+  </style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="topbar-brand">
+    <img src="https://i.postimg.cc/xj5dhZdS/Background-Eraser-20260615-082032763.png" alt="Logo" />
+    <div>
+      <div class="topbar-title">Perfil</div>
+      <div class="topbar-sub">Gerir conta e operações</div>
+    </div>
+  </div>
+</div>
+
+<!-- PROFILE HERO -->
+<div class="profile-hero">
+  <div class="profile-hero-inner">
+    <div class="avatar-big" id="avatar-big">M</div>
+    <div class="profile-info">
+      <h2 id="profile-name">Carregando…</h2>
+      <p id="profile-email">—</p>
+      <div class="profile-badges">
+        <span class="pbadge id-red" id="profile-ref">ID: —</span>
+        <span class="pbadge">Investidor</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- BALANCE CARD -->
+<div class="balance-row">
+  <div class="balance-card">
+    <div class="bc-icon" style="background:#dbeafe;">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#007bff" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+    </div>
+    <div class="bc-lbl">Saldo Disponível</div>
+    <div class="bc-val" id="balance-saldo">—</div>
+  </div>
+</div>
+
+<!-- MENU -->
+<div class="menu-section">
+  <div class="menu-label">Operações</div>
+  <div class="menu-list">
+    <div class="menu-item" onclick="openPanel('panel-history')">
+      <div class="menu-icon" style="background:#dbeafe;"><svg viewBox="0 0 24 24" fill="none" stroke="#007bff" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+      <div class="menu-text"><div class="title">Histórico</div><div class="sub">Movimentos e transacções</div></div>
+      <div class="menu-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></div>
+    </div>
+    <div class="menu-item" onclick="openPanel('panel-withdraw')">
+      <div class="menu-icon" style="background:#ffe4e2;"><svg viewBox="0 0 24 24" fill="none" stroke="#e53e3e" stroke-width="2"><path d="M12 19V5M5 12l7-7 7 7"/></svg></div>
+      <div class="menu-text"><div class="title">Levantar Fundos</div><div class="sub">Solicitar levantamento</div></div>
+      <div class="menu-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></div>
+    </div>
+    <div class="menu-item" id="nav-depositar" onclick="openPanel('panel-deposit')">
+      <div class="menu-icon" style="background:#dcfce7;"><svg viewBox="0 0 24 24" fill="none" stroke="#2b9348" stroke-width="2"><path d="M12 5v14M5 12l7 7 7-7"/></svg></div>
+      <div class="menu-text"><div class="title">Carregar / Depositar</div><div class="sub">Adicionar saldo à conta</div></div>
+      <div class="menu-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></div>
+    </div>
+    <div class="menu-item" onclick="openPanel('panel-friends')">
+      <div class="menu-icon" style="background:#fce7f3;"><svg viewBox="0 0 24 24" fill="none" stroke="#db2777" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+      <div class="menu-text"><div class="title">Amigos / Referência</div><div class="sub">Convide e ganhe 10% de comissão</div></div>
+      <div class="menu-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></div>
+    </div>
+  </div>
+</div>
+
+<div class="menu-section" style="margin-top:12px;">
+  <div class="menu-label">Segurança</div>
+  <div class="menu-list">
+    <div class="menu-item" onclick="openPanel('panel-password')">
+      <div class="menu-icon" style="background:#f0fdf4;"><svg viewBox="0 0 24 24" fill="none" stroke="#2b9348" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
+      <div class="menu-text"><div class="title">Alterar Senha</div><div class="sub">Actualizar credenciais de acesso</div></div>
+      <div class="menu-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></div>
+    </div>
+  </div>
+</div>
+
+<div class="logout-section">
+  <button class="btn-logout" onclick="doLogout()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+    Terminar Sessão
+  </button>
+</div>
+
+<!-- ===== PANEL: HISTORY ===== -->
+<div class="panel" id="panel-history">
+  <div class="panel-header">
+    <button class="panel-back" onclick="closePanel('panel-history')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+    </button>
+    <div class="panel-title">Histórico de Movimentos</div>
+  </div>
+  <div class="panel-body">
+    <div class="filter-row">
+      <input type="date" class="filter-input" id="hist-from" />
+      <input type="date" class="filter-input" id="hist-to" />
+      <button class="filter-btn" onclick="filterHistory()">Filtrar</button>
+    </div>
+    <div class="tx-list" id="tx-list">
+      <div style="text-align:center;padding:32px;color:var(--muted);font-size:14px;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="40" height="40" style="margin-bottom:10px;color:#c7d2e0;display:block;margin-left:auto;margin-right:auto;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        A carregar histórico…
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== PANEL: WITHDRAW ===== -->
+<div class="panel" id="panel-withdraw">
+  <div class="panel-header">
+    <button class="panel-back" onclick="closePanel('panel-withdraw')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+    </button>
+    <div class="panel-title">Levantar Fundos</div>
+  </div>
+  <div class="panel-body" id="withdraw-body">
+    <!-- Filled dynamically -->
+  </div>
+</div>
+
+<!-- ===== PANEL: DEPOSIT ===== -->
+<div class="panel" id="panel-deposit">
+  <div class="panel-header">
+    <button class="panel-back" onclick="closePanel('panel-deposit')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+    </button>
+    <div class="panel-title">Carregar / Depositar</div>
+  </div>
+  <div class="panel-body">
+    <div class="deposit-illus">
+      <img src="https://i.postimg.cc/fyzxcgw3/deposito-em-dinheiro-em-caixa-eletronico-illustration-svg-download-png-12462556.png" alt="Depósito" />
+    </div>
+    <div class="deposit-tabs">
+      <button class="deposit-tab active" onclick="switchDepositTab('accounts')">Contas</button>
+      <button class="deposit-tab" onclick="switchDepositTab('comprovativo')">Comprovativo</button>
+      <button class="deposit-tab" onclick="switchDepositTab('instrucoes')">Instruções</button>
+    </div>
+
+    <!-- ACCOUNTS -->
+    <div class="deposit-section active" id="dep-accounts">
+      <div style="font-size:13px;color:var(--muted);margin-bottom:12px;line-height:1.6;">Escolha uma das contas abaixo e transfira o valor pretendido. Depois envie o comprovativo na aba seguinte.</div>
+      <div class="account-card">
+        <div class="account-name">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#007bff" stroke-width="2" width="18" height="18"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+          Banco BAI
+        </div>
+        <div id="bai-number" style="font-size:13px;color:var(--muted);filter:blur(5px);user-select:none;margin:8px 0;">0040.0000.5823.3661.1013.5</div>
+        <button class="btn-reveal" id="bai-btn" onclick="revealAccount('bai')">Ver Dados</button>
+        <div class="countdown-text" id="bai-countdown" style="display:none;"></div>
+      </div>
+      <div class="account-card">
+        <div class="account-name">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#2b9348" stroke-width="2" width="18" height="18"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+          Banco BFA
+        </div>
+        <div id="bfa-number" style="font-size:13px;color:var(--muted);filter:blur(5px);user-select:none;margin:8px 0;">0006.0000.9095.7416.3015.7</div>
+        <button class="btn-reveal" id="bfa-btn" onclick="revealAccount('bfa')">Ver Dados</button>
+        <div class="countdown-text" id="bfa-countdown" style="display:none;"></div>
+      </div>
+    </div>
+
+    <!-- COMPROVATIVO -->
+    <div class="deposit-section" id="dep-comprovativo">
+      <div class="input-group">
+        <label>Valor Depositado</label>
+        <div class="mask-wrap">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          <input type="text" id="dep-amount-input" placeholder="0.00" readonly />
+        </div>
+      </div>
+      <!-- Numpad for deposit -->
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:14px;">
+        <button onclick="depNumpad('1')" style="padding:12px;background:var(--bg);border:none;border-radius:10px;font-size:17px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;">1</button>
+        <button onclick="depNumpad('2')" style="padding:12px;background:var(--bg);border:none;border-radius:10px;font-size:17px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;">2</button>
+        <button onclick="depNumpad('3')" style="padding:12px;background:var(--bg);border:none;border-radius:10px;font-size:17px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;">3</button>
+        <button onclick="depNumpad('4')" style="padding:12px;background:var(--bg);border:none;border-radius:10px;font-size:17px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;">4</button>
+        <button onclick="depNumpad('5')" style="padding:12px;background:var(--bg);border:none;border-radius:10px;font-size:17px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;">5</button>
+        <button onclick="depNumpad('6')" style="padding:12px;background:var(--bg);border:none;border-radius:10px;font-size:17px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;">6</button>
+        <button onclick="depNumpad('7')" style="padding:12px;background:var(--bg);border:none;border-radius:10px;font-size:17px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;">7</button>
+        <button onclick="depNumpad('8')" style="padding:12px;background:var(--bg);border:none;border-radius:10px;font-size:17px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;">8</button>
+        <button onclick="depNumpad('9')" style="padding:12px;background:var(--bg);border:none;border-radius:10px;font-size:17px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;">9</button>
+        <button onclick="depNumpad('00')" style="padding:12px;background:var(--bg);border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;">00</button>
+        <button onclick="depNumpad('0')" style="padding:12px;background:var(--bg);border:none;border-radius:10px;font-size:17px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;">0</button>
+        <button onclick="depNumpadDel()" style="padding:12px;background:var(--bg);border:none;border-radius:10px;font-size:17px;cursor:pointer;display:flex;align-items:center;justify-content:center;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><path d="M21 4H8l-7 8 7 8h13a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"/><line x1="18" y1="9" x2="12" y2="15"/><line x1="12" y1="9" x2="18" y2="15"/></svg>
+        </button>
+      </div>
+      <label class="upload-zone" for="comp-upload" onclick="document.getElementById('comp-upload').click()">
+        <input type="file" id="comp-upload" accept="image/*" onchange="previewComprovativo(this)" />
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        <div class="uz-title">Carregar Comprovativo</div>
+        <div class="uz-sub">Toque para seleccionar a foto</div>
+      </label>
+      <img id="comp-preview" class="upload-preview" src="" alt="" />
+      <button class="btn-primary-full ready" onclick="submitDeposit()" style="background:var(--green);">Enviar Pedido de Depósito</button>
+    </div>
+
+    <!-- INSTRUCOES -->
+    <div class="deposit-section" id="dep-instrucoes">
+      <div class="info-steps">
+        <div class="step-item"><div class="step-num">1</div><div class="step-text"><strong>Escolha a conta</strong> — Vá ao separador "Contas" e clique em "Ver Dados" para revelar o IBAN da conta desejada (BAI ou BFA).</div></div>
+        <div class="step-item"><div class="step-num">2</div><div class="step-text"><strong>Faça a transferência</strong> — Transfira o valor desejado para a conta escolhida através do seu banco ou aplicação.</div></div>
+        <div class="step-item"><div class="step-num">3</div><div class="step-text"><strong>Envie o comprovativo</strong> — Tire uma foto ou screenshot do comprovativo de pagamento e envie no separador "Comprovativo".</div></div>
+        <div class="step-item"><div class="step-num">4</div><div class="step-text"><strong>Aguarde a aprovação</strong> — A nossa equipa irá verificar e aprovar o depósito em <strong>10 minutos a 1 hora</strong>. Receberá uma notificação assim que o saldo for creditado.</div></div>
+        <div class="step-item"><div class="step-num">5</div><div class="step-text"><strong>Valor mínimo</strong>: não existe valor mínimo definido. Transfira o valor que desejar investir.</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== PANEL: FRIENDS ===== -->
+<div class="panel" id="panel-friends">
+  <div class="panel-header">
+    <button class="panel-back" onclick="closePanel('panel-friends')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+    </button>
+    <div class="panel-title">Amigos e Referências</div>
+  </div>
+  <div class="panel-body">
+    <div class="ref-hero">
+      <div class="ref-pct">10%</div>
+      <h3>Ganhe por cada amigo!</h3>
+      <p>Convide amigos e receba 10% do valor do primeiro investimento de cada convidado.</p>
+    </div>
+
+    <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:10px;">Confirme antes de partilhar:</div>
+    <div class="check-list" id="friend-checks">
+      <label class="check-item"><input type="checkbox" onchange="checkFriendReady()" /><div class="custom-chk"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" width="11" height="11"><polyline points="20 6 9 17 4 12"/></svg></div><div class="check-text">Compreendo que a comissão de <strong>10%</strong> só é paga após o primeiro investimento activo do amigo convidado.</div></label>
+      <label class="check-item"><input type="checkbox" onchange="checkFriendReady()" /><div class="custom-chk"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" width="11" height="11"><polyline points="20 6 9 17 4 12"/></svg></div><div class="check-text">A comissão é creditada automaticamente na minha carteira após confirmação do investimento do convidado.</div></label>
+      <label class="check-item"><input type="checkbox" onchange="checkFriendReady()" /><div class="custom-chk"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" width="11" height="11"><polyline points="20 6 9 17 4 12"/></svg></div><div class="check-text">Não há limite de convidados — posso convidar quantas pessoas quiser.</div></label>
+    </div>
+
+    <div id="ref-link-section" style="display:none;">
+      <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:8px;">O seu link de convite:</div>
+      <div class="ref-link-box">
+        <span id="ref-link-display">—</span>
+        <button class="btn-copy" onclick="copyRefLink()">Copiar</button>
+      </div>
+      <div class="ref-stats">
+        <div class="ref-stat">
+          <div class="ref-stat-val" id="ref-total-invited">0</div>
+          <div class="ref-stat-lbl">Amigos Convidados</div>
+        </div>
+        <div class="ref-stat">
+          <div class="ref-stat-val" id="ref-total-earned">0.00</div>
+          <div class="ref-stat-lbl">Total Ganho</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== PANEL: PASSWORD ===== -->
+<div class="panel" id="panel-password">
+  <div class="panel-header">
+    <button class="panel-back" onclick="closePanel('panel-password')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+    </button>
+    <div class="panel-title">Alterar Senha</div>
+  </div>
+  <div class="panel-body">
+    <div style="background:#fff;border-radius:14px;padding:20px;box-shadow:var(--shadow);">
+      <div style="font-size:13px;color:var(--muted);line-height:1.65;margin-bottom:20px;">
+        Leia com atenção antes de alterar a sua senha de acesso. A senha deve ter exactamente <strong>6 dígitos numéricos</strong>. Após a alteração, será necessário fazer login novamente.
+      </div>
+      <div class="check-list" id="pass-checks">
+        <label class="check-item"><input type="checkbox" onchange="checkPassReady()" /><div class="custom-chk"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" width="11" height="11"><polyline points="20 6 9 17 4 12"/></svg></div><div class="check-text">Compreendo que a nova senha substituirá a senha actual.</div></label>
+        <label class="check-item"><input type="checkbox" onchange="checkPassReady()" /><div class="custom-chk"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" width="11" height="11"><polyline points="20 6 9 17 4 12"/></svg></div><div class="check-text">Não partilharei a minha senha com ninguém, incluindo a equipa da Mirae Asset.</div></label>
+      </div>
+      <div class="input-group" style="margin-bottom:14px;">
+        <label>Senha Actual</label>
+        <div class="pass-input-wrap">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          <input type="password" id="pass-current" placeholder="••••••" maxlength="6" inputmode="numeric" />
+          <button class="eye-btn" onclick="togglePassEye('pass-current', this)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
+      </div>
+      <div class="input-group" style="margin-bottom:14px;">
+        <label>Nova Senha (6 dígitos)</label>
+        <div class="pass-input-wrap">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          <input type="password" id="pass-new" placeholder="••••••" maxlength="6" inputmode="numeric" />
+          <button class="eye-btn" onclick="togglePassEye('pass-new', this)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
+      </div>
+      <div class="input-group" style="margin-bottom:20px;">
+        <label>Confirmar Nova Senha</label>
+        <div class="pass-input-wrap">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          <input type="password" id="pass-confirm" placeholder="••••••" maxlength="6" inputmode="numeric" />
+          <button class="eye-btn" onclick="togglePassEye('pass-confirm', this)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
+      </div>
+      <button class="btn-primary-full danger" id="pass-submit-btn" onclick="submitPasswordChange()">Alterar Senha</button>
+    </div>
+  </div>
+</div>
+
+<!-- PROCESSING -->
+<div id="processing-overlay">
+  <img id="proc-logo" src="https://i.postimg.cc/xj5dhZdS/Background-Eraser-20260615-082032763.png" alt="" />
+  <div id="proc-text">A processar…</div>
+</div>
+
+<!-- BOTTOM NAV -->
+<nav class="bottom-nav">
+  <a class="nav-item" href="index.html">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    <span>Início</span>
+  </a>
+  <a class="nav-item" href="mirae.html">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+    <span>Mirae</span>
+  </a>
+  <a class="nav-item" href="cotas.html">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+    <span>Cotas</span>
+  </a>
+  <a class="nav-item active" href="perfil.html">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    <span>Perfil</span>
+  </a>
+</nav>
+
+<div id="toast-container"></div>
+<div id="wa-float">
+  <a href="https://wa.me/937359561" target="_blank">
+    <img src="https://i.postimg.cc/0yTXYxhD/Background-Eraser-20260615-095636211.png" alt="Suporte" />
+  </a>
+</div>
+
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyDp02RqKrac4ogFRGDcJjPLpA2inOV2rsk",
+    authDomain: "pro-2c872.firebaseapp.com",
+    databaseURL: "https://pro-2c872-default-rtdb.firebaseio.com",
+    projectId: "pro-2c872",
+    storageBucket: "pro-2c872.firebasestorage.app",
+    messagingSenderId: "778229616930",
+    appId: "1:778229616930:web:b56177b322241b103ad57b"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  const db = firebase.firestore();
+
+  let currentUser = null;
+  let userData = {};
+  let allTransactions = [];
+  let withdrawRawAmount = 0;
+  let depRawAmount = 0;
+  let revealTimers = {};
+  let todayWithdrawCount = 0;
+  let pendingWithdraw = false;
+
+  // Checkbox style for friends/password
+  const checkStyle = document.createElement('style');
+  checkStyle.textContent = `
+    .check-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+    .check-item { display: flex; align-items: flex-start; gap: 10px; padding: 12px; background: #fff; border-radius: 10px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); cursor: pointer; }
+    .check-item input[type="checkbox"] { display: none; }
+    .custom-chk { width: 20px; height: 20px; border: 2px solid #c7d2e0; border-radius: 5px; background: #fff; display: flex; align-items: center; justify-content: center; transition: all 0.2s; flex-shrink: 0; margin-top: 1px; }
+    .check-item input:checked + .custom-chk { background: var(--green); border-color: var(--green); }
+    .check-item input:checked + .custom-chk svg { display: block; }
+    .custom-chk svg { display: none; }
+    .check-text { font-size: 12px; color: var(--muted); line-height: 1.55; flex: 1; }
+    .check-text strong { color: var(--text); }
+  `;
+  document.head.appendChild(checkStyle);
+
+  auth.onAuthStateChanged(async user => {
+    if (!user) { window.location.href = 'auth.html'; return; }
+    currentUser = user;
+    loadProfile();
+    loadTransactions();
+    if (window.location.hash === '#depositar') openPanel('panel-deposit');
+  });
+
+  function loadProfile() {
+    db.collection('users').doc(currentUser.uid).onSnapshot(snap => {
+      if (!snap.exists) return;
+      userData = snap.data();
+      const name = userData.name || currentUser.displayName || 'Utilizador';
+      document.getElementById('profile-name').textContent = name;
+      document.getElementById('profile-email').textContent = currentUser.email;
+      document.getElementById('avatar-big').textContent = name.charAt(0).toUpperCase();
+      document.getElementById('profile-ref').textContent = 'ID: ' + (userData.referralId || '—');
+      document.getElementById('balance-saldo').textContent = fmt(userData.saldo || 0);
+      const refLink = `${window.location.origin}/auth.html?ref=${userData.referralId || ''}`;
+      document.getElementById('ref-link-display').textContent = refLink;
+    });
+  }
+
+  async function loadTransactions() {
+    db.collection('transacoes').where('userId', '==', currentUser.uid)
+      .orderBy('data', 'desc').limit(50)
+      .onSnapshot(snap => {
+        allTransactions = [];
+        const today = new Date().toDateString();
+        todayWithdrawCount = 0; pendingWithdraw = false;
+        snap.forEach(doc => {
+          const d = doc.data();
+          allTransactions.push({ id: doc.id, ...d });
+          if (d.tipo === 'levantamento') {
+            const dt = d.data?.toDate ? d.data.toDate() : new Date();
+            if (dt.toDateString() === today) todayWithdrawCount++;
+            if (d.status === 'pendente') pendingWithdraw = true;
+          }
+        });
+        renderTransactions(allTransactions);
+      });
+    db.collection('referrals').where('inviterCode', '==', userData.referralId || '').get().then(snap => {
+      document.getElementById('ref-total-invited').textContent = snap.size;
+    }).catch(() => {});
+  }
+
+  function renderTransactions(txs) {
+    const list = document.getElementById('tx-list');
+    if (txs.length === 0) {
+      list.innerHTML = '<div style="text-align:center;padding:32px;color:var(--muted);font-size:13px;">Sem movimentos para o período seleccionado.</div>';
+      return;
+    }
+    const typeConfig = {
+      'deposito': { icon: 'deposit', label: 'Depósito', sign: '+' },
+      'levantamento': { icon: 'withdraw', label: 'Levantamento', sign: '-' },
+      'investimento': { icon: 'invest', label: 'Investimento', sign: '-' },
+      'compra-cotas': { icon: 'invest', label: 'Compra de Cotas', sign: '-' },
+      'resgate': { icon: 'resgate', label: 'Resgate', sign: '+' },
+      'resgate_comissao': { icon: 'deposit', label: 'Resgate de Comissão', sign: '+' },
+      'comissao': { icon: 'deposit', label: 'Comissão de Referência', sign: '+' }
+    };
+    const icons = {
+      deposit: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><path d="M12 5v14M5 12l7 7 7-7"/></svg>',
+      withdraw: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><path d="M12 19V5M5 12l7-7 7 7"/></svg>',
+      invest: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><rect x="2" y="7" width="20" height="14" rx="2"/></svg>',
+      resgate: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>'
+    };
+    list.innerHTML = txs.map(tx => {
+      const cfg = typeConfig[tx.tipo] || { icon: 'invest', label: tx.tipo || 'Transacção', sign: '' };
+      const dt = tx.data?.toDate ? tx.data.toDate() : new Date();
+      const dateStr = dt.toLocaleDateString('pt-PT', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+      const statusMap = { aprovado: 'ok', pendente: 'pending', rejeitado: 'fail', falha: 'fail' };
+      const statusLabel = { aprovado: 'Aprovado', pendente: 'Pendente', rejeitado: 'Rejeitado', falha: 'Falha' };
+      const isPos = cfg.sign === '+';
+      return `
+        <div class="tx-item">
+          <div class="tx-icon ${cfg.icon}">${icons[cfg.icon]}</div>
+          <div class="tx-info">
+            <div class="tx-desc">${cfg.label}</div>
+            <div class="tx-date">${dateStr}</div>
+            <span class="tx-status ${statusMap[tx.status] || 'pending'}">${statusLabel[tx.status] || 'Pendente'}</span>
+          </div>
+          <div class="tx-val ${isPos ? 'pos' : 'neg'}">${isPos ? '+' : '-'}${fmt(tx.valor || 0)}</div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  function filterHistory() {
+    const from = document.getElementById('hist-from').value;
+    const to = document.getElementById('hist-to').value;
+    let filtered = allTransactions;
+    if (from) filtered = filtered.filter(tx => { const d = tx.data?.toDate ? tx.data.toDate() : new Date(); return d >= new Date(from); });
+    if (to) filtered = filtered.filter(tx => { const d = tx.data?.toDate ? tx.data.toDate() : new Date(); return d <= new Date(to + 'T23:59:59'); });
+    renderTransactions(filtered);
+  }
+
+  // ===== WITHDRAW PANEL =====
+  function buildWithdrawPanel() {
+    const body = document.getElementById('withdraw-body');
+    db.collection('investimentos_usuarios').where('userId', '==', currentUser.uid).where('status', '==', 'ativo').get().then(snap => {
+      if (snap.empty) {
+        body.innerHTML = `
+          <div style="text-align:center;padding:40px 20px;display:flex;flex-direction:column;align-items:center;gap:16px;">
+            <div style="width:72px;height:72px;border-radius:20px;background:#ffe4e2;display:flex;align-items:center;justify-content:center;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#e53e3e" stroke-width="1.5" width="36" height="36"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
+            </div>
+            <div style="font-size:16px;font-weight:800;color:var(--text);">Sem Investimento Activo</div>
+            <div style="font-size:13px;color:var(--muted);line-height:1.65;max-width:280px;">Para solicitar um levantamento é necessário ter pelo menos um investimento em cotas activo na plataforma.</div>
+            <button onclick="window.location.href='mirae.html'" style="padding:12px 24px;background:var(--primary);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;">Ver Planos de Investimento</button>
+          </div>`;
+        return;
+      }
+      if (pendingWithdraw) {
+        body.innerHTML = `<div style="background:#fff;border-radius:12px;padding:16px;box-shadow:var(--shadow);margin-bottom:14px;"><div style="font-size:14px;font-weight:700;color:var(--orange);margin-bottom:6px;">Pedido Pendente</div><div style="font-size:13px;color:var(--muted);">Tem um pedido de levantamento em processamento. Aguarde a aprovação ou rejeição antes de submeter um novo pedido.</div></div>`;
+        return;
+      }
+      if (todayWithdrawCount >= 2) {
+        body.innerHTML = `<div style="background:#fff;border-radius:12px;padding:16px;box-shadow:var(--shadow);"><div style="font-size:14px;font-weight:700;color:var(--red);margin-bottom:6px;">Limite Diário Atingido</div><div style="font-size:13px;color:var(--muted);">Atingiu o limite de 2 pedidos de levantamento por dia. Tente novamente amanhã.</div></div>`;
+        return;
+      }
+      body.innerHTML = buildWithdrawForm();
+      initWithdrawForm();
+    });
+  }
+
+  function buildWithdrawForm() {
+    return `
+      <div class="input-group">
+        <label>Valor a Levantar</label>
+        <div class="mask-wrap">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          <input type="text" id="wd-amount" placeholder="0.00" readonly />
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:14px;">
+        <button onclick="wdNumpad('1')" style="padding:12px;background:var(--bg);border:none;border-radius:10px;font-size:17px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;">1</button>
+        <button onclick="wdNumpad('2')" style="padding:12px;background:var(--bg);border:none;border-radius:10px;font-size:17px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;">2</button>
+        <button onclick="wdNumpad('3')" style="padding:12px;background:var(--bg);border:none;border-radius:10px;font-size:17px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;">3</button>
+        <button onclick="wdNumpad('4')" style="padding:12px;background:var(--bg);border:none;border-radius:10px;font-size:17px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;">4</button>
+        <button onclick="wdNumpad('5')" style="padding:12px;background:var(--bg);border:none;border-radius:10px;font-size:17px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;">5</button>
+        <button onclick="wdNumpad('6')" style="padding:12px;background:var(--bg);border:none;border-radius:10px;font-size:17px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;">6</button>
+        <button onclick="wdNumpad('7')" style="padding:12px;background:var(--bg);border:none;border-radius:10px;font-size:17px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;">7</button>
+        <button onclick="wdNumpad('8')" style="padding:12px;background:var(--bg);border:none;border-radius:10px;font-size:17px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;">8</button>
+        <button onclick="wdNumpad('9')" style="padding:12px;background:var(--bg);border:none;border-radius:10px;font-size:17px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;">9</button>
+        <button onclick="wdNumpad('00')" style="padding:12px;background:var(--bg);border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;">00</button>
+        <button onclick="wdNumpad('0')" style="padding:12px;background:var(--bg);border:none;border-radius:10px;font-size:17px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;">0</button>
+        <button onclick="wdNumpadDel()" style="padding:12px;background:var(--bg);border:none;border-radius:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><path d="M21 4H8l-7 8 7 8h13a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"/><line x1="18" y1="9" x2="12" y2="15"/><line x1="12" y1="9" x2="18" y2="15"/></svg>
+        </button>
+      </div>
+      <div class="fee-calc" id="fee-calc">
+        <div class="fee-row"><span class="fee-lbl">Valor solicitado</span><span class="fee-val" id="fc-valor">—</span></div>
+        <div class="fee-row"><span class="fee-lbl">Taxa de Admissão (7%)</span><span class="fee-val red" id="fc-admissao">—</span></div>
+        <div class="fee-row"><span class="fee-lbl">Juros da Empresa (7%)</span><span class="fee-val red" id="fc-juros">—</span></div>
+        <div class="fee-row"><span class="fee-lbl">Manutenção (1%)</span><span class="fee-val red" id="fc-manutencao">—</span></div>
+        <div class="fee-row"><span class="fee-lbl">Banco (1%)</span><span class="fee-val red" id="fc-banco">—</span></div>
+        <div class="fee-row"><span class="fee-lbl"><strong>Valor líquido a receber</strong></span><span class="fee-val total" id="fc-liquido">—</span></div>
+      </div>
+      <div class="input-group" style="margin-bottom:14px;">
+        <label>IBAN / Conta Bancária Destino</label>
+        <div class="mask-wrap">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+          <input type="text" id="wd-iban" placeholder="0000.0000.0000.0000.0000.0" style="font-size:13px;font-weight:600;letter-spacing:1px;text-align:left;padding-left:38px;" />
+        </div>
+      </div>
+      <button class="btn-primary-full danger ready" id="wd-submit-btn" onclick="submitWithdraw()" style="opacity:1;pointer-events:auto;">Solicitar Levantamento</button>
+      <div style="text-align:center;margin-top:8px;font-size:11px;color:var(--muted);">Saldo disponível: <strong id="wd-saldo-disp">${fmt(userData.saldo || 0)}</strong></div>
+    `;
+  }
+
+  function initWithdrawForm() { withdrawRawAmount = 0; }
+
+  function wdNumpad(d) {
+    withdrawRawAmount = withdrawRawAmount * 10 + parseInt(d === '00' ? '0' : d);
+    if (d === '00') withdrawRawAmount = withdrawRawAmount * 10;
+    updateWdDisplay();
+  }
+  function wdNumpadDel() { withdrawRawAmount = Math.floor(withdrawRawAmount / 10); updateWdDisplay(); }
+  function updateWdDisplay() {
+    const v = withdrawRawAmount / 100;
+    const inp = document.getElementById('wd-amount');
+    if (inp) inp.value = v.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    updateFeeCalc(v);
+  }
+  function updateFeeCalc(v) {
+    const fc = id => document.getElementById(id);
+    if (!fc('fc-valor')) return;
+    if (v <= 0) { ['fc-valor','fc-admissao','fc-juros','fc-manutencao','fc-banco','fc-liquido'].forEach(id => { if(fc(id)) fc(id).textContent = '—'; }); return; }
+    const adm = v * 0.07, juros = v * 0.07, man = v * 0.01, banco = v * 0.01;
+    const liquido = v - adm - juros - man - banco;
+    fc('fc-valor').textContent = fmt(v);
+    fc('fc-admissao').textContent = '-' + fmt(adm);
+    fc('fc-juros').textContent = '-' + fmt(juros);
+    fc('fc-manutencao').textContent = '-' + fmt(man);
+    fc('fc-banco').textContent = '-' + fmt(banco);
+    fc('fc-liquido').textContent = fmt(Math.max(liquido, 0));
+    fc('fc-liquido').style.color = liquido > 0 ? 'var(--green)' : 'var(--red)';
+  }
+
+  async function submitWithdraw() {
+    const v = withdrawRawAmount / 100;
+    const iban = (document.getElementById('wd-iban')?.value || '').trim();
+    if (v < 1) { showToast('warning', 'Valor inválido', 'O valor mínimo de levantamento é 1.00'); return; }
+    if (v > (userData.saldo || 0)) { showToast('error', 'Saldo insuficiente', 'O valor solicitado excede o saldo disponível.'); return; }
+    if (!iban) { showToast('warning', 'IBAN necessário', 'Introduza o IBAN da conta de destino.'); return; }
+    document.getElementById('processing-overlay').classList.add('active');
+    try {
+      const liquido = v * 0.84;
+      
+      // Debitar o saldo imediatamente
+      await db.collection('users').doc(currentUser.uid).update({
+        saldo: firebase.firestore.FieldValue.increment(-v)
+      });
+
+      await db.collection('levantamentos').add({
+        userId: currentUser.uid, valorSolicitado: v,
+        valorLiquido: liquido, iban,
+        taxas: { admissao: v*0.07, juros: v*0.07, manutencao: v*0.01, banco: v*0.01 },
+        status: 'pendente',
+        data: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      await db.collection('transacoes').add({
+        userId: currentUser.uid, tipo: 'levantamento',
+        valor: v, descricao: 'Pedido de levantamento', status: 'pendente',
+        data: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      
+      // Atualizar saldo local
+      userData.saldo = (userData.saldo || 0) - v;
+      document.getElementById('balance-saldo').textContent = fmt(userData.saldo);
+      
+      document.getElementById('processing-overlay').classList.remove('active');
+      showToast('success', 'Pedido enviado!', `Levantamento de ${fmt(v)} submetido. Saldo debitado. Aguarde processamento.`);
+      closePanel('panel-withdraw');
+    } catch(e) {
+      document.getElementById('processing-overlay').classList.remove('active');
+      showToast('error', 'Erro', 'Não foi possível submeter o pedido.');
+    }
+  }
+
+  // ===== DEPOSIT =====
+  function switchDepositTab(tab) {
+    document.querySelectorAll('.deposit-tab').forEach((b, i) => b.classList.toggle('active', ['accounts','comprovativo','instrucoes'][i] === tab));
+    document.querySelectorAll('.deposit-section').forEach(s => s.classList.remove('active'));
+    document.getElementById('dep-' + tab).classList.add('active');
+  }
+
+  function revealAccount(bank) {
+    const num = document.getElementById(bank + '-number');
+    const btn = document.getElementById(bank + '-btn');
+    const countdown = document.getElementById(bank + '-countdown');
+    if (revealTimers[bank]) return;
+    num.style.filter = 'none';
+    btn.disabled = true;
+    let secs = 10;
+    countdown.style.display = 'block';
+    countdown.textContent = `Disponível novamente em ${secs}s`;
+    revealTimers[bank] = setInterval(() => {
+      secs--;
+      if (secs <= 0) {
+        clearInterval(revealTimers[bank]); revealTimers[bank] = null;
+        num.style.filter = 'blur(5px)';
+        btn.disabled = false;
+        countdown.style.display = 'none';
+        btn.textContent = 'Ver Dados';
+      } else {
+        countdown.textContent = `Disponível novamente em ${secs}s`;
+      }
+    }, 1000);
+  }
+
+  function depNumpad(d) {
+    depRawAmount = depRawAmount * 10 + parseInt(d === '00' ? '0' : d);
+    if (d === '00') depRawAmount = depRawAmount * 10;
+    const v = (depRawAmount / 100).toFixed(2);
+    const inp = document.getElementById('dep-amount-input');
+    if (inp) inp.value = parseFloat(v).toLocaleString('pt-PT', { minimumFractionDigits: 2 });
+  }
+  function depNumpadDel() {
+    depRawAmount = Math.floor(depRawAmount / 10);
+    const inp = document.getElementById('dep-amount-input');
+    if (inp) inp.value = (depRawAmount / 100).toFixed(2);
+  }
+
+  function previewComprovativo(input) {
+    if (input.files && input.files[0]) {
+      const reader = new FileReader();
+      reader.onload = e => {
+        const prev = document.getElementById('comp-preview');
+        prev.src = e.target.result;
+        prev.style.display = 'block';
+      };
+      reader.readAsDataURL(input.files[0]);
+    }
+  }
+
+  async function submitDeposit() {
+    const v = depRawAmount / 100;
+    if (v <= 0) { showToast('warning', 'Valor necessário', 'Introduza o valor depositado.'); return; }
+    const file = document.getElementById('comp-upload').files[0];
+    document.getElementById('processing-overlay').classList.add('active');
+    try {
+      await db.collection('depositos').add({
+        userId: currentUser.uid, valor: v,
+        status: 'pendente', comprovativo: file ? file.name : null,
+        data: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      await db.collection('transacoes').add({
+        userId: currentUser.uid, tipo: 'deposito', valor: v,
+        descricao: 'Pedido de depósito', status: 'pendente',
+        data: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      document.getElementById('processing-overlay').classList.remove('active');
+      showToast('success', 'Pedido enviado!', `Depósito de ${fmt(v)} submetido. Será aprovado em 10min–1h.`);
+      closePanel('panel-deposit');
+    } catch(e) {
+      document.getElementById('processing-overlay').classList.remove('active');
+      showToast('error', 'Erro', 'Não foi possível enviar o pedido.');
+    }
+  }
+
+  // ===== FRIENDS =====
+  function checkFriendReady() {
+    const checks = document.querySelectorAll('#friend-checks input[type=checkbox]');
+    const all = Array.from(checks).every(c => c.checked);
+    document.getElementById('ref-link-section').style.display = all ? 'block' : 'none';
+  }
+
+  function copyRefLink() {
+    const link = document.getElementById('ref-link-display').textContent;
+    navigator.clipboard.writeText(link).then(() => showToast('success', 'Copiado!', 'Link de convite copiado para a área de transferência.')).catch(() => showToast('warning', 'Copie manualmente', link));
+  }
+
+  // ===== PASSWORD =====
+  function checkPassReady() {
+    const checks = document.querySelectorAll('#pass-checks input[type=checkbox]');
+    const all = Array.from(checks).every(c => c.checked);
+    const btn = document.getElementById('pass-submit-btn');
+    btn.classList.toggle('ready', all);
+  }
+
+  function togglePassEye(inputId, btn) {
+    const inp = document.getElementById(inputId);
+    inp.type = inp.type === 'password' ? 'text' : 'password';
+  }
+
+  async function submitPasswordChange() {
+    const cur = document.getElementById('pass-current').value;
+    const nw = document.getElementById('pass-new').value;
+    const cf = document.getElementById('pass-confirm').value;
+    if (!/^\d{6}$/.test(nw)) { showToast('error', 'Senha inválida', 'A nova senha deve ter exactamente 6 dígitos numéricos.'); return; }
+    if (nw !== cf) { showToast('error', 'Senhas diferentes', 'A nova senha e a confirmação não coincidem.'); return; }
+    document.getElementById('processing-overlay').classList.add('active');
+    try {
+      const cred = firebase.auth.EmailAuthProvider.credential(currentUser.email, cur);
+      await currentUser.reauthenticateWithCredential(cred);
+      await currentUser.updatePassword(nw);
+      document.getElementById('processing-overlay').classList.remove('active');
+      showToast('success', 'Senha alterada!', 'A sua senha foi actualizada com sucesso.');
+      closePanel('panel-password');
+    } catch(e) {
+      document.getElementById('processing-overlay').classList.remove('active');
+      if (e.code === 'auth/wrong-password') showToast('error', 'Senha actual incorrecta', 'Verifique a senha actual e tente novamente.');
+      else showToast('error', 'Erro', 'Não foi possível alterar a senha.');
+    }
+  }
+
+  // ===== PANEL CONTROLS =====
+  function openPanel(id) {
+    document.getElementById(id).classList.add('open');
+    document.body.style.overflow = 'hidden';
+    if (id === 'panel-history') loadTransactions();
+    if (id === 'panel-withdraw') buildWithdrawPanel();
+  }
+  function closePanel(id) {
+    document.getElementById(id).classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  // ===== LOGOUT =====
+  async function doLogout() {
+    if (!confirm('Tem a certeza que pretende terminar a sessão?')) return;
+    await auth.signOut();
+    window.location.href = 'auth.html';
+  }
+
+  // ===== UTILS =====
+  function fmt(v) { return parseFloat(v || 0).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, '.'); }
+
+  function showToast(type, title, msg) {
+    const icons = {
+      success: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="20" height="20"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>',
+      error: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="20" height="20"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>',
+      warning: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="20" height="20"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>'
+    };
+    const t = document.createElement('div');
+    t.className = `toast ${type}`;
+    t.innerHTML = `<div class="toast-icon">${icons[type]}</div><div class="toast-body"><div class="toast-title">${title}</div><div class="toast-msg">${msg}</div></div>`;
+    t.onclick = () => { t.classList.add('removing'); setTimeout(() => t.remove(), 380); };
+    document.getElementById('toast-container').appendChild(t);
+    setTimeout(() => { t.classList.add('removing'); setTimeout(() => t.remove(), 380); }, 5000);
+  }
+
+  // Draggable WA
+  const wa = document.getElementById('wa-float');
+  wa.addEventListener('mousedown', e => {
+    const r = wa.getBoundingClientRect(); let il = r.left, it = r.top, sx = e.clientX, sy = e.clientY;
+    wa.style.cssText = `position:fixed;right:auto;bottom:auto;left:${il}px;top:${it}px;z-index:6666;`;
+    document.onmousemove = ev => { wa.style.left=(il+ev.clientX-sx)+'px'; wa.style.top=(it+ev.clientY-sy)+'px'; };
+    document.onmouseup = () => document.onmousemove = null;
+  });
+</script>
+</body>
+</html>

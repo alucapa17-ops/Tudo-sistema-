@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mirae Asset — Acesso</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --primary: #007bff; --primary-dark: #0056b3;
+      --bg: #f4f4f7; --card: #ffffff; --text: #333; --muted: #555;
+      --radius: 8px; --shadow: 0 4px 10px rgba(0,0,0,0.12);
+      --green: #2b9348; --red: #e53e3e; --orange: #f97316;
+    }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); min-height: 100vh; overflow-x: hidden; color: var(--text); }
+
+    /* ===== SPLASH ===== */
+    #splash {
+      position: fixed; inset: 0;
+      background: linear-gradient(135deg, #002f6c 0%, #004a99 50%, #0066cc 100%);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      z-index: 9999; transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    #splash.fade-out { opacity: 0; transform: translateY(-30px); pointer-events: none; }
+    #splash-logo { width: 150px; height: 150px; border-radius: 50%; object-fit: contain; animation: pulse 2s ease-in-out infinite; filter: drop-shadow(0 0 30px rgba(0,123,255,0.5)); }
+    @keyframes pulse { 0%,100%{transform:scale(1);opacity:1} 50%{transform:scale(1.06);opacity:0.9} }
+    #splash-title { margin-top: 22px; font-size: 26px; font-weight: 800; color: #fff; letter-spacing: 1px; }
+    #splash-sub { margin-top: 6px; font-size: 12px; color: rgba(255,255,255,0.6); letter-spacing: 2px; text-transform: uppercase; }
+    #splash-bar { margin-top: 36px; width: 180px; height: 3px; background: rgba(255,255,255,0.15); border-radius: 10px; overflow: hidden; }
+    #splash-fill { height: 100%; background: linear-gradient(90deg,#007bff,#00c6ff); border-radius: 10px; animation: bar 3.4s ease forwards; }
+    @keyframes bar { from{width:0%} to{width:100%} }
+
+    /* ===== PROCESSING ===== */
+    #proc-overlay {
+      position: fixed; inset: 0; background: rgba(0,20,60,0.88);
+      backdrop-filter: blur(8px); z-index: 8888;
+      display: none; flex-direction: column; align-items: center; justify-content: center;
+    }
+    #proc-overlay.on { display: flex; }
+    #proc-logo { width: 88px; height: 88px; border-radius: 50%; object-fit: contain; animation: spin 1.1s linear infinite; }
+    @keyframes spin { to{transform:rotate(360deg)} }
+    #proc-txt { margin-top: 18px; color: #fff; font-size: 15px; font-weight: 500; }
+
+    /* ===== AUTH PAGE ===== */
+    #auth-page {
+      min-height: 100vh; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; padding: 20px;
+      opacity: 0; transform: translateY(20px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+    #auth-page.show { opacity: 1; transform: translateY(0); }
+
+    .auth-logo { text-align: center; margin-bottom: 24px; }
+    .auth-logo img { width: 58px; height: 58px; border-radius: 50%; object-fit: contain; margin-bottom: 10px; display: block; margin-left: auto; margin-right: auto; }
+    .auth-logo h1 { font-size: 22px; font-weight: 800; color: #002f6c; }
+    .auth-logo p { font-size: 12px; color: var(--muted); margin-top: 3px; }
+
+    .auth-card { width: 100%; max-width: 420px; background: var(--card); border-radius: 16px; box-shadow: var(--shadow); overflow: hidden; }
+
+    /* TABS */
+    .tab-row { display: flex; border-bottom: 1px solid #e8eaf0; }
+    .tab-btn {
+      flex: 1; padding: 15px; background: none; border: none; cursor: pointer;
+      font-size: 14px; font-weight: 600; color: var(--muted);
+      transition: color 0.2s; position: relative; font-family: 'Inter', sans-serif;
+    }
+    .tab-btn.active { color: var(--primary); }
+    .tab-btn.active::after { content: ''; position: absolute; bottom: 0; left: 16px; right: 16px; height: 2px; background: var(--primary); border-radius: 2px; }
+
+    .tab-pane { display: none; padding: 24px; }
+    .tab-pane.active { display: block; }
+
+    /* FORM */
+    .fg { margin-bottom: 16px; }
+    .fg > label { display: block; font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+    .iw { position: relative; display: flex; align-items: center; }
+    .iw > svg.fi { position: absolute; left: 13px; width: 17px; height: 17px; color: #9ca3af; pointer-events: none; flex-shrink: 0; }
+    .iw input { width: 100%; padding: 12px 12px 12px 40px; border: 1.5px solid #e2e8f0; border-radius: var(--radius); font-size: 14px; color: var(--text); background: #fafbff; outline: none; font-family: 'Inter', sans-serif; transition: border-color 0.2s, box-shadow 0.2s; }
+    .iw input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(0,123,255,0.1); background: #fff; }
+    .iw .eye { position: absolute; right: 11px; background: none; border: none; cursor: pointer; color: #9ca3af; display: flex; align-items: center; padding: 4px; }
+    .iw .eye svg { width: 16px; height: 16px; }
+
+    /* PIN style */
+    .pin-inp { letter-spacing: 8px !important; font-size: 18px !important; font-weight: 800 !important; text-align: center; }
+
+    /* Strength bar */
+    .str-bar { margin-top: 6px; height: 4px; background: #e2e8f0; border-radius: 4px; overflow: hidden; }
+    .str-fill { height: 100%; width: 0%; border-radius: 4px; transition: width 0.3s, background 0.3s; }
+    .str-lbl { font-size: 11px; color: var(--muted); margin-top: 3px; }
+
+    /* Error */
+    .err { font-size: 11px; color: var(--red); margin-top: 5px; display: none; }
+    .err.show { display: block; }
+
+    /* Checkbox */
+    .chk-wrap { display: flex; align-items: center; gap: 8px; cursor: pointer; margin-bottom: 14px; }
+    .chk-wrap input { display: none; }
+    .chk-box { width: 20px; height: 20px; border: 2px solid #c7d2e0; border-radius: 5px; background: #fff; display: flex; align-items: center; justify-content: center; transition: all 0.2s; flex-shrink: 0; }
+    .chk-wrap input:checked ~ .chk-box { background: var(--primary); border-color: var(--primary); }
+    .chk-box svg { display: none; }
+    .chk-wrap input:checked ~ .chk-box svg { display: block; }
+    .chk-lbl { font-size: 13px; color: var(--muted); }
+
+    /* Buttons */
+    .btn-main { width: 100%; padding: 13px; background: var(--primary); color: #fff; border: none; border-radius: var(--radius); font-size: 15px; font-weight: 700; cursor: pointer; font-family: 'Inter', sans-serif; transition: background 0.2s, transform 0.15s; margin-top: 4px; }
+    .btn-main:hover { background: var(--primary-dark); }
+    .btn-main:active { transform: scale(0.98); }
+
+    .divider { display: flex; align-items: center; gap: 10px; color: #c7d2e0; font-size: 12px; margin: 18px 0; }
+    .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: #e8eaf0; }
+
+    .btn-google { width: 100%; padding: 11px; background: #fafbff; border: 1.5px solid #e2e8f0; border-radius: var(--radius); font-size: 13px; font-weight: 600; color: var(--text); cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; font-family: 'Inter', sans-serif; transition: background 0.2s; }
+    .btn-google:hover { background: #f0f4ff; }
+    .btn-google svg { width: 18px; height: 18px; }
+
+    .form-footer { text-align: center; margin-top: 16px; font-size: 13px; color: var(--muted); }
+    .form-footer span { color: var(--primary); cursor: pointer; font-weight: 600; }
+    .form-footer span:hover { text-decoration: underline; }
+
+    .forgot-link { text-align: right; margin-bottom: 14px; }
+    .forgot-link span { font-size: 12px; color: var(--primary); cursor: pointer; font-weight: 600; }
+
+    .secure-note { display: flex; align-items: center; justify-content: center; gap: 5px; margin-top: 18px; font-size: 11px; color: #9ca3af; }
+    .secure-note svg { width: 13px; height: 13px; color: var(--green); }
+
+    /* ===== TERMS MODAL ===== */
+    #terms-overlay {
+      position: fixed; inset: 0; background: rgba(0,20,60,0.72);
+      backdrop-filter: blur(8px); z-index: 7777;
+      display: none; align-items: center; justify-content: center; padding: 16px;
+    }
+    #terms-overlay.on { display: flex; }
+    .terms-box { width: 100%; max-width: 480px; background: #fff; border-radius: 16px; display: flex; flex-direction: column; max-height: 92vh; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.25); }
+    .terms-head { padding: 18px 22px; background: linear-gradient(135deg,#002f6c,#004a99); border-radius: 16px 16px 0 0; }
+    .terms-head h2 { font-size: 17px; font-weight: 700; color: #fff; }
+    .terms-head p { font-size: 12px; color: rgba(255,255,255,0.65); margin-top: 3px; }
+    .terms-body { flex: 1; overflow-y: auto; padding: 18px 22px; font-size: 13px; line-height: 1.75; color: #444; }
+    .terms-body h3 { font-size: 13px; font-weight: 700; color: #002f6c; margin: 16px 0 5px; }
+    .terms-body p { margin-bottom: 9px; }
+    .terms-scroll-hint { padding: 8px 22px; font-size: 12px; color: var(--orange); font-weight: 600; border-top: 1px solid #e8eaf0; display: flex; align-items: center; gap: 6px; }
+    .terms-scroll-hint svg { width: 14px; height: 14px; flex-shrink: 0; }
+    .terms-foot { padding: 14px 22px; border-top: 1px solid #e8eaf0; display: flex; gap: 10px; align-items: center; justify-content: space-between; }
+    .btn-cancel { padding: 11px 18px; background: none; border: 1.5px solid #e2e8f0; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; color: var(--muted); font-family: 'Inter', sans-serif; }
+    #terms-ok { padding: 11px 22px; background: var(--primary); color: #fff; border: none; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; font-family: 'Inter', sans-serif; opacity: 0.35; pointer-events: none; transition: opacity 0.3s; }
+    #terms-ok.unlocked { opacity: 1; pointer-events: auto; }
+    #terms-ok.unlocked:hover { background: var(--primary-dark); }
+
+    /* ===== TOAST ===== */
+    #toasts { position: fixed; top: 18px; right: 16px; z-index: 99999; display: flex; flex-direction: column; gap: 9px; max-width: 330px; width: calc(100% - 32px); }
+    .toast { display: flex; align-items: flex-start; gap: 11px; padding: 13px 14px; border-radius: 10px; border-left: 4px solid; backdrop-filter: blur(8px); box-shadow: 0 4px 16px rgba(0,0,0,0.12); cursor: pointer; animation: tin 0.38s cubic-bezier(0.16,1,0.3,1) forwards; position: relative; overflow: hidden; }
+    .toast.out { animation: tout 0.32s ease forwards; }
+    .toast.success { background: #dcfce7; border-color: var(--green); }
+    .toast.error   { background: #ffe4e2; border-color: var(--red); }
+    .toast.warning { background: #fff0db; border-color: var(--orange); }
+    .toast-ico svg { width: 19px; height: 19px; }
+    .toast.success .toast-ico svg { color: var(--green); }
+    .toast.error   .toast-ico svg { color: var(--red); }
+    .toast.warning .toast-ico svg { color: var(--orange); }
+    .toast-b { flex: 1; }
+    .toast-ttl { font-size: 13px; font-weight: 700; color: var(--text); }
+    .toast-msg { font-size: 12px; color: var(--muted); margin-top: 2px; line-height: 1.4; }
+    .toast-prog { position: absolute; bottom: 0; left: 0; height: 2px; animation: prog 5s linear forwards; border-radius: 0 0 6px 6px; }
+    .toast.success .toast-prog { background: var(--green); }
+    .toast.error   .toast-prog { background: var(--red); }
+    .toast.warning .toast-prog { background: var(--orange); }
+    @keyframes tin  { from{opacity:0;transform:translateX(55px) scale(0.93);filter:blur(4px)} to{opacity:1;transform:translateX(0) scale(1);filter:blur(0)} }
+    @keyframes tout { from{opacity:1;transform:translateX(0)}  to{opacity:0;transform:translateX(55px);filter:blur(4px)} }
+    @keyframes prog { from{width:100%} to{width:0%} }
+
+    /* ===== WA FLOAT ===== */
+    #wa { position: fixed; bottom: 26px; right: 18px; z-index: 6666; cursor: grab; touch-action: none; user-select: none; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.25)); }
+    #wa img { width: 52px; height: 52px; border-radius: 50%; object-fit: cover; transition: transform 0.2s; display: block; }
+    #wa:hover img { transform: scale(1.08); }
+  </style>
+</head>
+<body>
+
+<!-- SPLASH -->
+<div id="splash">
+  <img id="splash-logo" src="https://i.postimg.cc/xj5dhZdS/Background-Eraser-20260615-082032763.png" alt="Mirae" />
+  <div id="splash-title">Mirae Asset</div>
+  <div id="splash-sub">Investimentos de Longo Prazo</div>
+  <div id="splash-bar"><div id="splash-fill"></div></div>
+</div>
+
+<!-- PROCESSING -->
+<div id="proc-overlay">
+  <img id="proc-logo" src="https://i.postimg.cc/xj5dhZdS/Background-Eraser-20260615-082032763.png" alt="" />
+  <div id="proc-txt">A processar, aguarde…</div>
+</div>
+
+<!-- AUTH PAGE -->
+<div id="auth-page">
+  <div class="auth-logo">
+    <img src="https://i.postimg.cc/xj5dhZdS/Background-Eraser-20260615-082032763.png" alt="Logo" />
+    <h1>Mirae Asset</h1>
+    <p>Plataforma de Investimentos Inteligentes</p>
+  </div>
+
+  <div class="auth-card">
+    <div class="tab-row">
+      <button class="tab-btn active" onclick="switchTab('login')">Entrar</button>
+      <button class="tab-btn" onclick="switchTab('register')">Criar Conta</button>
+    </div>
+
+    <!-- LOGIN -->
+    <div id="pane-login" class="tab-pane active">
+      <div class="fg">
+        <label>E-mail</label>
+        <div class="iw">
+          <svg class="fi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+          <input type="email" id="l-email" placeholder="seu@email.com" autocomplete="email" />
+        </div>
+        <div class="err" id="l-email-err">Por favor insira um e-mail válido.</div>
+      </div>
+      <div class="fg">
+        <label>Senha</label>
+        <div class="iw">
+          <svg class="fi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          <input type="password" id="l-pass" placeholder="••••••" autocomplete="current-password" />
+          <button class="eye" type="button" onclick="toggleEye('l-pass',this)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
+        <div class="err" id="l-pass-err">Credenciais incorrectas. Tente novamente.</div>
+      </div>
+      <div class="forgot-link">
+        <span onclick="doForgot()">Esqueci a minha senha</span>
+      </div>
+      <button class="btn-main" id="btn-login" onclick="doLogin()">Entrar na Plataforma</button>
+      <div class="divider">ou</div>
+      <button class="btn-google" onclick="doGoogle()">
+        <svg viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+        Continuar com Google
+      </button>
+      <div class="secure-note">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        Conexão segura SSL/TLS
+      </div>
+    </div>
+
+    <!-- REGISTER -->
+    <div id="pane-register" class="tab-pane">
+      <div class="fg">
+        <label>Nome / Apelido</label>
+        <div class="iw">
+          <svg class="fi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          <input type="text" id="r-name" placeholder="O seu nome completo" autocomplete="name" />
+        </div>
+        <div class="err" id="r-name-err">O nome é obrigatório.</div>
+      </div>
+      <div class="fg">
+        <label>E-mail</label>
+        <div class="iw">
+          <svg class="fi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+          <input type="email" id="r-email" placeholder="seu@email.com" autocomplete="email" />
+        </div>
+        <div class="err" id="r-email-err">E-mail inválido ou já em uso.</div>
+      </div>
+      <div class="fg">
+        <label>Senha (6 dígitos numéricos)</label>
+        <div class="iw">
+          <svg class="fi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          <input type="password" id="r-pass" class="pin-inp" placeholder="••••••" maxlength="6" inputmode="numeric" autocomplete="new-password" oninput="checkStrength(this.value)" />
+          <button class="eye" type="button" onclick="toggleEye('r-pass',this)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
+        <div class="str-bar"><div class="str-fill" id="str-fill"></div></div>
+        <div class="str-lbl" id="str-lbl"></div>
+        <div class="err" id="r-pass-err">A senha deve ter exactamente 6 dígitos numéricos.</div>
+      </div>
+
+      <!-- INVITE -->
+      <label class="chk-wrap" id="invite-chk-wrap">
+        <input type="checkbox" id="invited-chk" onchange="toggleInvite(this)" />
+        <div class="chk-box"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" width="11" height="11"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <span class="chk-lbl">Fui convidado por alguém</span>
+      </label>
+
+      <div class="fg" id="invite-fg" style="display:none;">
+        <label>Código de Convite</label>
+        <div class="iw">
+          <svg class="fi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+          <input type="text" id="r-invite" placeholder="Preenchido automaticamente" readonly style="background:#f0f4ff;color:var(--primary);font-weight:600;" />
+        </div>
+      </div>
+
+      <button class="btn-main" id="btn-register" onclick="doRegister()">Prosseguir e Criar Conta</button>
+      <div class="form-footer">Já tem conta? <span onclick="switchTab('login')">Entrar</span></div>
+    </div>
+  </div>
+
+  <div class="secure-note" style="margin-top:14px;">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+    Dados protegidos pela Mirae Asset · Política de Privacidade
+  </div>
+</div>
+
+<!-- TERMS MODAL (only for REGISTER) -->
+<div id="terms-overlay">
+  <div class="terms-box">
+    <div class="terms-head">
+      <h2>Termos e Condições de Uso</h2>
+      <p>Leia até ao final para criar a sua conta</p>
+    </div>
+    <div class="terms-body" id="terms-body" onscroll="onTermsScroll(this)">
+      <h3>1. Aceitação dos Termos</h3>
+      <p>Ao criar uma conta na plataforma Mirae Asset, o utilizador declara ter lido, compreendido e concordado com todos os termos e condições aqui estabelecidos. Estes Termos constituem um acordo legal vinculativo entre o utilizador e a Mirae Asset.</p>
+      <h3>2. Elegibilidade e Cadastro</h3>
+      <p>Para utilizar os serviços da Mirae Asset, o utilizador deve ser maior de 18 anos de idade, possuir capacidade civil plena e fornecer informações verdadeiras e completas durante o processo de registo. O utilizador é inteiramente responsável pela confidencialidade das suas credenciais de acesso.</p>
+      <h3>3. Natureza dos Investimentos</h3>
+      <p>Os investimentos disponibilizados na plataforma Mirae Asset envolvem riscos inerentes aos mercados financeiros. O valor das cotas pode aumentar ou diminuir em função das condições de mercado, e os rendimentos passados não garantem resultados futuros. A Mirae Asset não garante retornos fixos ou mínimos sobre qualquer investimento.</p>
+      <h3>4. Fundos e Cotas</h3>
+      <p>O preço das cotas é determinado pelo valor líquido dos activos dos fundos e actualizado periodicamente conforme as condições de mercado. As cotas são adquiridas através do débito do saldo disponível na carteira do utilizador pelo preço vigente no momento da transacção.</p>
+      <h3>5. Depósitos e Levantamentos</h3>
+      <p>Os depósitos são creditados após confirmação do pagamento. O prazo de processamento pode variar entre 10 minutos e 1 hora. Os levantamentos estão sujeitos às seguintes taxas: Taxa de Admissão 7%, Juros da Empresa 7%, Manutenção de Processamento 1%, e Taxa Bancária 1%. São permitidos no máximo dois pedidos de levantamento por dia.</p>
+      <h3>6. Programa de Referência</h3>
+      <p>A Mirae Asset disponibiliza um programa de referência que permite ao utilizador convidar outros utilizadores. Por cada amigo convidado que realizar o seu primeiro investimento, o utilizador que efectuou o convite receberá uma comissão de 10% do valor do primeiro investimento.</p>
+      <h3>7. Privacidade e Proteção de Dados</h3>
+      <p>A Mirae Asset compromete-se a proteger a privacidade dos seus utilizadores. Os dados pessoais recolhidos são utilizados exclusivamente para a prestação dos serviços da plataforma. Os dados são armazenados em servidores seguros com encriptação de ponta, utilizando tecnologia Firebase da Google.</p>
+      <h3>8. Segurança da Conta</h3>
+      <p>O utilizador é responsável por manter a segurança da sua conta, incluindo a protecção da senha e o controlo do acesso ao dispositivo utilizado. Em caso de suspeita de acesso não autorizado, o utilizador deve contactar imediatamente o suporte da Mirae Asset.</p>
+      <h3>9. Limitação de Responsabilidade</h3>
+      <p>A Mirae Asset não será responsável por quaisquer perdas ou danos resultantes da utilização dos seus serviços, incluindo perdas decorrentes de flutuações de mercado, falhas técnicas, ou actos de terceiros.</p>
+      <h3>10. Lei Aplicável</h3>
+      <p>Estes Termos são regidos pela legislação vigente na República de Angola. Ao clicar em "Aceitar e Continuar", o utilizador confirma ter lido na íntegra todos os termos e condições e concorda em cumpri-los.</p>
+      <p style="color:#002f6c;font-weight:600;margin-top:16px;">Mirae Asset © 2025–2026. Todos os direitos reservados.</p>
+    </div>
+    <div class="terms-scroll-hint" id="terms-hint">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      Role até ao final para activar o botão de aceitação
+    </div>
+    <div class="terms-foot">
+      <button class="btn-cancel" onclick="closeTerms()">Cancelar</button>
+      <button id="terms-ok" onclick="acceptTerms()">Aceitar e Continuar</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOASTS -->
+<div id="toasts"></div>
+
+<!-- WA FLOAT -->
+<div id="wa">
+  <a href="https://wa.me/937359561" target="_blank" onclick="event.stopPropagation()">
+    <img src="https://i.postimg.cc/0yTXYxhD/Background-Eraser-20260615-095636211.png" alt="Suporte WhatsApp" />
+  </a>
+</div>
+
+<script>
+// ===== FIREBASE =====
+const firebaseConfig = {
+  apiKey: "AIzaSyDp02RqKrac4ogFRGDcJjPLpA2inOV2rsk",
+  authDomain: "pro-2c872.firebaseapp.com",
+  databaseURL: "https://pro-2c872-default-rtdb.firebaseio.com",
+  projectId: "pro-2c872",
+  storageBucket: "pro-2c872.firebasestorage.app",
+  messagingSenderId: "778229616930",
+  appId: "1:778229616930:web:b56177b322241b103ad57b"
+};
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db   = firebase.firestore();
+
+// ===== FLAG CRÍTICA =====
+// Quando true, o onAuthStateChanged NÃO redireciona automaticamente.
+// O executeRegister() controla manualmente o redirect DEPOIS de
+// guardar todos os dados no Firestore.
+let isRegistering = false;
+
+// ===== SPLASH: 3.5s depois vai para auth =====
+let splashDone = false;
+setTimeout(() => {
+  splashDone = true;
+  document.getElementById('splash').classList.add('fade-out');
+  setTimeout(() => {
+    document.getElementById('splash').style.display = 'none';
+    document.getElementById('auth-page').classList.add('show');
+  }, 620);
+}, 3500);
+
+// ===== AUTO-REDIRECT SE JÁ LOGADO =====
+// BLOQUEADO durante o registo para não redirecionar antes
+// de os dados estarem guardados no Firestore.
+auth.onAuthStateChanged(user => {
+  if (!user) return;
+  if (isRegistering) return; // <-- deixa executeRegister() controlar
+  if (splashDone) {
+    window.location.href = 'index.html';
+  } else {
+    setTimeout(() => { window.location.href = 'index.html'; }, 3600);
+  }
+});
+
+// ===== INVITE FROM URL =====
+const urlParams  = new URLSearchParams(window.location.search);
+const inviteCode = urlParams.get('ref') || '';
+if (inviteCode) {
+  // Will be applied when register tab opens
+  document.addEventListener('DOMContentLoaded', () => applyInviteCode());
+} else {
+  document.addEventListener('DOMContentLoaded', () => applyInviteCode());
+}
+function applyInviteCode() {
+  if (inviteCode) {
+    document.getElementById('invited-chk').checked = true;
+    toggleInvite(document.getElementById('invited-chk'));
+    document.getElementById('r-invite').value = inviteCode;
+  }
+}
+
+// ===== TABS =====
+function switchTab(tab) {
+  document.querySelectorAll('.tab-btn').forEach((b,i) => b.classList.toggle('active', (tab==='login'&&i===0)||(tab==='register'&&i===1)));
+  document.getElementById('pane-login').classList.toggle('active', tab==='login');
+  document.getElementById('pane-register').classList.toggle('active', tab==='register');
+}
+
+// ===== EYE TOGGLE =====
+function toggleEye(id, btn) {
+  const inp = document.getElementById(id);
+  const isPass = inp.type === 'password';
+  inp.type = isPass ? 'text' : 'password';
+  btn.querySelector('svg').innerHTML = isPass
+    ? '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>'
+    : '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
+}
+
+// ===== PASSWORD STRENGTH =====
+function checkStrength(val) {
+  const digits = val.replace(/\D/g,'');
+  const len = digits.length;
+  const fill = document.getElementById('str-fill');
+  const lbl  = document.getElementById('str-lbl');
+  if (len === 0) { fill.style.width='0%'; lbl.textContent=''; return; }
+  const pct = (len/6)*100;
+  let color='#e53e3e', text='Fraca';
+  if (len>=4) { color='#ed8936'; text='Média'; }
+  if (len===6) { color='#2b9348'; text='Segura'; }
+  fill.style.width = pct+'%';
+  fill.style.background = color;
+  lbl.style.color = color;
+  lbl.textContent = text;
+}
+
+// ===== INVITE TOGGLE =====
+function toggleInvite(chk) {
+  document.getElementById('invite-fg').style.display = chk.checked ? 'block' : 'none';
+}
+
+// ===== VALIDATION =====
+function isEmail(e) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e); }
+function showErr(id, show) { const el=document.getElementById(id); if(el) el.classList.toggle('show', show); }
+function clearErrs(...ids) { ids.forEach(id => showErr(id, false)); }
+
+// ===== PROCESSING =====
+function proc(on, txt) {
+  document.getElementById('proc-overlay').classList.toggle('on', on);
+  if (txt) document.getElementById('proc-txt').textContent = txt;
+}
+
+// ===== LOGIN — directo, SEM termos =====
+async function doLogin() {
+  const email = document.getElementById('l-email').value.trim();
+  const pass  = document.getElementById('l-pass').value;
+  clearErrs('l-email-err','l-pass-err');
+  let ok = true;
+  if (!isEmail(email)) { showErr('l-email-err', true); ok=false; }
+  if (!pass || pass.length < 1) { showErr('l-pass-err', true); ok=false; }
+  if (!ok) return;
+
+  // Disable button to prevent double click
+  const btn = document.getElementById('btn-login');
+  btn.disabled = true;
+  btn.textContent = 'A entrar…';
+
+  proc(true, 'A verificar credenciais…');
+  try {
+    await auth.signInWithEmailAndPassword(email, pass);
+    showToast('success','Bem-vindo!','Login realizado com sucesso. A redirecionar…');
+    setTimeout(() => { window.location.href = 'index.html'; }, 1400);
+  } catch(e) {
+    proc(false);
+    btn.disabled = false;
+    btn.textContent = 'Entrar na Plataforma';
+    let msg = 'Credenciais incorrectas. Verifique e tente novamente.';
+    if (e.code === 'auth/user-not-found')     msg = 'Conta não encontrada. Crie uma conta primeiro.';
+    if (e.code === 'auth/wrong-password')     msg = 'Senha incorrecta. Tente novamente.';
+    if (e.code === 'auth/invalid-credential') msg = 'E-mail ou senha incorrectos.';
+    if (e.code === 'auth/too-many-requests')  msg = 'Demasiadas tentativas. Tente mais tarde.';
+    if (e.code === 'auth/invalid-email')      msg = 'E-mail inválido.';
+    document.getElementById('l-pass-err').textContent = msg;
+    showErr('l-pass-err', true);
+    showToast('error','Falha no acesso', msg);
+  }
+}
+
+// ===== GOOGLE LOGIN =====
+async function doGoogle() {
+  proc(true, 'A autenticar com Google…');
+  try {
+    const provider = new firebase.auth.GoogleAuthProvider();
+    const result   = await auth.signInWithPopup(provider);
+    const user     = result.user;
+    const snap     = await db.collection('users').doc(user.uid).get();
+    if (!snap.exists) {
+      const refId = 'MA' + user.uid.substring(0,8).toUpperCase();
+      await db.collection('users').doc(user.uid).set({
+        name: user.displayName||'', email: user.email, uid: user.uid,
+        saldo: 0, pontos: 0, referralId: refId,
+        invitedBy: inviteCode||null,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+    }
+    showToast('success','Acesso com Google','Bem-vindo, '+(user.displayName||'utilizador')+'!');
+    setTimeout(() => { window.location.href = 'index.html'; }, 1300);
+  } catch(e) {
+    proc(false);
+    showToast('error','Erro Google','Não foi possível autenticar com o Google.');
+  }
+}
+
+// ===== REGISTER — valida e abre termos =====
+function doRegister() {
+  const name  = document.getElementById('r-name').value.trim();
+  const email = document.getElementById('r-email').value.trim();
+  const pass  = document.getElementById('r-pass').value;
+  clearErrs('r-name-err','r-email-err','r-pass-err');
+  let ok = true;
+  if (!name)            { showErr('r-name-err', true); ok=false; }
+  if (!isEmail(email))  { showErr('r-email-err', true); ok=false; }
+  if (!/^\d{6}$/.test(pass)) { showErr('r-pass-err', true); ok=false; }
+  if (!ok) return;
+  openTerms();
+}
+
+// ===== TERMS =====
+function openTerms() {
+  document.getElementById('terms-overlay').classList.add('on');
+  document.getElementById('terms-body').scrollTop = 0;
+  document.getElementById('terms-ok').classList.remove('unlocked');
+  document.getElementById('terms-hint').style.display = 'flex';
+}
+function closeTerms() {
+  document.getElementById('terms-overlay').classList.remove('on');
+}
+function onTermsScroll(el) {
+  const atBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 50;
+  if (atBottom) {
+    document.getElementById('terms-ok').classList.add('unlocked');
+    document.getElementById('terms-hint').style.display = 'none';
+  }
+}
+function acceptTerms() {
+  closeTerms();
+  executeRegister();
+}
+
+// ===== EXECUTE REGISTER =====
+async function executeRegister() {
+  const name   = document.getElementById('r-name').value.trim();
+  const email  = document.getElementById('r-email').value.trim();
+  const pass   = document.getElementById('r-pass').value;
+  const invite = document.getElementById('r-invite').value.trim();
+
+  const btn = document.getElementById('btn-register');
+  btn.disabled = true;
+  btn.textContent = 'A criar conta…';
+
+  // BLOQUEIA o onAuthStateChanged para não redirecionar
+  // automaticamente enquanto os dados ainda não foram guardados
+  isRegistering = true;
+
+  proc(true, 'A criar a sua conta…');
+  try {
+    // 1. Cria o utilizador no Firebase Auth
+    proc(true, 'A registar credenciais…');
+    const cred  = await auth.createUserWithEmailAndPassword(email, pass);
+    const uid   = cred.user.uid;
+    const refId = 'MA' + uid.substring(0,8).toUpperCase();
+
+    // 2. Actualiza o displayName no Auth
+    proc(true, 'A guardar o perfil…');
+    await cred.user.updateProfile({ displayName: name });
+
+    // 3. Guarda os dados do utilizador no Firestore
+    // Só depois deste await é que os dados estão confirmados
+    proc(true, 'A guardar os seus dados…');
+    await db.collection('users').doc(uid).set({
+      name, email, uid,
+      saldo: 0,
+      pontos: 0,
+      referralId: refId,
+      invitedBy: invite || null,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+
+    // 4. Regista o convite se existir
+    if (invite) {
+      await db.collection('referrals').add({
+        inviterCode: invite,
+        newUserId: uid,
+        status: 'pending',
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+    }
+
+    // 5. Tudo guardado — agora sim redireciona
+    proc(true, 'Conta criada com sucesso!');
+    showToast('success', 'Conta criada!', 'Bem-vindo à Mirae Asset, ' + name + '!');
+    isRegistering = false; // liberta a flag (já não é necessário mas boa prática)
+    setTimeout(() => { window.location.href = 'index.html'; }, 1400);
+
+  } catch(e) {
+    // Se houve erro, liberta a flag e repõe o botão
+    isRegistering = false;
+    proc(false);
+    btn.disabled = false;
+    btn.textContent = 'Prosseguir e Criar Conta';
+    let msg = 'Erro ao criar conta. Tente novamente.';
+    if (e.code === 'auth/email-already-in-use') msg = 'Este e-mail já está registado. Tente fazer login.';
+    if (e.code === 'auth/weak-password')        msg = 'Senha demasiado fraca.';
+    if (e.code === 'auth/invalid-email')        msg = 'E-mail inválido.';
+    document.getElementById('r-email-err').textContent = msg;
+    showErr('r-email-err', true);
+    showToast('error','Erro no registo', msg);
+  }
+}
+
+// ===== FORGOT PASSWORD =====
+async function doForgot() {
+  const email = document.getElementById('l-email').value.trim();
+  if (!isEmail(email)) {
+    showErr('l-email-err', true);
+    showToast('warning','E-mail necessário','Insira o seu e-mail no campo acima primeiro.');
+    return;
+  }
+  proc(true, 'A enviar e-mail de recuperação…');
+  try {
+    await auth.sendPasswordResetEmail(email);
+    proc(false);
+    showToast('success','E-mail enviado','Verifique a sua caixa de entrada para redefinir a senha.');
+  } catch(e) {
+    proc(false);
+    showToast('error','Erro','Não foi possível enviar o e-mail de recuperação.');
+  }
+}
+
+// ===== TOAST =====
+const T_ICONS = {
+  success:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="19" height="19"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>',
+  error:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="19" height="19"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>',
+  warning:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="19" height="19"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>'
+};
+function showToast(type, title, msg) {
+  const c = document.getElementById('toasts');
+  const t = document.createElement('div');
+  t.className = 'toast ' + type;
+  t.innerHTML = `<div class="toast-ico">${T_ICONS[type]}</div><div class="toast-b"><div class="toast-ttl">${title}</div><div class="toast-msg">${msg}</div></div><div class="toast-prog"></div>`;
+  const remove = () => { t.classList.add('out'); setTimeout(() => t.remove(), 340); };
+  t.onclick = remove;
+  let timer = setTimeout(remove, 5200);
+  t.addEventListener('mouseenter', () => clearTimeout(timer));
+  t.addEventListener('mouseleave', () => { timer = setTimeout(remove, 3000); });
+  c.appendChild(t);
+}
+
+// ===== DRAGGABLE WA =====
+const wa = document.getElementById('wa');
+let _sx,_sy,_il,_it,_dragging=false;
+wa.addEventListener('mousedown', e => {
+  _dragging=false; _sx=e.clientX; _sy=e.clientY;
+  const r=wa.getBoundingClientRect(); _il=r.left; _it=r.top;
+  wa.style.cssText=`position:fixed;right:auto;bottom:auto;left:${_il}px;top:${_it}px;z-index:6666;cursor:grabbing;touch-action:none;user-select:none;`;
+  document.onmousemove=ev=>{_dragging=true;wa.style.left=(_il+ev.clientX-_sx)+'px';wa.style.top=(_it+ev.clientY-_sy)+'px';};
+  document.onmouseup=()=>{document.onmousemove=null;document.onmouseup=null;};
+  e.preventDefault();
+});
+wa.addEventListener('touchstart', e=>{
+  const t=e.touches[0]; _sx=t.clientX; _sy=t.clientY;
+  const r=wa.getBoundingClientRect(); _il=r.left; _it=r.top;
+  wa.style.cssText=`position:fixed;right:auto;bottom:auto;left:${_il}px;top:${_it}px;z-index:6666;`;
+},{passive:true});
+wa.addEventListener('touchmove', e=>{
+  const t=e.touches[0];
+  wa.style.left=(_il+t.clientX-_sx)+'px';
+  wa.style.top=(_it+t.clientY-_sy)+'px';
+  e.preventDefault();
+},{passive:false});
+
+// Enter key support
+document.addEventListener('keydown', e => {
+  if (e.key !== 'Enter') return;
+  const loginActive = document.getElementById('pane-login').classList.contains('active');
+  const regActive   = document.getElementById('pane-register').classList.contains('active');
+  const termsOpen   = document.getElementById('terms-overlay').classList.contains('on');
+  if (termsOpen) return;
+  if (loginActive) doLogin();
+  else if (regActive) doRegister();
+});
+</script>
+</body>
+</html>
