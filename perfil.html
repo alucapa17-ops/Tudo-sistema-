@@ -35,12 +35,24 @@
       display: flex; align-items: center; gap: 14px;
       padding: 16px; cursor: pointer;
       border-bottom: 1px solid #f0f2f8;
-      transition: background 0.2s;
+      transition: background 0.2s, transform 0.15s ease;
       -webkit-tap-highlight-color: transparent;
+      position: relative;
+      overflow: hidden;
+      animation: menu-in 0.4s ease both;
     }
+    .menu-item:nth-child(1) { animation-delay: 0.02s; }
+    .menu-item:nth-child(2) { animation-delay: 0.08s; }
+    .menu-item:nth-child(3) { animation-delay: 0.14s; }
+    .menu-item:nth-child(4) { animation-delay: 0.20s; }
+    .menu-item:nth-child(5) { animation-delay: 0.26s; }
     .menu-item:last-child { border-bottom: none; }
     .menu-item:hover { background: #f8f9ff; }
-    .menu-item:active { background: #f0f4ff; }
+    .menu-item:active { background: #eef1ff; transform: scale(0.97); }
+    .menu-item .menu-icon { transition: transform 0.25s cubic-bezier(0.34,1.56,0.64,1); }
+    .menu-item:active .menu-icon { transform: scale(1.12) rotate(-4deg); }
+    .menu-item .menu-arrow svg { transition: transform 0.25s ease; }
+    .menu-item:hover .menu-arrow svg { transform: translateX(3px); }
     .menu-icon { width: 40px; height: 40px; border-radius: 11px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
     .menu-icon svg { width: 20px; height: 20px; }
     .menu-text { flex: 1; }
@@ -56,6 +68,8 @@
     }
     .panel.open { display: flex; animation: panel-in 0.3s cubic-bezier(0.16,1,0.3,1); }
     @keyframes panel-in { from { transform: translateX(100%); } to { transform: translateX(0); } }
+    @keyframes card-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes menu-in { from { opacity: 0; transform: translateX(-12px); } to { opacity: 1; transform: translateX(0); } }
     .panel-header {
       background: linear-gradient(135deg, #002f6c, #004a99);
       padding: 14px 16px; display: flex; align-items: center; gap: 12px;
@@ -85,7 +99,12 @@
       background: #fff; border-radius: 12px; padding: 14px;
       box-shadow: 0 2px 6px rgba(0,0,0,0.07);
       display: flex; align-items: center; gap: 12px;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      cursor: pointer;
+      animation: card-in 0.35s ease both;
     }
+    .tx-item:hover { transform: translateY(-3px); box-shadow: 0 6px 14px rgba(0,0,0,0.1); }
+    .tx-item:active { transform: scale(0.97); }
     .tx-icon { width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
     .tx-icon svg { width: 20px; height: 20px; }
     .tx-icon.deposit { background: #dcfce7; color: var(--green); }
@@ -131,7 +150,8 @@
     .deposit-section.active { display: block; }
     .deposit-illus { text-align: center; margin-bottom: 16px; }
     .deposit-illus img { width: 100%; max-width: 280px; height: auto; object-fit: contain; }
-    .account-card { background: #fff; border-radius: 12px; padding: 16px; box-shadow: var(--shadow); margin-bottom: 12px; }
+    .account-card { background: #fff; border-radius: 12px; padding: 16px; box-shadow: var(--shadow); margin-bottom: 12px; transition: transform 0.25s ease, box-shadow 0.25s ease; }
+    .account-card:hover { transform: translateY(-4px); box-shadow: 0 8px 18px rgba(0,0,0,0.12); }
     .account-name { font-size: 14px; font-weight: 800; color: var(--text); margin-bottom: 4px; display: flex; align-items: center; gap: 8px; }
     .account-number { font-size: 15px; font-weight: 800; color: var(--primary); letter-spacing: 1px; margin: 8px 0; word-break: break-all; }
     .btn-reveal { padding: 8px 14px; background: var(--primary); color: #fff; border: none; border-radius: 8px; font-size: 12px; font-weight: 700; cursor: pointer; font-family: 'Inter', sans-serif; transition: all 0.2s; }
@@ -164,8 +184,10 @@
     .upload-status-text { font-size: 12px; color: var(--muted); margin-bottom: 10px; display: none; }
 
     .info-steps { display: flex; flex-direction: column; gap: 10px; }
-    .step-item { display: flex; gap: 12px; align-items: flex-start; background: #fff; border-radius: 10px; padding: 14px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
-    .step-num { width: 28px; height: 28px; border-radius: 50%; background: var(--primary); color: #fff; font-size: 13px; font-weight: 800; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .step-item { display: flex; gap: 12px; align-items: flex-start; background: #fff; border-radius: 10px; padding: 14px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); transition: transform 0.2s ease; }
+    .step-item:hover { transform: translateX(4px); }
+    .step-item:active .step-num { transform: scale(1.15); }
+    .step-num { width: 28px; height: 28px; border-radius: 50%; background: var(--primary); color: #fff; font-size: 13px; font-weight: 800; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: transform 0.2s cubic-bezier(0.34,1.56,0.64,1); }
     .step-text { font-size: 13px; color: var(--muted); line-height: 1.6; }
     .step-text strong { color: var(--text); }
 
@@ -178,7 +200,8 @@
     .ref-link-box span { flex: 1; font-size: 12px; color: var(--primary); font-weight: 600; word-break: break-all; }
     .btn-copy { padding: 8px 14px; background: var(--primary); color: #fff; border: none; border-radius: 8px; font-size: 12px; font-weight: 700; cursor: pointer; white-space: nowrap; font-family: 'Inter', sans-serif; }
     .ref-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
-    .ref-stat { background: #fff; border-radius: 12px; padding: 14px; box-shadow: var(--shadow); text-align: center; }
+    .ref-stat { background: #fff; border-radius: 12px; padding: 14px; box-shadow: var(--shadow); text-align: center; transition: transform 0.25s ease; cursor: default; }
+    .ref-stat:hover { transform: translateY(-4px) scale(1.02); }
     .ref-stat-val { font-size: 22px; font-weight: 800; color: var(--primary); }
     .ref-stat-lbl { font-size: 11px; color: var(--muted); margin-top: 3px; }
 
@@ -396,8 +419,9 @@
         </button>
       </div>
 
-      <!-- Upload zone: agora separado por uma divisória clara, NUNCA sobreposto ao teclado -->
+      <!-- Upload zone: agora abaixo do botão de envio, conforme solicitado -->
       <div class="upload-section">
+        <button class="btn-primary-full ready" id="submit-deposit-btn" onclick="submitDeposit()" style="background:var(--green);margin-bottom:18px;">Enviar Pedido de Depósito</button>
         <div class="upload-section-label">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
           Comprovativo de Pagamento
@@ -413,7 +437,6 @@
           <div class="upload-progress-bar" id="upload-progress-bar"></div>
         </div>
         <div class="upload-status-text" id="upload-status-text"></div>
-        <button class="btn-primary-full ready" onclick="submitDeposit()" style="background:var(--green);">Enviar Pedido de Depósito</button>
       </div>
     </div>
 
@@ -595,8 +618,36 @@
     .custom-chk svg { display: none; }
     .check-text { font-size: 12px; color: var(--muted); line-height: 1.55; flex: 1; }
     .check-text strong { color: var(--text); }
+    .ripple-effect {
+      position: absolute; border-radius: 50%;
+      background: rgba(0,123,255,0.25);
+      transform: scale(0);
+      animation: ripple-anim 0.55s ease-out;
+      pointer-events: none;
+    }
+    @keyframes ripple-anim { to { transform: scale(2.8); opacity: 0; } }
   `;
   document.head.appendChild(checkStyle);
+
+  // Efeito ripple ao tocar/clicar em qualquer card (menu-item, account-card, tx-item, ref-stat)
+  function attachRippleEffect(selector) {
+    document.addEventListener('click', e => {
+      const target = e.target.closest(selector);
+      if (!target) return;
+      const rect = target.getBoundingClientRect();
+      const ripple = document.createElement('span');
+      const size = Math.max(rect.width, rect.height);
+      ripple.className = 'ripple-effect';
+      ripple.style.width = ripple.style.height = size + 'px';
+      ripple.style.left = (e.clientX - rect.left - size / 2) + 'px';
+      ripple.style.top = (e.clientY - rect.top - size / 2) + 'px';
+      if (getComputedStyle(target).position === 'static') target.style.position = 'relative';
+      target.style.overflow = 'hidden';
+      target.appendChild(ripple);
+      setTimeout(() => ripple.remove(), 600);
+    });
+  }
+  attachRippleEffect('.menu-item, .account-card, .tx-item, .ref-stat, .step-item');
 
   auth.onAuthStateChanged(async user => {
     if (!user) { window.location.href = 'auth.html'; return; }
@@ -906,13 +957,24 @@
       wrap.style.display = 'block';
       statusText.style.display = 'block';
       statusText.textContent = 'A enviar comprovativo… 0%';
+
+      // Timeout de segurança: se o Storage não responder em 25s, falha de forma controlada
+      // em vez de deixar o usuário preso no ecrã "A processar" para sempre.
+      const timeoutId = setTimeout(() => {
+        statusText.textContent = 'O envio está a demorar demasiado.';
+        reject(new Error('TIMEOUT_UPLOAD'));
+      }, 25000);
+
       task.on('state_changed', snap => {
         const pct = Math.round((snap.bytesTransferred / snap.totalBytes) * 100);
         bar.style.width = pct + '%';
         statusText.textContent = `A enviar comprovativo… ${pct}%`;
       }, err => {
+        clearTimeout(timeoutId);
+        statusText.textContent = 'Falha ao enviar o comprovativo.';
         reject(err);
       }, async () => {
+        clearTimeout(timeoutId);
         try {
           const url = await task.snapshot.ref.getDownloadURL();
           statusText.textContent = 'Comprovativo enviado com sucesso.';
@@ -927,24 +989,40 @@
     if (v <= 0) { showToast('warning', 'Valor necessário', 'Introduza o valor depositado.'); return; }
     if (!compFile) { showToast('warning', 'Comprovativo necessário', 'Seleccione a foto do comprovativo antes de enviar.'); return; }
 
+    const submitBtn = document.getElementById('submit-deposit-btn');
+    if (submitBtn) { submitBtn.disabled = true; submitBtn.style.opacity = '0.6'; }
     document.getElementById('processing-overlay').classList.add('active');
     document.getElementById('proc-text').textContent = 'A enviar comprovativo…';
+
+    let uploaded = null;
+    let uploadFailed = false;
+
     try {
       // 1. Faz upload real do comprovativo para o Firebase Storage
-      const uploaded = await uploadComprovativo(compFile, currentUser.uid);
+      uploaded = await uploadComprovativo(compFile, currentUser.uid);
       compUploadedUrl = uploaded.url;
+    } catch (uploadErr) {
+      console.error('Erro no upload do comprovativo:', uploadErr);
+      uploadFailed = true;
+    }
 
+    try {
       document.getElementById('proc-text').textContent = 'A registar pedido de depósito…';
 
-      // 2. Cria o pedido de depósito já com a URL do comprovativo
-      await db.collection('depositos').add({
+      // 2. Cria o pedido de depósito. Se o upload falhou, regista o pedido mesmo assim
+      // (com o nome do ficheiro) para o usuário não ficar bloqueado, e avisa-o do problema.
+      const depositoPayload = {
         userId: currentUser.uid, valor: v,
         status: 'pendente',
         comprovativo: compFile.name,
-        comprovanteUrl: uploaded.url,
-        comprovantePath: uploaded.path,
         data: firebase.firestore.FieldValue.serverTimestamp()
-      });
+      };
+      if (uploaded) {
+        depositoPayload.comprovanteUrl = uploaded.url;
+        depositoPayload.comprovantePath = uploaded.path;
+      }
+
+      await db.collection('depositos').add(depositoPayload);
       await db.collection('transacoes').add({
         userId: currentUser.uid, tipo: 'deposito', valor: v,
         descricao: 'Pedido de depósito', status: 'pendente',
@@ -952,13 +1030,19 @@
       });
 
       document.getElementById('processing-overlay').classList.remove('active');
-      showToast('success', 'Pedido enviado!', `Depósito de ${fmt(v)} submetido. Será aprovado em 10min–1h.`);
+      if (uploadFailed) {
+        showToast('warning', 'Pedido enviado, comprovativo não anexado', `Depósito de ${fmt(v)} registado, mas a imagem do comprovativo falhou ao enviar. Contacte o suporte via WhatsApp para enviar a foto manualmente.`);
+      } else {
+        showToast('success', 'Pedido enviado!', `Depósito de ${fmt(v)} submetido. Será aprovado em 10min–1h.`);
+      }
       resetDepositForm();
       closePanel('panel-deposit');
     } catch(e) {
       document.getElementById('processing-overlay').classList.remove('active');
-      showToast('error', 'Erro', 'Não foi possível enviar o comprovativo ou o pedido. Tente novamente.');
+      showToast('error', 'Erro', 'Não foi possível registar o pedido de depósito. Tente novamente.');
       console.error(e);
+    } finally {
+      if (submitBtn) { submitBtn.disabled = false; submitBtn.style.opacity = '1'; }
     }
   }
 
