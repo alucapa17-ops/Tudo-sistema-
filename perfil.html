@@ -8,6 +8,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
@@ -25,36 +26,6 @@
     .topbar-brand img { width: 34px; height: 34px; border-radius: 50%; object-fit: contain; }
     .topbar-title { font-size: 17px; font-weight: 800; color: #fff; }
     .topbar-sub { font-size: 11px; color: rgba(255,255,255,0.6); }
-
-    /* PROFILE HERO */
-    .profile-hero {
-      background: linear-gradient(135deg, #002f6c, #004a99, #0066cc);
-      padding: 24px 16px 20px; position: relative; overflow: hidden;
-    }
-    .profile-hero::before { content: ''; position: absolute; top: -20px; right: -20px; width: 120px; height: 120px; background: radial-gradient(circle, rgba(255,255,255,0.06), transparent 70%); border-radius: 50%; }
-    .profile-hero-inner { display: flex; align-items: center; gap: 16px; }
-    .avatar-big { width: 64px; height: 64px; border-radius: 50%; background: rgba(255,255,255,0.2); border: 3px solid rgba(255,255,255,0.35); display: flex; align-items: center; justify-content: center; font-size: 26px; font-weight: 800; color: #fff; flex-shrink: 0; }
-    .profile-info h2 { font-size: 18px; font-weight: 800; color: #fff; }
-    .profile-info p { font-size: 12px; color: rgba(255,255,255,0.65); margin-top: 3px; }
-    .profile-badges { display: flex; gap: 6px; margin-top: 8px; }
-    .pbadge { padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; background: rgba(255,255,255,0.15); color: #fff; }
-    .pbadge.id-red { background: rgba(255,0,0,0.3); color: #ff6b6b; }
-
-    /* BALANCE CARD */
-    .balance-row {
-      display: grid; grid-template-columns: 1fr;
-      gap: 12px; margin: 14px 16px 0;
-    }
-    .balance-card {
-      background: var(--card); border-radius: 14px;
-      padding: 16px; box-shadow: var(--shadow);
-      transition: transform 0.3s;
-    }
-    .balance-card:hover { transform: translateY(-4px); }
-    .bc-icon { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-bottom: 8px; }
-    .bc-icon svg { width: 18px; height: 18px; }
-    .bc-lbl { font-size: 11px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
-    .bc-val { font-size: 20px; font-weight: 800; color: var(--text); margin-top: 4px; }
 
     /* MENU LIST */
     .menu-section { margin: 20px 16px 0; }
@@ -167,13 +138,31 @@
     .btn-reveal:hover { background: var(--primary-dark); }
     .btn-reveal:disabled { background: #9ca3af; cursor: not-allowed; }
     .countdown-text { font-size: 12px; color: var(--orange); font-weight: 700; margin-top: 4px; }
-    .upload-zone { border: 2px dashed #c7d2e0; border-radius: 12px; padding: 24px; text-align: center; cursor: pointer; transition: border-color 0.25s; margin-bottom: 14px; margin-top: 14px; }
+
+    /* Numpad for deposit value */
+    .numpad-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 6px; margin-bottom: 18px; }
+    .numpad-grid button { padding: 14px; background: var(--bg); border: none; border-radius: 10px; font-size: 17px; font-weight: 700; cursor: pointer; font-family: 'Inter', sans-serif; }
+    .numpad-grid button:active { background: #e2e8f0; }
+
+    /* Upload zone — agora isolada, separada do teclado por uma margem clara */
+    .upload-section {
+      margin-top: 22px;
+      padding-top: 18px;
+      border-top: 1.5px dashed #d8deea;
+    }
+    .upload-section-label { font-size: 12px; font-weight: 700; color: var(--text); margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+    .upload-zone { border: 2px dashed #c7d2e0; border-radius: 12px; padding: 24px; text-align: center; cursor: pointer; transition: border-color 0.25s; margin-bottom: 14px; background: #fff; }
     .upload-zone:hover { border-color: var(--primary); }
     .upload-zone input { display: none; }
     .upload-zone svg { width: 36px; height: 36px; color: #9ca3af; margin-bottom: 8px; }
     .upload-zone .uz-title { font-size: 14px; font-weight: 700; color: var(--text); }
     .upload-zone .uz-sub { font-size: 12px; color: var(--muted); margin-top: 4px; }
+    .upload-zone.has-file { border-color: var(--green); background: #f4fbf6; }
     .upload-preview { display: none; width: 100%; height: 160px; object-fit: cover; border-radius: 10px; margin-bottom: 14px; }
+    .upload-progress-wrap { display: none; background: #e2e8f0; border-radius: 8px; height: 8px; overflow: hidden; margin-bottom: 14px; }
+    .upload-progress-bar { height: 100%; width: 0%; background: var(--primary); transition: width 0.2s; }
+    .upload-status-text { font-size: 12px; color: var(--muted); margin-bottom: 10px; display: none; }
+
     .info-steps { display: flex; flex-direction: column; gap: 10px; }
     .step-item { display: flex; gap: 12px; align-items: flex-start; background: #fff; border-radius: 10px; padding: 14px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
     .step-num { width: 28px; height: 28px; border-radius: 50%; background: var(--primary); color: #fff; font-size: 13px; font-weight: 800; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
@@ -257,34 +246,8 @@
   </div>
 </div>
 
-<!-- PROFILE HERO -->
-<div class="profile-hero">
-  <div class="profile-hero-inner">
-    <div class="avatar-big" id="avatar-big">M</div>
-    <div class="profile-info">
-      <h2 id="profile-name">Carregando…</h2>
-      <p id="profile-email">—</p>
-      <div class="profile-badges">
-        <span class="pbadge id-red" id="profile-ref">ID: —</span>
-        <span class="pbadge">Investidor</span>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- BALANCE CARD -->
-<div class="balance-row">
-  <div class="balance-card">
-    <div class="bc-icon" style="background:#dbeafe;">
-      <svg viewBox="0 0 24 24" fill="none" stroke="#007bff" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
-    </div>
-    <div class="bc-lbl">Saldo Disponível</div>
-    <div class="bc-val" id="balance-saldo">—</div>
-  </div>
-</div>
-
 <!-- MENU -->
-<div class="menu-section">
+<div class="menu-section" style="margin-top:16px;">
   <div class="menu-label">Operações</div>
   <div class="menu-list">
     <div class="menu-item" onclick="openPanel('panel-history')">
@@ -414,31 +377,44 @@
           <input type="text" id="dep-amount-input" placeholder="0.00" readonly />
         </div>
       </div>
+
       <!-- Numpad for deposit -->
-      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:14px;">
-        <button onclick="depNumpad('1')" style="padding:12px;background:var(--bg);border:none;border-radius:10px;font-size:17px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;">1</button>
-        <button onclick="depNumpad('2')" style="padding:12px;background:var(--bg);border:none;border-radius:10px;font-size:17px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;">2</button>
-        <button onclick="depNumpad('3')" style="padding:12px;background:var(--bg);border:none;border-radius:10px;font-size:17px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;">3</button>
-        <button onclick="depNumpad('4')" style="padding:12px;background:var(--bg);border:none;border-radius:10px;font-size:17px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;">4</button>
-        <button onclick="depNumpad('5')" style="padding:12px;background:var(--bg);border:none;border-radius:10px;font-size:17px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;">5</button>
-        <button onclick="depNumpad('6')" style="padding:12px;background:var(--bg);border:none;border-radius:10px;font-size:17px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;">6</button>
-        <button onclick="depNumpad('7')" style="padding:12px;background:var(--bg);border:none;border-radius:10px;font-size:17px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;">7</button>
-        <button onclick="depNumpad('8')" style="padding:12px;background:var(--bg);border:none;border-radius:10px;font-size:17px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;">8</button>
-        <button onclick="depNumpad('9')" style="padding:12px;background:var(--bg);border:none;border-radius:10px;font-size:17px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;">9</button>
-        <button onclick="depNumpad('00')" style="padding:12px;background:var(--bg);border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;">00</button>
-        <button onclick="depNumpad('0')" style="padding:12px;background:var(--bg);border:none;border-radius:10px;font-size:17px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;">0</button>
-        <button onclick="depNumpadDel()" style="padding:12px;background:var(--bg);border:none;border-radius:10px;font-size:17px;cursor:pointer;display:flex;align-items:center;justify-content:center;">
+      <div class="numpad-grid">
+        <button onclick="depNumpad('1')">1</button>
+        <button onclick="depNumpad('2')">2</button>
+        <button onclick="depNumpad('3')">3</button>
+        <button onclick="depNumpad('4')">4</button>
+        <button onclick="depNumpad('5')">5</button>
+        <button onclick="depNumpad('6')">6</button>
+        <button onclick="depNumpad('7')">7</button>
+        <button onclick="depNumpad('8')">8</button>
+        <button onclick="depNumpad('9')">9</button>
+        <button onclick="depNumpad('00')" style="font-size:14px;">00</button>
+        <button onclick="depNumpad('0')">0</button>
+        <button onclick="depNumpadDel()" style="display:flex;align-items:center;justify-content:center;">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><path d="M21 4H8l-7 8 7 8h13a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"/><line x1="18" y1="9" x2="12" y2="15"/><line x1="12" y1="9" x2="18" y2="15"/></svg>
         </button>
       </div>
-      <label class="upload-zone" for="comp-upload" onclick="document.getElementById('comp-upload').click()">
-        <input type="file" id="comp-upload" accept="image/*" onchange="previewComprovativo(this)" />
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-        <div class="uz-title">Carregar Comprovativo</div>
-        <div class="uz-sub">Toque para seleccionar a foto</div>
-      </label>
-      <img id="comp-preview" class="upload-preview" src="" alt="" />
-      <button class="btn-primary-full ready" onclick="submitDeposit()" style="background:var(--green);">Enviar Pedido de Depósito</button>
+
+      <!-- Upload zone: agora separado por uma divisória clara, NUNCA sobreposto ao teclado -->
+      <div class="upload-section">
+        <div class="upload-section-label">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          Comprovativo de Pagamento
+        </div>
+        <label class="upload-zone" id="upload-zone-label" for="comp-upload" onclick="document.getElementById('comp-upload').click()">
+          <input type="file" id="comp-upload" accept="image/*" onchange="previewComprovativo(this)" />
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          <div class="uz-title" id="uz-title-text">Carregar Comprovativo</div>
+          <div class="uz-sub" id="uz-sub-text">Toque para seleccionar a foto</div>
+        </label>
+        <img id="comp-preview" class="upload-preview" src="" alt="" />
+        <div class="upload-progress-wrap" id="upload-progress-wrap">
+          <div class="upload-progress-bar" id="upload-progress-bar"></div>
+        </div>
+        <div class="upload-status-text" id="upload-status-text"></div>
+        <button class="btn-primary-full ready" onclick="submitDeposit()" style="background:var(--green);">Enviar Pedido de Depósito</button>
+      </div>
     </div>
 
     <!-- INSTRUCOES -->
@@ -576,7 +552,7 @@
 
 <div id="toast-container"></div>
 <div id="wa-float">
-  <a href="https://wa.me/931533527" target="_blank">
+  <a href="https://wa.me/937359561" target="_blank">
     <img src="https://i.postimg.cc/0yTXYxhD/Background-Eraser-20260615-095636211.png" alt="Suporte" />
   </a>
 </div>
@@ -594,6 +570,7 @@
   firebase.initializeApp(firebaseConfig);
   const auth = firebase.auth();
   const db = firebase.firestore();
+  const storage = firebase.storage();
 
   let currentUser = null;
   let userData = {};
@@ -603,6 +580,8 @@
   let revealTimers = {};
   let todayWithdrawCount = 0;
   let pendingWithdraw = false;
+  let compFile = null;
+  let compUploadedUrl = null;
 
   // Checkbox style for friends/password
   const checkStyle = document.createElement('style');
@@ -631,12 +610,6 @@
     db.collection('users').doc(currentUser.uid).onSnapshot(snap => {
       if (!snap.exists) return;
       userData = snap.data();
-      const name = userData.name || currentUser.displayName || 'Utilizador';
-      document.getElementById('profile-name').textContent = name;
-      document.getElementById('profile-email').textContent = currentUser.email;
-      document.getElementById('avatar-big').textContent = name.charAt(0).toUpperCase();
-      document.getElementById('profile-ref').textContent = 'ID: ' + (userData.referralId || '—');
-      document.getElementById('balance-saldo').textContent = fmt(userData.saldo || 0);
       const refLink = `${window.location.origin}/auth.html?ref=${userData.referralId || ''}`;
       document.getElementById('ref-link-display').textContent = refLink;
     });
@@ -754,19 +727,19 @@
           <input type="text" id="wd-amount" placeholder="0.00" readonly />
         </div>
       </div>
-      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:14px;">
-        <button onclick="wdNumpad('1')" style="padding:12px;background:var(--bg);border:none;border-radius:10px;font-size:17px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;">1</button>
-        <button onclick="wdNumpad('2')" style="padding:12px;background:var(--bg);border:none;border-radius:10px;font-size:17px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;">2</button>
-        <button onclick="wdNumpad('3')" style="padding:12px;background:var(--bg);border:none;border-radius:10px;font-size:17px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;">3</button>
-        <button onclick="wdNumpad('4')" style="padding:12px;background:var(--bg);border:none;border-radius:10px;font-size:17px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;">4</button>
-        <button onclick="wdNumpad('5')" style="padding:12px;background:var(--bg);border:none;border-radius:10px;font-size:17px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;">5</button>
-        <button onclick="wdNumpad('6')" style="padding:12px;background:var(--bg);border:none;border-radius:10px;font-size:17px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;">6</button>
-        <button onclick="wdNumpad('7')" style="padding:12px;background:var(--bg);border:none;border-radius:10px;font-size:17px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;">7</button>
-        <button onclick="wdNumpad('8')" style="padding:12px;background:var(--bg);border:none;border-radius:10px;font-size:17px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;">8</button>
-        <button onclick="wdNumpad('9')" style="padding:12px;background:var(--bg);border:none;border-radius:10px;font-size:17px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;">9</button>
-        <button onclick="wdNumpad('00')" style="padding:12px;background:var(--bg);border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;">00</button>
-        <button onclick="wdNumpad('0')" style="padding:12px;background:var(--bg);border:none;border-radius:10px;font-size:17px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;">0</button>
-        <button onclick="wdNumpadDel()" style="padding:12px;background:var(--bg);border:none;border-radius:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;">
+      <div class="numpad-grid">
+        <button onclick="wdNumpad('1')">1</button>
+        <button onclick="wdNumpad('2')">2</button>
+        <button onclick="wdNumpad('3')">3</button>
+        <button onclick="wdNumpad('4')">4</button>
+        <button onclick="wdNumpad('5')">5</button>
+        <button onclick="wdNumpad('6')">6</button>
+        <button onclick="wdNumpad('7')">7</button>
+        <button onclick="wdNumpad('8')">8</button>
+        <button onclick="wdNumpad('9')">9</button>
+        <button onclick="wdNumpad('00')" style="font-size:14px;">00</button>
+        <button onclick="wdNumpad('0')">0</button>
+        <button onclick="wdNumpadDel()" style="display:flex;align-items:center;justify-content:center;">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><path d="M21 4H8l-7 8 7 8h13a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"/><line x1="18" y1="9" x2="12" y2="15"/><line x1="12" y1="9" x2="18" y2="15"/></svg>
         </button>
       </div>
@@ -828,7 +801,7 @@
     document.getElementById('processing-overlay').classList.add('active');
     try {
       const liquido = v * 0.84;
-      
+
       // Debitar o saldo imediatamente
       await db.collection('users').doc(currentUser.uid).update({
         saldo: firebase.firestore.FieldValue.increment(-v)
@@ -846,11 +819,10 @@
         valor: v, descricao: 'Pedido de levantamento', status: 'pendente',
         data: firebase.firestore.FieldValue.serverTimestamp()
       });
-      
+
       // Atualizar saldo local
       userData.saldo = (userData.saldo || 0) - v;
-      document.getElementById('balance-saldo').textContent = fmt(userData.saldo);
-      
+
       document.getElementById('processing-overlay').classList.remove('active');
       showToast('success', 'Pedido enviado!', `Levantamento de ${fmt(v)} submetido. Saldo debitado. Aguarde processamento.`);
       closePanel('panel-withdraw');
@@ -904,27 +876,73 @@
     if (inp) inp.value = (depRawAmount / 100).toFixed(2);
   }
 
+  // Pré-visualização local do comprovativo (não faz upload ainda — só guarda o ficheiro escolhido)
   function previewComprovativo(input) {
     if (input.files && input.files[0]) {
+      compFile = input.files[0];
+      compUploadedUrl = null;
       const reader = new FileReader();
       reader.onload = e => {
         const prev = document.getElementById('comp-preview');
         prev.src = e.target.result;
         prev.style.display = 'block';
       };
-      reader.readAsDataURL(input.files[0]);
+      reader.readAsDataURL(compFile);
+      document.getElementById('upload-zone-label').classList.add('has-file');
+      document.getElementById('uz-title-text').textContent = 'Comprovativo seleccionado';
+      document.getElementById('uz-sub-text').textContent = compFile.name;
     }
+  }
+
+  // Faz o upload real do ficheiro para o Firebase Storage, devolvendo a URL pública
+  function uploadComprovativo(file, userId) {
+    return new Promise((resolve, reject) => {
+      const path = `comprovativos/${userId}/${Date.now()}_${file.name}`;
+      const ref = storage.ref().child(path);
+      const task = ref.put(file);
+      const wrap = document.getElementById('upload-progress-wrap');
+      const bar = document.getElementById('upload-progress-bar');
+      const statusText = document.getElementById('upload-status-text');
+      wrap.style.display = 'block';
+      statusText.style.display = 'block';
+      statusText.textContent = 'A enviar comprovativo… 0%';
+      task.on('state_changed', snap => {
+        const pct = Math.round((snap.bytesTransferred / snap.totalBytes) * 100);
+        bar.style.width = pct + '%';
+        statusText.textContent = `A enviar comprovativo… ${pct}%`;
+      }, err => {
+        reject(err);
+      }, async () => {
+        try {
+          const url = await task.snapshot.ref.getDownloadURL();
+          statusText.textContent = 'Comprovativo enviado com sucesso.';
+          resolve({ url, path });
+        } catch (e) { reject(e); }
+      });
+    });
   }
 
   async function submitDeposit() {
     const v = depRawAmount / 100;
     if (v <= 0) { showToast('warning', 'Valor necessário', 'Introduza o valor depositado.'); return; }
-    const file = document.getElementById('comp-upload').files[0];
+    if (!compFile) { showToast('warning', 'Comprovativo necessário', 'Seleccione a foto do comprovativo antes de enviar.'); return; }
+
     document.getElementById('processing-overlay').classList.add('active');
+    document.getElementById('proc-text').textContent = 'A enviar comprovativo…';
     try {
+      // 1. Faz upload real do comprovativo para o Firebase Storage
+      const uploaded = await uploadComprovativo(compFile, currentUser.uid);
+      compUploadedUrl = uploaded.url;
+
+      document.getElementById('proc-text').textContent = 'A registar pedido de depósito…';
+
+      // 2. Cria o pedido de depósito já com a URL do comprovativo
       await db.collection('depositos').add({
         userId: currentUser.uid, valor: v,
-        status: 'pendente', comprovativo: file ? file.name : null,
+        status: 'pendente',
+        comprovativo: compFile.name,
+        comprovanteUrl: uploaded.url,
+        comprovantePath: uploaded.path,
         data: firebase.firestore.FieldValue.serverTimestamp()
       });
       await db.collection('transacoes').add({
@@ -932,13 +950,31 @@
         descricao: 'Pedido de depósito', status: 'pendente',
         data: firebase.firestore.FieldValue.serverTimestamp()
       });
+
       document.getElementById('processing-overlay').classList.remove('active');
       showToast('success', 'Pedido enviado!', `Depósito de ${fmt(v)} submetido. Será aprovado em 10min–1h.`);
+      resetDepositForm();
       closePanel('panel-deposit');
     } catch(e) {
       document.getElementById('processing-overlay').classList.remove('active');
-      showToast('error', 'Erro', 'Não foi possível enviar o pedido.');
+      showToast('error', 'Erro', 'Não foi possível enviar o comprovativo ou o pedido. Tente novamente.');
+      console.error(e);
     }
+  }
+
+  function resetDepositForm() {
+    depRawAmount = 0;
+    compFile = null;
+    compUploadedUrl = null;
+    const inp = document.getElementById('dep-amount-input'); if (inp) inp.value = '';
+    const prev = document.getElementById('comp-preview'); prev.src = ''; prev.style.display = 'none';
+    document.getElementById('comp-upload').value = '';
+    document.getElementById('upload-zone-label').classList.remove('has-file');
+    document.getElementById('uz-title-text').textContent = 'Carregar Comprovativo';
+    document.getElementById('uz-sub-text').textContent = 'Toque para seleccionar a foto';
+    document.getElementById('upload-progress-wrap').style.display = 'none';
+    document.getElementById('upload-progress-bar').style.width = '0%';
+    document.getElementById('upload-status-text').style.display = 'none';
   }
 
   // ===== FRIENDS =====
