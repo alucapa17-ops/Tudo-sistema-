@@ -27,6 +27,126 @@
     .topbar-title { font-size: 17px; font-weight: 800; color: #fff; }
     .topbar-sub { font-size: 11px; color: rgba(255,255,255,0.6); }
 
+    /* ===== PROFILE CARD ===== */
+    .profile-card {
+      margin: 14px 16px 0;
+      background: linear-gradient(135deg, #0052cc 0%, #0066ff 45%, #1a8fff 100%);
+      border-radius: 20px;
+      padding: 22px 20px 20px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 8px 28px rgba(0,82,204,0.38);
+      cursor: pointer;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+      transform: translateZ(0);
+      transition: transform 0.18s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.18s ease;
+      animation: card-in 0.5s cubic-bezier(0.16,1,0.3,1) both;
+    }
+    .profile-card:hover {
+      transform: translateY(-4px) scale(1.015);
+      box-shadow: 0 16px 36px rgba(0,82,204,0.45);
+    }
+    .profile-card:active {
+      transform: scale(0.965) translateY(2px);
+      box-shadow: 0 4px 14px rgba(0,82,204,0.3);
+      transition: transform 0.1s ease, box-shadow 0.1s ease;
+    }
+
+    /* Gráfico SVG de fundo */
+    .pc-chart-bg {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 80px;
+      opacity: 0.18;
+      pointer-events: none;
+    }
+    .pc-chart-bg .chart-line {
+      stroke: #fff;
+      stroke-width: 2.5;
+      fill: none;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-dasharray: 600;
+      stroke-dashoffset: 600;
+      animation: draw-line 1.6s cubic-bezier(0.4,0,0.2,1) 0.3s forwards;
+    }
+    .pc-chart-bg .chart-fill {
+      fill: url(#pcGradFill);
+      opacity: 0;
+      animation: fill-fade 0.6s ease 1.7s forwards;
+    }
+    @keyframes draw-line { to { stroke-dashoffset: 0; } }
+    @keyframes fill-fade  { to { opacity: 1; } }
+
+    /* Decoração de bolhas */
+    .pc-bubble {
+      position: absolute; border-radius: 50%;
+      background: rgba(255,255,255,0.07);
+      pointer-events: none;
+    }
+    .pc-bubble.b1 { width: 120px; height: 120px; top: -35px; right: -25px; animation: bubble-float 6s ease-in-out infinite; }
+    .pc-bubble.b2 { width: 70px;  height: 70px;  bottom: -20px; right: 60px; animation: bubble-float 8s ease-in-out 1.5s infinite; }
+    .pc-bubble.b3 { width: 40px;  height: 40px;  top: 10px; right: 90px; animation: bubble-float 5s ease-in-out 0.8s infinite; }
+    @keyframes bubble-float {
+      0%, 100% { transform: translateY(0) scale(1); }
+      50%       { transform: translateY(-8px) scale(1.05); }
+    }
+
+    /* Conteúdo do card */
+    .pc-inner { position: relative; z-index: 2; display: flex; align-items: center; gap: 14px; }
+    .pc-avatar {
+      width: 54px; height: 54px; border-radius: 50%;
+      background: rgba(255,255,255,0.2);
+      border: 2.5px solid rgba(255,255,255,0.4);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px; font-weight: 800; color: #fff; flex-shrink: 0;
+      transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+      box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+    }
+    .profile-card:hover .pc-avatar { transform: scale(1.1) rotate(-4deg); }
+    .pc-avatar-pulse {
+      position: absolute; inset: -4px; border-radius: 50%;
+      border: 2px solid rgba(255,255,255,0.25);
+      animation: avatar-pulse 2.4s ease-in-out infinite;
+    }
+    @keyframes avatar-pulse {
+      0%, 100% { transform: scale(1); opacity: 0.6; }
+      50%       { transform: scale(1.15); opacity: 0; }
+    }
+    .pc-info { flex: 1; }
+    .pc-greeting { font-size: 11px; color: rgba(255,255,255,0.65); font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
+    .pc-name { font-size: 19px; font-weight: 800; color: #fff; margin-top: 2px; letter-spacing: 0.2px; line-height: 1.2; transition: letter-spacing 0.3s ease; }
+    .profile-card:hover .pc-name { letter-spacing: 0.8px; }
+    .pc-ref { display: inline-block; margin-top: 6px; background: rgba(255,255,255,0.18); border: 1px solid rgba(255,255,255,0.25); border-radius: 20px; padding: 3px 10px; font-size: 10px; font-weight: 700; color: rgba(255,255,255,0.9); letter-spacing: 0.8px; }
+
+    /* Stats row dentro do card */
+    .pc-stats-row { position: relative; z-index: 2; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0; margin-top: 16px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,0.15); }
+    .pc-stat-item { text-align: center; }
+    .pc-stat-item:not(:last-child) { border-right: 1px solid rgba(255,255,255,0.15); }
+    .pc-stat-lbl { font-size: 10px; color: rgba(255,255,255,0.55); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+    .pc-stat-val { font-size: 15px; font-weight: 800; color: #fff; margin-top: 3px; transition: transform 0.2s cubic-bezier(0.34,1.56,0.64,1); }
+    .profile-card:hover .pc-stat-val { transform: scale(1.07); }
+
+    /* Animação de toque (tap feedback) */
+    @keyframes pc-tap-anim {
+      0%   { transform: scale(1); }
+      25%  { transform: scale(0.96) translateY(2px); }
+      60%  { transform: scale(1.02) translateY(-2px); }
+      100% { transform: scale(1) translateY(0); }
+    }
+    .profile-card.pc-tapped { animation: pc-tap-anim 0.4s cubic-bezier(0.34,1.56,0.64,1) both; }
+
+    /* Ripple branco específico para o card de perfil */
+    .pc-ripple {
+      position: absolute; border-radius: 50%;
+      background: rgba(255,255,255,0.28);
+      transform: scale(0);
+      animation: pc-ripple-anim 0.65s ease-out forwards;
+      pointer-events: none; z-index: 3;
+    }
+    @keyframes pc-ripple-anim { to { transform: scale(3.5); opacity: 0; } }
+
     /* MENU LIST */
     .menu-section { margin: 20px 16px 0; }
     .menu-label { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
@@ -265,6 +385,60 @@
     <div>
       <div class="topbar-title">Perfil</div>
       <div class="topbar-sub">Gerir conta e operações</div>
+    </div>
+  </div>
+</div>
+
+<!-- PROFILE CARD -->
+<div class="profile-card" id="profile-card" onclick="profileCardTap(this)">
+
+  <!-- Bolhas decorativas -->
+  <div class="pc-bubble b1"></div>
+  <div class="pc-bubble b2"></div>
+  <div class="pc-bubble b3"></div>
+
+  <!-- Gráfico SVG de fundo (sparkline animada) -->
+  <svg class="pc-chart-bg" viewBox="0 0 400 80" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="pcGradFill" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%"   stop-color="#fff" stop-opacity="0.35"/>
+        <stop offset="100%" stop-color="#fff" stop-opacity="0"/>
+      </linearGradient>
+    </defs>
+    <!-- linha da sparkline -->
+    <polyline class="chart-line"
+      points="0,65 40,52 80,58 120,38 160,44 200,28 240,34 280,18 320,24 360,12 400,8" />
+    <!-- preenchimento sob a linha -->
+    <polygon class="chart-fill"
+      points="0,65 40,52 80,58 120,38 160,44 200,28 240,34 280,18 320,24 360,12 400,8 400,80 0,80" />
+  </svg>
+
+  <!-- Conteúdo principal -->
+  <div class="pc-inner">
+    <div style="position:relative;flex-shrink:0;">
+      <div class="pc-avatar" id="pc-avatar">?</div>
+      <div class="pc-avatar-pulse"></div>
+    </div>
+    <div class="pc-info">
+      <div class="pc-greeting">Bem-vindo de volta</div>
+      <div class="pc-name" id="pc-name">A carregar…</div>
+      <div class="pc-ref" id="pc-ref">ID: —</div>
+    </div>
+  </div>
+
+  <!-- Stats row -->
+  <div class="pc-stats-row">
+    <div class="pc-stat-item">
+      <div class="pc-stat-lbl">Saldo</div>
+      <div class="pc-stat-val" id="pc-saldo">—</div>
+    </div>
+    <div class="pc-stat-item">
+      <div class="pc-stat-lbl">Investimentos</div>
+      <div class="pc-stat-val" id="pc-inv-count">—</div>
+    </div>
+    <div class="pc-stat-item">
+      <div class="pc-stat-lbl">Convidados</div>
+      <div class="pc-stat-val" id="pc-refs-count">—</div>
     </div>
   </div>
 </div>
@@ -661,10 +835,74 @@
     db.collection('users').doc(currentUser.uid).onSnapshot(snap => {
       if (!snap.exists) return;
       userData = snap.data();
-      const refLink = `${window.location.origin}/auth.html?ref=${userData.referralId || ''}`;
-      document.getElementById('ref-link-display').textContent = refLink;
+
+      const name = userData.name || currentUser.displayName || 'Utilizador';
+      const initial = name.charAt(0).toUpperCase();
+      const refId = userData.referralId || '—';
+      const saldo = userData.saldo || 0;
+
+      // Preencher o card de perfil
+      const pcAvatar = document.getElementById('pc-avatar');
+      const pcName   = document.getElementById('pc-name');
+      const pcRef    = document.getElementById('pc-ref');
+      const pcSaldo  = document.getElementById('pc-saldo');
+      if (pcAvatar) pcAvatar.textContent = initial;
+      if (pcName)   pcName.textContent   = name;
+      if (pcRef)    pcRef.textContent     = 'ID: ' + refId;
+      if (pcSaldo)  pcSaldo.textContent   = fmt(saldo);
+
+      // Link de referência no painel de amigos
+      const refLink = `${window.location.origin}/auth.html?ref=${refId}`;
+      const refLinkEl = document.getElementById('ref-link-display');
+      if (refLinkEl) refLinkEl.textContent = refLink;
     });
+
+    // Contar investimentos activos
+    db.collection('investimentos_usuarios')
+      .where('userId', '==', currentUser.uid)
+      .where('status', '==', 'ativo')
+      .get().then(snap => {
+        const el = document.getElementById('pc-inv-count');
+        if (el) el.textContent = snap.size;
+      }).catch(() => {});
+
+    // Contar referências (amigos convidados)
+    db.collection('users').doc(currentUser.uid).get().then(snap => {
+      if (!snap.exists) return;
+      const refId = snap.data().referralId || '';
+      if (!refId) return;
+      db.collection('users').where('invitedBy', '==', refId).get().then(r => {
+        const el = document.getElementById('pc-refs-count');
+        if (el) el.textContent = r.size;
+      });
+    }).catch(() => {});
   }
+
+  // Animação de toque suave no card de perfil — bounce + ripple branco
+  function profileCardTap(card) {
+    // Bounce
+    card.classList.remove('pc-tapped');
+    void card.offsetWidth;
+    card.classList.add('pc-tapped');
+    setTimeout(() => card.classList.remove('pc-tapped'), 500);
+  }
+
+  // Ripple branco na posição exata do toque no card de perfil
+  document.addEventListener('DOMContentLoaded', () => {
+    const card = document.getElementById('profile-card');
+    if (!card) return;
+    card.addEventListener('pointerdown', e => {
+      const rect = card.getBoundingClientRect();
+      const ripple = document.createElement('span');
+      const size = Math.max(rect.width, rect.height) * 0.8;
+      ripple.className = 'pc-ripple';
+      ripple.style.width = ripple.style.height = size + 'px';
+      ripple.style.left = (e.clientX - rect.left - size / 2) + 'px';
+      ripple.style.top  = (e.clientY - rect.top  - size / 2) + 'px';
+      card.appendChild(ripple);
+      setTimeout(() => ripple.remove(), 700);
+    });
+  });
 
   async function loadTransactions() {
     db.collection('transacoes').where('userId', '==', currentUser.uid)
