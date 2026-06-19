@@ -39,20 +39,70 @@
     .topbar-title { font-size: 17px; font-weight: 800; color: #fff; }
     .topbar-sub { font-size: 11px; color: rgba(255,255,255,0.6); }
 
-    /* PORTFOLIO SUMMARY */
+    /* ===== PORTFOLIO SUMMARY (corrigido: mesmo estilo dos outros cards) ===== */
     .portfolio-card {
       margin: 16px 16px 0;
-      background: linear-gradient(135deg, #002f6c, #004a99, #0066cc);
-      border-radius: 16px; padding: 22px 20px 18px;
+      background: linear-gradient(135deg, #002f6c 0%, #004a99 100%);
+      border-radius: 20px; padding: 22px 20px 20px;
       position: relative; overflow: hidden;
-      box-shadow: 0 8px 24px rgba(0,47,108,0.35);
+      box-shadow: 0 8px 28px rgba(0,47,108,0.4);
+      cursor: pointer;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+      transform: translateZ(0);
+      transition: transform 0.18s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.18s ease;
+      animation: card-in 0.5s cubic-bezier(0.16,1,0.3,1) both;
     }
-    .portfolio-card::before {
-      content: ''; position: absolute; top: -30px; right: -30px;
-      width: 150px; height: 150px;
-      background: radial-gradient(circle, rgba(255,255,255,0.07), transparent 70%);
-      border-radius: 50%;
+    @keyframes card-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .portfolio-card:hover {
+      transform: translateY(-4px) scale(1.015);
+      box-shadow: 0 16px 36px rgba(0,47,108,0.48);
     }
+    .portfolio-card:active {
+      transform: scale(0.965) translateY(2px);
+      box-shadow: 0 4px 14px rgba(0,47,108,0.32);
+      transition: transform 0.1s ease, box-shadow 0.1s ease;
+    }
+
+    /* Bolhas decorativas, mesmo padrao dos outros cards */
+    .pfc-bubble { position: absolute; border-radius: 50%; background: rgba(255,255,255,0.07); pointer-events: none; }
+    .pfc-bubble.b1 { width: 130px; height: 130px; top: -40px; right: -30px; animation: pfc-float 6s ease-in-out infinite; }
+    .pfc-bubble.b2 { width: 75px;  height: 75px;  bottom: -25px; left: -15px; animation: pfc-float 8s ease-in-out 1.5s infinite; }
+    .pfc-bubble.b3 { width: 42px;  height: 42px;  top: 14px; left: 28px; animation: pfc-float 5s ease-in-out 0.8s infinite; }
+    @keyframes pfc-float { 0%,100%{transform:translateY(0) scale(1)} 50%{transform:translateY(-8px) scale(1.05)} }
+
+    /* Grafico SVG de fundo, mesmo padrao dos outros cards */
+    .pfc-chart-bg { position: absolute; bottom: 0; left: 0; right: 0; height: 80px; opacity: 0.16; pointer-events: none; }
+    .pfc-chart-bg .pfc-line {
+      stroke: #fff; stroke-width: 2.5; fill: none;
+      stroke-linecap: round; stroke-linejoin: round;
+      stroke-dasharray: 600; stroke-dashoffset: 600;
+      animation: pfc-draw 1.6s cubic-bezier(0.4,0,0.2,1) 0.3s forwards;
+    }
+    .pfc-chart-bg .pfc-fill { fill: url(#pfcGradFill); opacity: 0; animation: pfc-fill-in 0.6s ease 1.7s forwards; }
+    @keyframes pfc-draw    { to { stroke-dashoffset: 0; } }
+    @keyframes pfc-fill-in { to { opacity: 1; } }
+
+    /* Ripple branco ao toque */
+    .pfc-ripple {
+      position: absolute; border-radius: 50%;
+      background: rgba(255,255,255,0.28);
+      transform: scale(0);
+      animation: pfc-ripple-anim 0.65s ease-out forwards;
+      pointer-events: none; z-index: 3;
+    }
+    @keyframes pfc-ripple-anim { to { transform: scale(3.5); opacity: 0; } }
+
+    /* Bounce ao tocar */
+    @keyframes pfc-tap-anim {
+      0%   { transform: scale(1); }
+      25%  { transform: scale(0.96) translateY(2px); }
+      60%  { transform: scale(1.02) translateY(-2px); }
+      100% { transform: scale(1) translateY(0); }
+    }
+    .portfolio-card.pfc-tapped { animation: pfc-tap-anim 0.4s cubic-bezier(0.34,1.56,0.64,1) both; }
+
+    .pfc-content { position: relative; z-index: 2; }
     .pc-label { font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.6); text-transform: uppercase; letter-spacing: 1.5px; }
     .pc-value { font-size: 30px; font-weight: 800; color: #fff; margin: 4px 0; letter-spacing: -0.5px; transition: color 0.4s; }
     .pc-value.flash-up { animation: fu 0.6s ease; }
@@ -60,7 +110,8 @@
     @keyframes fu { 0%,100%{color:#fff} 50%{color:#86efac} }
     @keyframes fd { 0%,100%{color:#fff} 50%{color:#fca5a5} }
     .pc-row { display: flex; align-items: center; gap: 10px; margin-top: 6px; }
-    .pc-badge { padding: 3px 10px; border-radius: 20px; font-size: 12px; font-weight: 700; display: inline-flex; align-items: center; gap: 4px; }
+    .pc-badge { padding: 3px 10px; border-radius: 20px; font-size: 12px; font-weight: 700; display: inline-flex; align-items: center; gap: 4px; transition: transform 0.2s cubic-bezier(0.34,1.56,0.64,1); }
+    .portfolio-card:hover .pc-badge { transform: scale(1.06); }
     .pc-badge.up { background: rgba(43,147,72,0.25); color: #86efac; }
     .pc-badge.dn { background: rgba(229,62,62,0.25); color: #fca5a5; }
     .pc-badge svg { width: 11px; height: 11px; }
@@ -69,7 +120,8 @@
     .pc-stat { text-align: center; }
     .pc-stat:not(:last-child) { border-right: 1px solid rgba(255,255,255,0.1); }
     .pc-stat-lbl { font-size: 10px; color: rgba(255,255,255,0.5); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
-    .pc-stat-val { font-size: 14px; font-weight: 800; color: #fff; margin-top: 3px; }
+    .pc-stat-val { font-size: 14px; font-weight: 800; color: #fff; margin-top: 3px; transition: transform 0.2s cubic-bezier(0.34,1.56,0.64,1); }
+    .portfolio-card:hover .pc-stat-val { transform: scale(1.07); }
 
     /* TABS */
     .section-tabs {
@@ -317,35 +369,54 @@
     <img src="https://i.postimg.cc/xj5dhZdS/Background-Eraser-20260615-082032763.png" alt="Logo" />
     <div>
       <div class="topbar-title">Cotas</div>
-      <div class="topbar-sub">Portfólio em tempo real</div>
+      <div class="topbar-sub">Portfolio em tempo real</div>
     </div>
   </div>
   <div style="color:rgba(255,255,255,0.75); font-size:12px; font-weight:600;" id="top-saldo">Saldo: —</div>
 </div>
 
-<!-- PORTFOLIO CARD -->
-<div class="portfolio-card">
-  <div class="pc-label">Valor Total do Portfólio</div>
-  <div class="pc-value" id="pc-value">0.00</div>
-  <div class="pc-row">
-    <div class="pc-badge up" id="pc-badge">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="18 15 12 9 6 15"/></svg>
-      <span id="pc-pct">+0.00%</span>
+<!-- PORTFOLIO CARD (corrigido: mesmo estilo dos outros cards) -->
+<div class="portfolio-card" id="portfolio-card" onclick="portfolioCardTap(this)">
+  <div class="pfc-bubble b1"></div>
+  <div class="pfc-bubble b2"></div>
+  <div class="pfc-bubble b3"></div>
+
+  <svg class="pfc-chart-bg" viewBox="0 0 400 80" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="pfcGradFill" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%"   stop-color="#fff" stop-opacity="0.35"/>
+        <stop offset="100%" stop-color="#fff" stop-opacity="0"/>
+      </linearGradient>
+    </defs>
+    <polyline class="pfc-line"
+      points="0,65 40,52 80,58 120,38 160,44 200,28 240,34 280,18 320,24 360,12 400,8" />
+    <polygon class="pfc-fill"
+      points="0,65 40,52 80,58 120,38 160,44 200,28 240,34 280,18 320,24 360,12 400,8 400,80 0,80" />
+  </svg>
+
+  <div class="pfc-content">
+    <div class="pc-label">Valor Total do Portfolio</div>
+    <div class="pc-value" id="pc-value">0.00</div>
+    <div class="pc-row">
+      <div class="pc-badge up" id="pc-badge">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="18 15 12 9 6 15"/></svg>
+        <span id="pc-pct">+0.00%</span>
+      </div>
+      <div class="pc-sub" id="pc-sub">Actualizado agora</div>
     </div>
-    <div class="pc-sub" id="pc-sub">Actualizado agora</div>
-  </div>
-  <div class="pc-stats">
-    <div class="pc-stat">
-      <div class="pc-stat-lbl">Investido</div>
-      <div class="pc-stat-val" id="pc-investido">0.00</div>
-    </div>
-    <div class="pc-stat">
-      <div class="pc-stat-lbl">Ganho/Perda</div>
-      <div class="pc-stat-val" id="pc-ganho" style="color:#86efac;">+0.00</div>
-    </div>
-    <div class="pc-stat">
-      <div class="pc-stat-lbl">Posições</div>
-      <div class="pc-stat-val" id="pc-posicoes">0</div>
+    <div class="pc-stats">
+      <div class="pc-stat">
+        <div class="pc-stat-lbl">Investido</div>
+        <div class="pc-stat-val" id="pc-investido">0.00</div>
+      </div>
+      <div class="pc-stat">
+        <div class="pc-stat-lbl">Ganho/Perda</div>
+        <div class="pc-stat-val" id="pc-ganho" style="color:#86efac;">+0.00</div>
+      </div>
+      <div class="pc-stat">
+        <div class="pc-stat-lbl">Posicoes</div>
+        <div class="pc-stat-val" id="pc-posicoes">0</div>
+      </div>
     </div>
   </div>
 </div>
@@ -361,7 +432,7 @@
 <div class="tab-section active" id="tab-dashboard">
   <div class="chart-card">
     <div class="chart-header">
-      <div class="chart-title">Valorização do Portfólio</div>
+      <div class="chart-title">Valorizacao do Portfolio</div>
       <div class="period-btns">
         <button class="period-btn active" onclick="changePeriod(7, this)">7D</button>
         <button class="period-btn" onclick="changePeriod(15, this)">15D</button>
@@ -373,11 +444,11 @@
 
   <div class="price-ticker">
     <div class="ticker-left">
-      <div class="lbl">Cotação de Referência</div>
+      <div class="lbl">Cotacao de Referencia</div>
       <div class="val" id="ticker-val">—</div>
     </div>
     <div class="ticker-right">
-      <div class="lbl">Variação Hoje</div>
+      <div class="lbl">Variacao Hoje</div>
       <div class="val" id="ticker-chg" style="color:var(--green);">—</div>
     </div>
   </div>
@@ -392,7 +463,7 @@
         </div>
         <div>
           <div style="font-size:13px;font-weight:700;">MSCI Asia</div>
-          <div style="font-size:11px;color:var(--muted);">Índice Regional</div>
+          <div style="font-size:11px;color:var(--muted);">Indice Regional</div>
         </div>
       </div>
       <div style="text-align:right;">
@@ -407,7 +478,7 @@
         </div>
         <div>
           <div style="font-size:13px;font-weight:700;">Nikkei 225</div>
-          <div style="font-size:11px;color:var(--muted);">Japão</div>
+          <div style="font-size:11px;color:var(--muted);">Japao</div>
         </div>
       </div>
       <div style="text-align:right;">
@@ -422,7 +493,7 @@
         </div>
         <div>
           <div style="font-size:13px;font-weight:700;">BSE Sensex</div>
-          <div style="font-size:11px;color:var(--muted);">Índia</div>
+          <div style="font-size:11px;color:var(--muted);">India</div>
         </div>
       </div>
       <div style="text-align:right;">
@@ -441,7 +512,7 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
       </div>
       <div class="empty-title">Nenhuma cota activa</div>
-      <div class="empty-sub">Ainda não tem investimentos em cotas. Vá à secção Mirae e escolha o seu primeiro plano.</div>
+      <div class="empty-sub">Ainda nao tem investimentos em cotas. Va a seccao Mirae e escolha o seu primeiro plano.</div>
       <button class="btn-go-invest" onclick="window.location.href='mirae.html'">Ver Planos de Investimento</button>
     </div>
   </div>
@@ -469,7 +540,7 @@
           <option value="china-growth|7299">Mirae China Growth — 7.299</option>
           <option value="india-sector|12950">Mirae India Sector Leader — 12.950</option>
           <option value="esg-growth|18200">Mirae ESG Asia Growth — 18.200</option>
-          <option value="fiis|51000">Fundos Imobiliários FIIs — 51.000</option>
+          <option value="fiis|51000">Fundos Imobiliarios FIIs — 51.000</option>
         </select>
       </div>
       <div class="form-group">
@@ -489,7 +560,7 @@
         <button onclick="numpad('6')" style="padding:14px;background:var(--bg);border:none;border-radius:10px;font-size:18px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;">6</button>
         <button onclick="numpad('7')" style="padding:14px;background:var(--bg);border:none;border-radius:10px;font-size:18px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;">7</button>
         <button onclick="numpad('8')" style="padding:14px;background:var(--bg);border:none;border-radius:10px;font-size:18px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;">8</button>
-        <button onclick="numpad('9')" style="padding:14px;background:var(--bg);border:none;border-radius:10px;font-size:18px;font-weight:700;cursor:pointer;font-family:Inter,sans-sans;">9</button>
+        <button onclick="numpad('9')" style="padding:14px;background:var(--bg);border:none;border-radius:10px;font-size:18px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;">9</button>
         <button onclick="numpad('00')" style="padding:14px;background:var(--bg);border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;">00</button>
         <button onclick="numpad('0')" style="padding:14px;background:var(--bg);border:none;border-radius:10px;font-size:18px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;">0</button>
         <button onclick="numpadDel()" style="padding:14px;background:var(--bg);border:none;border-radius:10px;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;">
@@ -497,9 +568,9 @@
         </button>
       </div>
       <div class="calc-result" id="buy-calc">
-        <div class="calc-row"><span class="calc-lbl">Preço da cota</span><span class="calc-val" id="bc-preco">—</span></div>
+        <div class="calc-row"><span class="calc-lbl">Preco da cota</span><span class="calc-val" id="bc-preco">—</span></div>
         <div class="calc-row"><span class="calc-lbl">Cotas a adquirir</span><span class="calc-val" id="bc-cotas">—</span></div>
-        <div class="calc-row"><span class="calc-lbl">Saldo disponível</span><span class="calc-val" id="bc-saldo">—</span></div>
+        <div class="calc-row"><span class="calc-lbl">Saldo disponivel</span><span class="calc-val" id="bc-saldo">—</span></div>
         <div class="calc-row"><span class="calc-lbl">Total a debitar</span><span class="calc-val highlight" id="bc-total">—</span></div>
       </div>
       <button class="btn-trade buy" onclick="doBuy()">
@@ -519,16 +590,16 @@
       </div>
       <div class="calc-result" id="sell-calc">
         <div class="calc-row"><span class="calc-lbl">Cotas em carteira</span><span class="calc-val" id="sc-cotas">—</span></div>
-        <div class="calc-row"><span class="calc-lbl">Preço médio de compra</span><span class="calc-val" id="sc-preco-compra">—</span></div>
-        <div class="calc-row"><span class="calc-lbl">Preço actual da cota</span><span class="calc-val" id="sc-preco-atual">—</span></div>
+        <div class="calc-row"><span class="calc-lbl">Preco medio de compra</span><span class="calc-val" id="sc-preco-compra">—</span></div>
+        <div class="calc-row"><span class="calc-lbl">Preco actual da cota</span><span class="calc-val" id="sc-preco-atual">—</span></div>
         <div class="calc-row"><span class="calc-lbl">Valor investido</span><span class="calc-val" id="sc-investido">—</span></div>
-        <div class="calc-row"><span class="calc-lbl">Comissão diária</span><span class="calc-val highlight" id="sc-comissao" style="color:var(--green);">—</span></div>
+        <div class="calc-row"><span class="calc-lbl">Comissao diaria</span><span class="calc-val highlight" id="sc-comissao" style="color:var(--green);">—</span></div>
       </div>
       <button class="btn-trade sell" onclick="doSell()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
-        Resgatar Comissão (1x/dia)
+        Resgatar Comissao (1x/dia)
       </button>
-      <div class="saldo-info" style="color:var(--orange);font-weight:600;">Resgate disponível 1 vez por dia. A comissão é creditada diariamente.</div>
+      <div class="saldo-info" style="color:var(--orange);font-weight:600;">Resgate disponivel 1 vez por dia. A comissao e creditada diariamente.</div>
     </div>
   </div>
 </div>
@@ -537,22 +608,22 @@
 <div id="resgate-modal">
   <div class="resgate-card">
     <div class="resgate-drag"></div>
-    <div class="resgate-title">Confirmar Resgate de Comissão</div>
+    <div class="resgate-title">Confirmar Resgate de Comissao</div>
     <div class="resgate-sub" id="resgate-fund-name">—</div>
     <div class="resgate-info-box">
       <div class="ri-row"><span class="ri-lbl">Cotas em carteira</span><span class="ri-val" id="rm-cotas">—</span></div>
       <div class="ri-row"><span class="ri-lbl">Valor investido</span><span class="ri-val" id="rm-investido">—</span></div>
-      <div class="ri-row"><span class="ri-lbl">Comissão diária</span><span class="ri-val green" id="rm-comissao">—</span></div>
+      <div class="ri-row"><span class="ri-lbl">Comissao diaria</span><span class="ri-val green" id="rm-comissao">—</span></div>
       <div class="ri-row"><span class="ri-lbl">Total a creditar</span><span class="ri-val green" id="rm-total">—</span></div>
     </div>
     <div class="resgate-warning">
-      Atenção: O resgate da comissão está disponível uma vez por dia. O seu investimento mantém-se activo e amanhã poderá resgatar novamente a comissão diária.
+      Atencao: O resgate da comissao esta disponivel uma vez por dia. O seu investimento mantem-se activo e amanha podera resgatar novamente a comissao diaria.
     </div>
     <div class="resgate-btns">
       <button class="btn-cancel" onclick="closeResgateModal()">Cancelar</button>
       <button class="btn-confirm-resgate" onclick="confirmResgate()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
-        Resgatar Comissão
+        Resgatar Comissao
       </button>
     </div>
   </div>
@@ -568,7 +639,7 @@
 <nav class="bottom-nav">
   <a class="nav-item" href="index.html">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-    <span>Início</span>
+    <span>Inicio</span>
   </a>
   <a class="nav-item" href="mirae.html">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
@@ -613,7 +684,6 @@
   let mainChart = null;
   let lastResgateDates = {};
 
-  // Comissões por plano (diárias)
   const COMISSOES = {
     'esg-asia-fund': 250,
     'china-growth-fund': 510,
@@ -664,7 +734,6 @@
         snap.forEach(doc => {
           const data = doc.data();
           userInvestments.push({ id: doc.id, ...data });
-          // Carregar último resgate
           if (data.ultimoResgate) {
             lastResgateDates[doc.id] = data.ultimoResgate;
           }
@@ -744,17 +813,17 @@
         <div class="inv-item-body">
           <div class="inv-metrics">
             <div class="inv-metric"><div class="lbl">Investido</div><div class="val">${fmt(valorInv)}</div></div>
-            <div class="inv-metric"><div class="lbl">Comissão Diária</div><div class="val" style="color:var(--green);">+${fmt(comissao)}</div></div>
-            <div class="inv-metric"><div class="lbl">Status</div><div class="val" style="color:${podeResgatar ? 'var(--green)' : 'var(--orange)'};">${podeResgatar ? 'Disponível' : 'Resgatado hoje'}</div></div>
+            <div class="inv-metric"><div class="lbl">Comissao Diaria</div><div class="val" style="color:var(--green);">+${fmt(comissao)}</div></div>
+            <div class="inv-metric"><div class="lbl">Status</div><div class="val" style="color:${podeResgatar ? 'var(--green)' : 'var(--orange)'};">${podeResgatar ? 'Disponivel' : 'Resgatado hoje'}</div></div>
           </div>
           <div class="inv-actions">
             <button class="btn-resgate detail" onclick="window.location.href='cotas.html'">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-              Ver Gráfico
+              Ver Grafico
             </button>
             <button class="btn-resgate sell" onclick="openResgateFromList('${inv.id}', '${inv.nomeFundo || inv.fundoId}', ${inv.quantidade_cotas || 0}, ${preco}, ${valorInv}, '${inv.fundoId}')" ${!podeResgatar ? 'disabled style="opacity:0.5;cursor:not-allowed;"' : ''}>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
-              ${podeResgatar ? 'Resgatar' : 'Já resgatado hoje'}
+              ${podeResgatar ? 'Resgatar' : 'Ja resgatado hoje'}
             </button>
           </div>
         </div>
@@ -770,7 +839,7 @@
       const pode = canResgateToday(inv.id);
       const opt = document.createElement('option');
       opt.value = inv.id;
-      opt.textContent = (inv.nomeFundo || inv.fundoId) + ' — ' + (inv.quantidade_cotas || 0).toFixed(4) + ' cotas' + (pode ? '' : ' (já resgatado hoje)');
+      opt.textContent = (inv.nomeFundo || inv.fundoId) + ' — ' + (inv.quantidade_cotas || 0).toFixed(4) + ' cotas' + (pode ? '' : ' (ja resgatado hoje)');
       opt.disabled = !pode;
       sel.appendChild(opt);
     });
@@ -823,7 +892,6 @@
     setInterval(update, 4000);
   }
 
-  // ===== NUMPAD =====
   function numpad(digit) {
     rawAmount = rawAmount * 10 + parseInt(digit === '00' ? '00' : digit);
     if (digit === '00') rawAmount = Math.min(rawAmount * 100, 9999999900);
@@ -863,7 +931,7 @@
     selectedSellInv = userInvestments.find(i => i.id === invId);
     if (!selectedSellInv) return;
     if (!canResgateToday(invId)) {
-      showToast('warning', 'Atenção', 'Já resgatou a comissão hoje. Volte amanhã.');
+      showToast('warning', 'Atencao', 'Ja resgatou a comissao hoje. Volte amanha.');
       return;
     }
     const preco = await getFundPrice(selectedSellInv.fundoId, selectedSellInv.preco_medio_compra || 1);
@@ -898,14 +966,14 @@
   }
 
   async function doBuy() {
-    showToast('warning', 'Solicitação Enviada', 'A compra de cotas deve ser solicitada ao gestor. Entraremos em contacto.');
+    showToast('warning', 'Solicitacao Enviada', 'A compra de cotas deve ser solicitada ao gestor. Entraremos em contacto.');
   }
 
   function doSell() {
-    if (!selectedSellInv) { showToast('warning', 'Atenção', 'Seleccione um investimento para resgatar.'); return; }
+    if (!selectedSellInv) { showToast('warning', 'Atencao', 'Seleccione um investimento para resgatar.'); return; }
     const invId = selectedSellInv.id;
     if (!canResgateToday(invId)) {
-      showToast('warning', 'Atenção', 'Já resgatou a comissão hoje. Volte amanhã.');
+      showToast('warning', 'Atencao', 'Ja resgatou a comissao hoje. Volte amanha.');
       return;
     }
     document.getElementById('resgate-fund-name').textContent = selectedSellInv.nomeFundo || selectedSellInv.fundoId;
@@ -919,7 +987,7 @@
 
   function openResgateFromList(id, nome, cotas, preco, valorInv, fundoId) {
     if (!canResgateToday(id)) {
-      showToast('warning', 'Atenção', 'Já resgatou a comissão hoje. Volte amanhã.');
+      showToast('warning', 'Atencao', 'Ja resgatou a comissao hoje. Volte amanha.');
       return;
     }
     const comissao = COMISSOES[fundoId] || 0;
@@ -944,30 +1012,27 @@
       batch.update(db.collection('users').doc(currentUser.uid), { 
         saldo: firebase.firestore.FieldValue.increment(comissao) 
       });
-      // Atualizar último resgate
       batch.update(db.collection('investimentos_usuarios').doc(selectedSellInv.id), { 
         ultimoResgate: firebase.firestore.FieldValue.serverTimestamp()
       });
       batch.set(db.collection('transacoes').doc(), {
         userId: currentUser.uid, tipo: 'resgate_comissao', valor: comissao,
-        descricao: `Resgate de comissão: ${selectedSellInv.nomeFundo || ''}`, 
+        descricao: `Resgate de comissao: ${selectedSellInv.nomeFundo || ''}`, 
         status: 'aprovado',
         data: firebase.firestore.FieldValue.serverTimestamp()
       });
       await batch.commit();
-      // Atualizar local
       lastResgateDates[selectedSellInv.id] = new Date();
       document.getElementById('processing-overlay').classList.remove('active');
-      showToast('success', 'Comissão resgatada!', `${fmt(comissao)} creditado na sua carteira. Volte amanhã para resgatar novamente.`);
-      // Recarregar investimentos
+      showToast('success', 'Comissao resgatada!', `${fmt(comissao)} creditado na sua carteira. Volte amanha para resgatar novamente.`);
       loadInvestments();
     } catch(e) {
       document.getElementById('processing-overlay').classList.remove('active');
-      showToast('error', 'Erro no resgate', 'Não foi possível processar o resgate.');
+      showToast('error', 'Erro no resgate', 'Nao foi possivel processar o resgate.');
     }
   }
 
-  function fmt(v) { return parseFloat(v || 0).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, '.'); }
+  function fmt(v) { return parseFloat(v || 0).toFixed(2).replace(/\\B(?=(\\d{3})+(?!\\d))/g, '.'); }
 
   function showToast(type, title, msg) {
     const icons = {
@@ -983,7 +1048,29 @@
     setTimeout(() => { t.classList.add('removing'); setTimeout(() => t.remove(), 380); }, 5000);
   }
 
-  // Draggable WA
+  function portfolioCardTap(card) {
+    card.classList.remove('pfc-tapped');
+    void card.offsetWidth;
+    card.classList.add('pfc-tapped');
+    setTimeout(() => card.classList.remove('pfc-tapped'), 500);
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const card = document.getElementById('portfolio-card');
+    if (!card) return;
+    card.addEventListener('pointerdown', e => {
+      const rect = card.getBoundingClientRect();
+      const ripple = document.createElement('span');
+      const size = Math.max(rect.width, rect.height) * 0.8;
+      ripple.className = 'pfc-ripple';
+      ripple.style.width = ripple.style.height = size + 'px';
+      ripple.style.left = (e.clientX - rect.left - size / 2) + 'px';
+      ripple.style.top  = (e.clientY - rect.top  - size / 2) + 'px';
+      card.appendChild(ripple);
+      setTimeout(() => ripple.remove(), 700);
+    });
+  });
+
   const wa = document.getElementById('wa-float');
   wa.addEventListener('mousedown', e => {
     const r = wa.getBoundingClientRect(); let il = r.left, it = r.top, sx = e.clientX, sy = e.clientY;
