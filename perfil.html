@@ -906,52 +906,58 @@
   });
 
   function loadProfile() {
-    // --- Perfil principal via onSnapshot (tempo real) ---
-    db.collection('users').doc(currentUser.uid).onSnapshot(snap => {
-      if (!snap.exists) {
-        console.warn('Documento do utilizador não encontrado:', currentUser.uid);
-        return;
-      }
+    const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+
+    // Usa .get() simples (mais compatível com regras Firestore)
+    db.collection('users').doc(currentUser.uid).get().then(snap => {
+      if (!snap.exists) return;
       userData = snap.data();
+
       const name    = userData.name || currentUser.displayName || 'Utilizador';
-      const initial = name.charAt(0).toUpperCase();
       const refId   = userData.referralId || '—';
       const saldo   = userData.saldo || 0;
 
-      const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
-      set('pc-avatar', initial);
+      set('pc-avatar', name.charAt(0).toUpperCase());
       set('pc-name',   name);
       set('pc-ref',    'ID: ' + refId);
       set('pc-saldo',  fmt(saldo));
+      set('pc-inv-count', '0');
+      set('pc-refs-count', '0');
 
       const refLinkEl = document.getElementById('ref-link-display');
       if (refLinkEl) refLinkEl.textContent = window.location.origin + '/auth.html?ref=' + refId;
 
-      // Contar investimentos activos — query simples, apenas userId
-      // (filtramos por status no cliente para evitar índice composto)
+      // Contar investimentos — filtra no cliente
       db.collection('investimentos_usuarios')
         .where('userId', '==', currentUser.uid)
         .get()
         .then(invSnap => {
           const ativos = invSnap.docs.filter(d => (d.data().status || '') === 'ativo').length;
           set('pc-inv-count', ativos);
-        })
-        .catch(err => { console.error('Erro ao contar investimentos:', err); set('pc-inv-count', '0'); });
+        }).catch(() => {});
 
-      // Contar convidados — só se tiver referralId válido
+      // Contar convidados
       if (refId && refId !== '—') {
-        db.collection('users')
-          .where('invitedBy', '==', refId)
-          .get()
-          .then(r => set('pc-refs-count', r.size))
-          .catch(err => { console.error('Erro ao contar convidados:', err); set('pc-refs-count', '0'); });
-      } else {
-        set('pc-refs-count', '0');
+        db.collection('users').where('invitedBy', '==', refId).get()
+          .then(r => set('pc-refs-count', r.size)).catch(() => {});
       }
-    }, err => {
-      console.error('Erro ao carregar perfil:', err);
-      showToast('error', 'Erro', 'Não foi possível carregar os dados do perfil.');
+    }).catch(err => {
+      console.error('Erro loadProfile:', err);
+      // Retry após 2 segundos
+      setTimeout(() => loadProfile(), 2000);
     });
+
+    // Listener em tempo real para actualizar saldo automaticamente
+    db.collection('users').doc(currentUser.uid).onSnapshot(snap => {
+      if (!snap.exists) return;
+      userData = snap.data();
+      set('pc-saldo', fmt(userData.saldo || 0));
+      set('pc-name',  userData.name || currentUser.displayName || 'Utilizador');
+      set('pc-avatar', (userData.name || currentUser.displayName || 'U').charAt(0).toUpperCase());
+      set('pc-ref',   'ID: ' + (userData.referralId || '—'));
+      const refLinkEl = document.getElementById('ref-link-display');
+      if (refLinkEl) refLinkEl.textContent = window.location.origin + '/auth.html?ref=' + (userData.referralId || '');
+    }, () => { /* ignora erros do listener - o .get() já fez a carga inicial */ });
   }
 
   function profileCardTap(card) {
@@ -999,33 +1005,42 @@
     setTimeout(() => card.classList.remove('ref-tapped'), 500);
   }
 
+  function processTransactionsSnap(snap) {
+    allTransactions = [];
+    const today = new Date().toDateString();
+    todayWithdrawCount = 0; pendingWithdraw = false;
+    snap.forEach(doc => {
+      const d = doc.data();
+      allTransactions.push({ id: doc.id, ...d });
+      if (d.tipo === 'levantamento') {
+        const dt = d.data?.toDate ? d.data.toDate() : new Date();
+        if (dt.toDateString() === today) todayWithdrawCount++;
+        if (d.status === 'pendente') pendingWithdraw = true;
+      }
+    });
+    allTransactions.sort((a, b) => {
+      const ta = a.data?.toDate ? a.data.toDate().getTime() : 0;
+      const tb = b.data?.toDate ? b.data.toDate().getTime() : 0;
+      return tb - ta;
+    });
+    renderTransactions(allTransactions);
+  }
+
   async function loadTransactions() {
-    db.collection('transacoes')
-      .where('userId', '==', currentUser.uid)
-      .limit(50)
-      .onSnapshot(snap => {
-        allTransactions = [];
-        const today = new Date().toDateString();
-        todayWithdrawCount = 0; pendingWithdraw = false;
-        snap.forEach(doc => {
-          const d = doc.data();
-          allTransactions.push({ id: doc.id, ...d });
-          if (d.tipo === 'levantamento') {
-            const dt = d.data?.toDate ? d.data.toDate() : new Date();
-            if (dt.toDateString() === today) todayWithdrawCount++;
-            if (d.status === 'pendente') pendingWithdraw = true;
-          }
-        });
-        // Ordenar por data descendente no cliente (evita índice composto)
-        allTransactions.sort((a, b) => {
-          const ta = a.data?.toDate ? a.data.toDate().getTime() : 0;
-          const tb = b.data?.toDate ? b.data.toDate().getTime() : 0;
-          return tb - ta;
-        });
-        renderTransactions(allTransactions);
-      }, err => {
-        console.error('Erro ao carregar transacções:', err);
-      });
+    const txRef = db.collection('transacoes').where('userId', '==', currentUser.uid).limit(50);
+
+    // Carga inicial com .get() — sempre funciona
+    txRef.get().then(snap => {
+      processTransactionsSnap(snap);
+    }).catch(err => {
+      console.error('Erro ao carregar transacções:', err);
+    });
+
+    // Listener em tempo real para actualizações
+    txRef.onSnapshot(snap => {
+      processTransactionsSnap(snap);
+    }, () => { /* silencia erros do listener */ });
+
     // Referrals count
     if (userData.referralId) {
       db.collection('referrals').where('inviterCode', '==', userData.referralId).get().then(snap => {
@@ -1520,11 +1535,4 @@
   }
 
   // ===== FRIENDS =====
-  function checkFriendReady() {
-    const checks = document.querySelectorAll('#friend-checks input[type=checkbox]');
-    const all = Array.from(checks).every(c => c.checked);
-    document.getElementById('ref-link-section').style.display = all ? 'block' : 'none';
-  }
-  function copyRefLink() {
-    const link = document.getElementById('ref-link-display').textContent;
-    navigator.clipboard.writeText(link).then(() => showToast('success', 'Copiado!', 'Link de convite copiado.')).catch(() => showToast(
+  function checkFri
