@@ -27,145 +27,59 @@
     .topbar-title { font-size: 17px; font-weight: 800; color: #fff; }
     .topbar-sub { font-size: 11px; color: rgba(255,255,255,0.6); }
 
-    /* ===== PROFILE CARD ===== */
+    /* PROFILE CARD */
     .profile-card {
       margin: 14px 16px 0;
       background: linear-gradient(135deg, #002f6c 0%, #004a99 100%);
-      border-radius: 20px;
-      padding: 22px 20px 20px;
-      position: relative;
-      overflow: hidden;
-      box-shadow: 0 8px 28px rgba(0,47,108,0.4);
-      cursor: pointer;
-      user-select: none;
-      -webkit-tap-highlight-color: transparent;
+      border-radius: 20px; padding: 22px 20px 20px;
+      position: relative; overflow: hidden; box-shadow: 0 8px 28px rgba(0,47,108,0.4);
+      cursor: pointer; user-select: none; -webkit-tap-highlight-color: transparent;
       transform: translateZ(0);
       transition: transform 0.18s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.18s ease;
       animation: card-in 0.5s cubic-bezier(0.16,1,0.3,1) both;
     }
-    .profile-card:hover {
-      transform: translateY(-4px) scale(1.015);
-      box-shadow: 0 16px 36px rgba(0,47,108,0.48);
-    }
-    .profile-card:active {
-      transform: scale(0.965) translateY(2px);
-      box-shadow: 0 4px 14px rgba(0,47,108,0.32);
-      transition: transform 0.1s ease, box-shadow 0.1s ease;
-    }
-
-    /* Gráfico SVG de fundo */
-    .pc-chart-bg {
-      position: absolute;
-      bottom: 0; left: 0; right: 0;
-      height: 80px;
-      opacity: 0.18;
-      pointer-events: none;
-    }
-    .pc-chart-bg .chart-line {
-      stroke: #fff;
-      stroke-width: 2.5;
-      fill: none;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-      stroke-dasharray: 600;
-      stroke-dashoffset: 600;
-      animation: draw-line 1.6s cubic-bezier(0.4,0,0.2,1) 0.3s forwards;
-    }
-    .pc-chart-bg .chart-fill {
-      fill: url(#pcGradFill);
-      opacity: 0;
-      animation: fill-fade 0.6s ease 1.7s forwards;
-    }
+    .profile-card:hover { transform: translateY(-4px) scale(1.015); box-shadow: 0 16px 36px rgba(0,47,108,0.48); }
+    .profile-card:active { transform: scale(0.965) translateY(2px); box-shadow: 0 4px 14px rgba(0,47,108,0.32); transition: transform 0.1s ease, box-shadow 0.1s ease; }
+    .pc-chart-bg { position: absolute; bottom: 0; left: 0; right: 0; height: 80px; opacity: 0.18; pointer-events: none; }
+    .pc-chart-bg .chart-line { stroke: #fff; stroke-width: 2.5; fill: none; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 600; stroke-dashoffset: 600; animation: draw-line 1.6s cubic-bezier(0.4,0,0.2,1) 0.3s forwards; }
+    .pc-chart-bg .chart-fill { fill: url(#pcGradFill); opacity: 0; animation: fill-fade 0.6s ease 1.7s forwards; }
     @keyframes draw-line { to { stroke-dashoffset: 0; } }
     @keyframes fill-fade  { to { opacity: 1; } }
-
-    /* Decoração de bolhas */
-    .pc-bubble {
-      position: absolute; border-radius: 50%;
-      background: rgba(255,255,255,0.07);
-      pointer-events: none;
-    }
+    .pc-bubble { position: absolute; border-radius: 50%; background: rgba(255,255,255,0.07); pointer-events: none; }
     .pc-bubble.b1 { width: 120px; height: 120px; top: -35px; right: -25px; animation: bubble-float 6s ease-in-out infinite; }
     .pc-bubble.b2 { width: 70px;  height: 70px;  bottom: -20px; right: 60px; animation: bubble-float 8s ease-in-out 1.5s infinite; }
     .pc-bubble.b3 { width: 40px;  height: 40px;  top: 10px; right: 90px; animation: bubble-float 5s ease-in-out 0.8s infinite; }
-    @keyframes bubble-float {
-      0%, 100% { transform: translateY(0) scale(1); }
-      50%       { transform: translateY(-8px) scale(1.05); }
-    }
-
-    /* Conteúdo do card */
+    @keyframes bubble-float { 0%, 100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-8px) scale(1.05); } }
     .pc-inner { position: relative; z-index: 2; display: flex; align-items: center; gap: 14px; }
-    .pc-avatar {
-      width: 54px; height: 54px; border-radius: 50%;
-      background: rgba(255,255,255,0.2);
-      border: 2.5px solid rgba(255,255,255,0.4);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 22px; font-weight: 800; color: #fff; flex-shrink: 0;
-      transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
-      box-shadow: 0 2px 10px rgba(0,0,0,0.15);
-    }
+    .pc-avatar { width: 54px; height: 54px; border-radius: 50%; background: rgba(255,255,255,0.2); border: 2.5px solid rgba(255,255,255,0.4); display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: 800; color: #fff; flex-shrink: 0; transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1); box-shadow: 0 2px 10px rgba(0,0,0,0.15); }
     .profile-card:hover .pc-avatar { transform: scale(1.1) rotate(-4deg); }
-    .pc-avatar-pulse {
-      position: absolute; inset: -4px; border-radius: 50%;
-      border: 2px solid rgba(255,255,255,0.25);
-      animation: avatar-pulse 2.4s ease-in-out infinite;
-    }
-    @keyframes avatar-pulse {
-      0%, 100% { transform: scale(1); opacity: 0.6; }
-      50%       { transform: scale(1.15); opacity: 0; }
-    }
+    .pc-avatar-pulse { position: absolute; inset: -4px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.25); animation: avatar-pulse 2.4s ease-in-out infinite; }
+    @keyframes avatar-pulse { 0%, 100% { transform: scale(1); opacity: 0.6; } 50% { transform: scale(1.15); opacity: 0; } }
     .pc-info { flex: 1; }
     .pc-greeting { font-size: 11px; color: rgba(255,255,255,0.65); font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
     .pc-name { font-size: 19px; font-weight: 800; color: #fff; margin-top: 2px; letter-spacing: 0.2px; line-height: 1.2; transition: letter-spacing 0.3s ease; }
     .profile-card:hover .pc-name { letter-spacing: 0.8px; }
     .pc-ref { display: inline-block; margin-top: 6px; background: rgba(255,255,255,0.18); border: 1px solid rgba(255,255,255,0.25); border-radius: 20px; padding: 3px 10px; font-size: 10px; font-weight: 700; color: rgba(255,255,255,0.9); letter-spacing: 0.8px; }
-
-    /* Stats row dentro do card */
     .pc-stats-row { position: relative; z-index: 2; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0; margin-top: 16px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,0.15); }
     .pc-stat-item { text-align: center; }
     .pc-stat-item:not(:last-child) { border-right: 1px solid rgba(255,255,255,0.15); }
     .pc-stat-lbl { font-size: 10px; color: rgba(255,255,255,0.55); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
     .pc-stat-val { font-size: 15px; font-weight: 800; color: #fff; margin-top: 3px; transition: transform 0.2s cubic-bezier(0.34,1.56,0.64,1); }
     .profile-card:hover .pc-stat-val { transform: scale(1.07); }
-
-    /* Animação de toque (tap feedback) */
-    @keyframes pc-tap-anim {
-      0%   { transform: scale(1); }
-      25%  { transform: scale(0.96) translateY(2px); }
-      60%  { transform: scale(1.02) translateY(-2px); }
-      100% { transform: scale(1) translateY(0); }
-    }
+    @keyframes pc-tap-anim { 0% { transform: scale(1); } 25% { transform: scale(0.96) translateY(2px); } 60% { transform: scale(1.02) translateY(-2px); } 100% { transform: scale(1) translateY(0); } }
     .profile-card.pc-tapped { animation: pc-tap-anim 0.4s cubic-bezier(0.34,1.56,0.64,1) both; }
-
-    /* Ripple branco específico para o card de perfil */
-    .pc-ripple {
-      position: absolute; border-radius: 50%;
-      background: rgba(255,255,255,0.28);
-      transform: scale(0);
-      animation: pc-ripple-anim 0.65s ease-out forwards;
-      pointer-events: none; z-index: 3;
-    }
+    .pc-ripple { position: absolute; border-radius: 50%; background: rgba(255,255,255,0.28); transform: scale(0); animation: pc-ripple-anim 0.65s ease-out forwards; pointer-events: none; z-index: 3; }
     @keyframes pc-ripple-anim { to { transform: scale(3.5); opacity: 0; } }
 
-    /* MENU LIST */
+    /* MENU */
     .menu-section { margin: 20px 16px 0; }
     .menu-label { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
     .menu-list { background: var(--card); border-radius: 14px; box-shadow: var(--shadow); overflow: hidden; }
-    .menu-item {
-      display: flex; align-items: center; gap: 14px;
-      padding: 16px; cursor: pointer;
-      border-bottom: 1px solid #f0f2f8;
-      transition: background 0.2s, transform 0.15s ease;
-      -webkit-tap-highlight-color: transparent;
-      position: relative;
-      overflow: hidden;
-      animation: menu-in 0.4s ease both;
-    }
+    .menu-item { display: flex; align-items: center; gap: 14px; padding: 16px; cursor: pointer; border-bottom: 1px solid #f0f2f8; transition: background 0.2s, transform 0.15s ease; -webkit-tap-highlight-color: transparent; position: relative; overflow: hidden; animation: menu-in 0.4s ease both; }
     .menu-item:nth-child(1) { animation-delay: 0.02s; }
     .menu-item:nth-child(2) { animation-delay: 0.08s; }
     .menu-item:nth-child(3) { animation-delay: 0.14s; }
     .menu-item:nth-child(4) { animation-delay: 0.20s; }
-    .menu-item:nth-child(5) { animation-delay: 0.26s; }
     .menu-item:last-child { border-bottom: none; }
     .menu-item:hover { background: #f8f9ff; }
     .menu-item:active { background: #eef1ff; transform: scale(0.97); }
@@ -181,48 +95,21 @@
     .menu-arrow { color: #c7d2e0; }
     .menu-arrow svg { width: 16px; height: 16px; }
 
-    /* FULL SCREEN PANELS */
-    .panel {
-      position: fixed; inset: 0; background: var(--bg); z-index: 500;
-      display: none; flex-direction: column; overflow: hidden;
-    }
+    /* PANELS */
+    .panel { position: fixed; inset: 0; background: var(--bg); z-index: 500; display: none; flex-direction: column; overflow: hidden; }
     .panel.open { display: flex; animation: panel-in 0.3s cubic-bezier(0.16,1,0.3,1); }
     @keyframes panel-in { from { transform: translateX(100%); } to { transform: translateX(0); } }
     @keyframes card-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     @keyframes menu-in { from { opacity: 0; transform: translateX(-12px); } to { opacity: 1; transform: translateX(0); } }
-    .panel-header {
-      background: linear-gradient(135deg, #002f6c, #004a99);
-      padding: 14px 16px; display: flex; align-items: center; gap: 12px;
-      flex-shrink: 0;
-    }
+    .panel-header { background: linear-gradient(135deg, #002f6c, #004a99); padding: 14px 16px; display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
     .panel-back { background: rgba(255,255,255,0.12); border: none; border-radius: 50%; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #fff; flex-shrink: 0; }
     .panel-back svg { width: 18px; height: 18px; }
     .panel-title { font-size: 16px; font-weight: 800; color: #fff; }
     .panel-body { flex: 1; overflow-y: auto; padding: 16px; }
 
-    /* ===== HISTORY PANEL ===== */
-    .filter-row { display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
-    .filter-input {
-      flex: 1; min-width: 130px; padding: 10px 12px;
-      border: 1.5px solid #e2e8f0; border-radius: 8px;
-      font-size: 13px; color: var(--text); background: #fff;
-      outline: none; font-family: 'Inter', sans-serif;
-    }
-    .filter-input:focus { border-color: var(--primary); }
-    .filter-btn {
-      padding: 10px 16px; background: var(--primary); color: #fff;
-      border: none; border-radius: 8px; font-size: 13px; font-weight: 700;
-      cursor: pointer; font-family: 'Inter', sans-serif;
-    }
+    /* HISTORY */
     .tx-list { display: flex; flex-direction: column; gap: 8px; }
-    .tx-item {
-      background: #fff; border-radius: 12px; padding: 14px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.07);
-      display: flex; align-items: center; gap: 12px;
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-      cursor: pointer;
-      animation: card-in 0.35s ease both;
-    }
+    .tx-item { background: #fff; border-radius: 12px; padding: 14px; box-shadow: 0 2px 6px rgba(0,0,0,0.07); display: flex; align-items: center; gap: 12px; transition: transform 0.2s ease, box-shadow 0.2s ease; cursor: pointer; animation: card-in 0.35s ease both; }
     .tx-item:hover { transform: translateY(-3px); box-shadow: 0 6px 14px rgba(0,0,0,0.1); }
     .tx-item:active { transform: scale(0.97); }
     .tx-icon { width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
@@ -231,18 +118,39 @@
     .tx-icon.withdraw { background: #ffe4e2; color: var(--red); }
     .tx-icon.invest { background: #dbeafe; color: var(--primary); }
     .tx-icon.resgate { background: #fff7ed; color: var(--orange); }
-    .tx-info { flex: 1; }
-    .tx-desc { font-size: 13px; font-weight: 700; color: var(--text); }
+    .tx-info { flex: 1; min-width: 0; }
+    .tx-desc { font-size: 13px; font-weight: 700; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .tx-id { font-size: 10px; color: #9ca3af; margin-top: 1px; font-family: monospace; }
     .tx-date { font-size: 11px; color: var(--muted); margin-top: 2px; }
-    .tx-status { display: inline-block; padding: 2px 7px; border-radius: 4px; font-size: 10px; font-weight: 700; margin-top: 3px; }
-    .tx-status.ok { background: #dcfce7; color: var(--green); }
-    .tx-status.pending { background: #fff7ed; color: var(--orange); }
-    .tx-status.fail { background: #ffe4e2; color: var(--red); }
-    .tx-val { font-size: 15px; font-weight: 800; text-align: right; }
+    .tx-status-icon { display: flex; align-items: center; flex-shrink: 0; }
+    .tx-val { font-size: 15px; font-weight: 800; text-align: right; flex-shrink: 0; }
     .tx-val.pos { color: var(--green); }
     .tx-val.neg { color: var(--red); }
 
-    /* ===== WITHDRAW PANEL ===== */
+    /* TX DETAIL MODAL */
+    .tx-modal { position: fixed; inset: 0; z-index: 900; display: none; flex-direction: column; background: var(--bg); }
+    .tx-modal.open { display: flex; animation: panel-in 0.28s cubic-bezier(0.16,1,0.3,1); }
+    .tx-modal-header { background: linear-gradient(135deg, #002f6c, #004a99); padding: 14px 16px; display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+    .tx-modal-body { flex: 1; overflow-y: auto; padding: 20px 16px; }
+    .tx-detail-icon-wrap { display: flex; flex-direction: column; align-items: center; padding: 28px 0 24px; }
+    .tx-detail-icon { width: 72px; height: 72px; border-radius: 22px; display: flex; align-items: center; justify-content: center; margin-bottom: 14px; }
+    .tx-detail-icon svg { width: 34px; height: 34px; }
+    .tx-detail-amount { font-size: 34px; font-weight: 800; }
+    .tx-detail-amount.pos { color: var(--green); }
+    .tx-detail-amount.neg { color: var(--red); }
+    .tx-detail-label { font-size: 14px; color: var(--muted); margin-top: 4px; font-weight: 600; }
+    .tx-status-badge { display: inline-flex; align-items: center; gap: 7px; padding: 7px 18px; border-radius: 30px; font-size: 13px; font-weight: 800; margin-top: 14px; }
+    .tx-status-badge.ok { background: #dcfce7; color: var(--green); }
+    .tx-status-badge.pending { background: #fff7ed; color: var(--orange); }
+    .tx-status-badge.fail { background: #ffe4e2; color: var(--red); }
+    .tx-detail-rows { background: #fff; border-radius: 16px; box-shadow: var(--shadow); overflow: hidden; }
+    .tx-detail-row { display: flex; justify-content: space-between; align-items: center; padding: 14px 16px; border-bottom: 1px solid #f0f2f8; }
+    .tx-detail-row:last-child { border-bottom: none; }
+    .tx-detail-row-lbl { font-size: 12px; color: var(--muted); font-weight: 600; }
+    .tx-detail-row-val { font-size: 13px; font-weight: 700; color: var(--text); text-align: right; max-width: 60%; word-break: break-all; font-family: monospace; }
+    .tx-detail-row-val.mono-small { font-size: 11px; }
+
+    /* WITHDRAW */
     .input-group { margin-bottom: 14px; }
     .input-group label { display: block; font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
     .mask-wrap { position: relative; }
@@ -262,7 +170,23 @@
     .btn-primary-full.danger { background: var(--red); }
     .btn-primary-full.danger:hover { background: #b91c1c; }
 
-    /* ===== DEPOSIT PANEL ===== */
+    /* IBAN POPUP */
+    .iban-popup-overlay { position: fixed; inset: 0; background: rgba(0,10,30,0.7); backdrop-filter: blur(6px); z-index: 800; display: none; align-items: flex-end; justify-content: center; }
+    .iban-popup-overlay.open { display: flex; }
+    .iban-popup { background: #fff; border-radius: 24px 24px 0 0; padding: 28px 20px 32px; width: 100%; max-width: 480px; animation: slide-up 0.32s cubic-bezier(0.16,1,0.3,1); }
+    @keyframes slide-up { from { transform: translateY(100%); } to { transform: translateY(0); } }
+    .iban-popup-handle { width: 40px; height: 4px; background: #e2e8f0; border-radius: 4px; margin: 0 auto 20px; }
+    .iban-popup h3 { font-size: 17px; font-weight: 800; color: var(--text); margin-bottom: 6px; }
+    .iban-popup p { font-size: 12px; color: var(--muted); margin-bottom: 20px; line-height: 1.6; }
+    .iban-popup .amount-confirm { background: #f0f7ff; border-radius: 10px; padding: 12px 16px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; }
+    .iban-popup .amount-confirm .lbl { font-size: 12px; color: var(--muted); }
+    .iban-popup .amount-confirm .val { font-size: 20px; font-weight: 800; color: var(--primary); }
+    .iban-field { margin-bottom: 14px; }
+    .iban-field label { display: block; font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+    .iban-field input { width: 100%; padding: 13px 14px; border: 1.5px solid #e2e8f0; border-radius: 8px; font-size: 14px; font-weight: 600; color: var(--text); background: #fafbff; outline: none; font-family: 'Inter', sans-serif; letter-spacing: 0.5px; }
+    .iban-field input:focus { border-color: var(--primary); }
+
+    /* DEPOSIT */
     .deposit-tabs { display: flex; gap: 4px; background: #f0f2f8; border-radius: 12px; padding: 4px; margin-bottom: 14px; }
     .deposit-tab { flex: 1; padding: 9px; border: none; border-radius: 9px; font-size: 12px; font-weight: 700; cursor: pointer; font-family: 'Inter', sans-serif; color: var(--muted); background: transparent; transition: all 0.25s; }
     .deposit-tab.active { background: #fff; color: var(--primary); box-shadow: var(--shadow); }
@@ -273,23 +197,30 @@
     .account-card { background: #fff; border-radius: 12px; padding: 16px; box-shadow: var(--shadow); margin-bottom: 12px; transition: transform 0.25s ease, box-shadow 0.25s ease; }
     .account-card:hover { transform: translateY(-4px); box-shadow: 0 8px 18px rgba(0,0,0,0.12); }
     .account-name { font-size: 14px; font-weight: 800; color: var(--text); margin-bottom: 4px; display: flex; align-items: center; gap: 8px; }
-    .account-number { font-size: 15px; font-weight: 800; color: var(--primary); letter-spacing: 1px; margin: 8px 0; word-break: break-all; }
+    .account-number-row { display: flex; align-items: center; gap: 8px; margin: 8px 0; }
+    .account-number { font-size: 14px; font-weight: 800; color: var(--primary); letter-spacing: 0.8px; word-break: break-all; flex: 1; }
+    .btn-copy-iban { padding: 6px 12px; background: #f0f7ff; color: var(--primary); border: 1.5px solid #c7deff; border-radius: 8px; font-size: 11px; font-weight: 700; cursor: pointer; font-family: 'Inter', sans-serif; transition: all 0.2s; white-space: nowrap; display: flex; align-items: center; gap: 5px; }
+    .btn-copy-iban:hover { background: var(--primary); color: #fff; }
     .btn-reveal { padding: 8px 14px; background: var(--primary); color: #fff; border: none; border-radius: 8px; font-size: 12px; font-weight: 700; cursor: pointer; font-family: 'Inter', sans-serif; transition: all 0.2s; }
     .btn-reveal:hover { background: var(--primary-dark); }
     .btn-reveal:disabled { background: #9ca3af; cursor: not-allowed; }
     .countdown-text { font-size: 12px; color: var(--orange); font-weight: 700; margin-top: 4px; }
+    /* Express transfer card */
+    .express-card { background: linear-gradient(135deg, #065f46, #047857); border-radius: 12px; padding: 16px; margin-bottom: 12px; box-shadow: 0 6px 20px rgba(4,120,87,0.35); transition: transform 0.25s ease, box-shadow 0.25s ease; }
+    .express-card:hover { transform: translateY(-4px); box-shadow: 0 12px 28px rgba(4,120,87,0.45); }
+    .express-card-name { font-size: 14px; font-weight: 800; color: #fff; margin-bottom: 4px; display: flex; align-items: center; gap: 8px; }
+    .express-card-tag { background: rgba(255,255,255,0.2); border-radius: 20px; padding: 2px 10px; font-size: 10px; font-weight: 700; color: #fff; }
+    .express-number-row { display: flex; align-items: center; gap: 8px; margin: 10px 0; }
+    .express-number { font-size: 24px; font-weight: 800; color: #fff; letter-spacing: 2px; }
+    .btn-copy-express { padding: 7px 14px; background: rgba(255,255,255,0.2); color: #fff; border: 1.5px solid rgba(255,255,255,0.35); border-radius: 8px; font-size: 12px; font-weight: 700; cursor: pointer; font-family: 'Inter', sans-serif; transition: all 0.2s; display: flex; align-items: center; gap: 5px; }
+    .btn-copy-express:hover { background: rgba(255,255,255,0.35); }
+    .express-desc { font-size: 12px; color: rgba(255,255,255,0.8); line-height: 1.5; margin-top: 4px; }
 
-    /* Numpad for deposit value */
+    /* Numpad */
     .numpad-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 6px; margin-bottom: 18px; }
     .numpad-grid button { padding: 14px; background: var(--bg); border: none; border-radius: 10px; font-size: 17px; font-weight: 700; cursor: pointer; font-family: 'Inter', sans-serif; }
     .numpad-grid button:active { background: #e2e8f0; }
-
-    /* Upload zone — agora isolada, separada do teclado por uma margem clara */
-    .upload-section {
-      margin-top: 22px;
-      padding-top: 18px;
-      border-top: 1.5px dashed #d8deea;
-    }
+    .upload-section { margin-top: 22px; padding-top: 18px; border-top: 1.5px dashed #d8deea; }
     .upload-section-label { font-size: 12px; font-weight: 700; color: var(--text); margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
     .upload-zone { border: 2px dashed #c7d2e0; border-radius: 12px; padding: 24px; text-align: center; cursor: pointer; transition: border-color 0.25s; margin-bottom: 14px; background: #fff; }
     .upload-zone:hover { border-color: var(--primary); }
@@ -302,68 +233,30 @@
     .upload-progress-wrap { display: none; background: #e2e8f0; border-radius: 8px; height: 8px; overflow: hidden; margin-bottom: 14px; }
     .upload-progress-bar { height: 100%; width: 0%; background: var(--primary); transition: width 0.2s; }
     .upload-status-text { font-size: 12px; color: var(--muted); margin-bottom: 10px; display: none; }
-
     .info-steps { display: flex; flex-direction: column; gap: 10px; }
     .step-item { display: flex; gap: 12px; align-items: flex-start; background: #fff; border-radius: 10px; padding: 14px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); transition: transform 0.2s ease; }
     .step-item:hover { transform: translateX(4px); }
-    .step-item:active .step-num { transform: scale(1.15); }
-    .step-num { width: 28px; height: 28px; border-radius: 50%; background: var(--primary); color: #fff; font-size: 13px; font-weight: 800; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: transform 0.2s cubic-bezier(0.34,1.56,0.64,1); }
+    .step-num { width: 28px; height: 28px; border-radius: 50%; background: var(--primary); color: #fff; font-size: 13px; font-weight: 800; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
     .step-text { font-size: 13px; color: var(--muted); line-height: 1.6; }
     .step-text strong { color: var(--text); }
 
-    /* ===== FRIENDS PANEL — card animado, mesma cor do header ===== */
-    .ref-hero {
-      background: linear-gradient(135deg, #002f6c 0%, #004a99 100%);
-      border-radius: 20px;
-      padding: 24px 20px 20px;
-      margin-bottom: 16px;
-      text-align: center;
-      position: relative;
-      overflow: hidden;
-      cursor: pointer;
-      user-select: none;
-      -webkit-tap-highlight-color: transparent;
-      box-shadow: 0 8px 28px rgba(0,47,108,0.4);
-      transition: transform 0.18s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.18s ease;
-      animation: card-in 0.5s cubic-bezier(0.16,1,0.3,1) both;
-    }
+    /* FRIENDS */
+    .ref-hero { background: linear-gradient(135deg, #002f6c 0%, #004a99 100%); border-radius: 20px; padding: 24px 20px 20px; margin-bottom: 16px; text-align: center; position: relative; overflow: hidden; cursor: pointer; user-select: none; -webkit-tap-highlight-color: transparent; box-shadow: 0 8px 28px rgba(0,47,108,0.4); transition: transform 0.18s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.18s ease; animation: card-in 0.5s cubic-bezier(0.16,1,0.3,1) both; }
     .ref-hero:hover { transform: translateY(-4px) scale(1.015); box-shadow: 0 16px 36px rgba(0,47,108,0.48); }
-    .ref-hero:active { transform: scale(0.965) translateY(2px); box-shadow: 0 4px 14px rgba(0,47,108,0.32); transition: transform 0.1s ease, box-shadow 0.1s ease; }
-
-    /* Bolhas decorativas (mesmo estilo do profile-card) */
+    .ref-hero:active { transform: scale(0.965) translateY(2px); transition: transform 0.1s ease; }
     .ref-bubble { position: absolute; border-radius: 50%; background: rgba(255,255,255,0.07); pointer-events: none; }
     .ref-bubble.rb1 { width: 120px; height: 120px; top: -35px; right: -25px; animation: bubble-float 6s ease-in-out infinite; }
     .ref-bubble.rb2 { width: 70px;  height: 70px;  bottom: -20px; left: -15px; animation: bubble-float 8s ease-in-out 1.5s infinite; }
     .ref-bubble.rb3 { width: 40px;  height: 40px;  top: 14px; left: 26px; animation: bubble-float 5s ease-in-out 0.8s infinite; }
-
-    /* Gráfico SVG de fundo, igual ao profile-card */
     .ref-chart-bg { position: absolute; bottom: 0; left: 0; right: 0; height: 70px; opacity: 0.16; pointer-events: none; }
-    .ref-chart-bg .ref-line {
-      stroke: #fff; stroke-width: 2.5; fill: none;
-      stroke-linecap: round; stroke-linejoin: round;
-      stroke-dasharray: 560; stroke-dashoffset: 560;
-      animation: draw-line 1.6s cubic-bezier(0.4,0,0.2,1) 0.3s forwards;
-    }
+    .ref-chart-bg .ref-line { stroke: #fff; stroke-width: 2.5; fill: none; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 560; stroke-dashoffset: 560; animation: draw-line 1.6s cubic-bezier(0.4,0,0.2,1) 0.3s forwards; }
     .ref-chart-bg .ref-fill { fill: url(#refGradFill); opacity: 0; animation: fill-fade 0.6s ease 1.7s forwards; }
-
     .ref-hero-content { position: relative; z-index: 2; }
-    .ref-pct { font-size: 44px; font-weight: 800; color: #fff; margin: 10px 0; transition: transform 0.2s cubic-bezier(0.34,1.56,0.64,1); }
-    .ref-hero:hover .ref-pct { transform: scale(1.08); }
+    .ref-pct { font-size: 44px; font-weight: 800; color: #fff; margin: 10px 0; }
     .ref-hero h3 { font-size: 18px; font-weight: 800; color: #fff; margin-bottom: 6px; position: relative; z-index: 2; }
     .ref-hero p { font-size: 13px; color: rgba(255,255,255,0.75); position: relative; z-index: 2; }
-
-    /* Ripple branco ao tocar, igual ao profile-card */
-    .ref-ripple {
-      position: absolute; border-radius: 50%;
-      background: rgba(255,255,255,0.28);
-      transform: scale(0);
-      animation: pc-ripple-anim 0.65s ease-out forwards;
-      pointer-events: none; z-index: 3;
-    }
-
-    /* Animação de toque (bounce) */
+    .ref-ripple { position: absolute; border-radius: 50%; background: rgba(255,255,255,0.28); transform: scale(0); animation: pc-ripple-anim 0.65s ease-out forwards; pointer-events: none; z-index: 3; }
     .ref-hero.ref-tapped { animation: pc-tap-anim 0.4s cubic-bezier(0.34,1.56,0.64,1) both; }
-
     .ref-link-box { background: #fff; border-radius: 10px; border: 1.5px solid #e2e8f0; padding: 12px 14px; display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
     .ref-link-box span { flex: 1; font-size: 12px; color: var(--primary); font-weight: 600; word-break: break-all; }
     .btn-copy { padding: 8px 14px; background: var(--primary); color: #fff; border: none; border-radius: 8px; font-size: 12px; font-weight: 700; cursor: pointer; white-space: nowrap; font-family: 'Inter', sans-serif; }
@@ -373,7 +266,7 @@
     .ref-stat-val { font-size: 22px; font-weight: 800; color: var(--primary); }
     .ref-stat-lbl { font-size: 11px; color: var(--muted); margin-top: 3px; }
 
-    /* ===== PASSWORD PANEL ===== */
+    /* PASSWORD */
     .pass-input-wrap { position: relative; }
     .pass-input-wrap svg.icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; color: #9ca3af; }
     .pass-input-wrap input { width: 100%; padding: 12px 42px 12px 38px; border: 1.5px solid #e2e8f0; border-radius: 8px; font-size: 18px; font-weight: 800; color: var(--text); background: #fafbff; outline: none; font-family: 'Inter', sans-serif; letter-spacing: 6px; text-align: center; }
@@ -386,6 +279,21 @@
     .btn-logout { width: 100%; padding: 14px; background: #fff; color: var(--red); border: 1.5px solid #fecaca; border-radius: 12px; font-size: 14px; font-weight: 700; cursor: pointer; font-family: 'Inter', sans-serif; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.25s; box-shadow: var(--shadow); }
     .btn-logout:hover { background: var(--red); color: #fff; border-color: var(--red); }
     .btn-logout svg { width: 18px; height: 18px; }
+
+    /* CUSTOM CONFIRM MODAL */
+    .confirm-overlay { position: fixed; inset: 0; background: rgba(0,10,30,0.72); backdrop-filter: blur(6px); z-index: 850; display: none; align-items: center; justify-content: center; padding: 24px; }
+    .confirm-overlay.open { display: flex; }
+    .confirm-box { background: #fff; border-radius: 20px; padding: 28px 22px 22px; width: 100%; max-width: 340px; text-align: center; animation: pop-in 0.28s cubic-bezier(0.34,1.56,0.64,1); }
+    @keyframes pop-in { from { transform: scale(0.82); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    .confirm-icon { width: 60px; height: 60px; border-radius: 18px; background: #fff0f0; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; }
+    .confirm-icon svg { width: 28px; height: 28px; color: var(--red); }
+    .confirm-box h3 { font-size: 17px; font-weight: 800; color: var(--text); margin-bottom: 8px; }
+    .confirm-box p { font-size: 13px; color: var(--muted); line-height: 1.6; margin-bottom: 22px; }
+    .confirm-btns { display: flex; gap: 10px; }
+    .confirm-btn { flex: 1; padding: 13px; border: none; border-radius: 10px; font-size: 14px; font-weight: 700; cursor: pointer; font-family: 'Inter', sans-serif; }
+    .confirm-btn.cancel { background: #f4f4f7; color: var(--text); }
+    .confirm-btn.confirm { background: var(--red); color: #fff; }
+    .confirm-btn:hover { opacity: 0.88; }
 
     /* PROCESSING */
     #processing-overlay { position: fixed; inset: 0; background: rgba(0,20,60,0.85); backdrop-filter: blur(8px); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; }
@@ -439,13 +347,9 @@
 
 <!-- PROFILE CARD -->
 <div class="profile-card" id="profile-card" onclick="profileCardTap(this)">
-
-  <!-- Bolhas decorativas -->
   <div class="pc-bubble b1"></div>
   <div class="pc-bubble b2"></div>
   <div class="pc-bubble b3"></div>
-
-  <!-- Gráfico SVG de fundo (sparkline animada) -->
   <svg class="pc-chart-bg" viewBox="0 0 400 80" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
     <defs>
       <linearGradient id="pcGradFill" x1="0" y1="0" x2="0" y2="1">
@@ -453,15 +357,9 @@
         <stop offset="100%" stop-color="#fff" stop-opacity="0"/>
       </linearGradient>
     </defs>
-    <!-- linha da sparkline -->
-    <polyline class="chart-line"
-      points="0,65 40,52 80,58 120,38 160,44 200,28 240,34 280,18 320,24 360,12 400,8" />
-    <!-- preenchimento sob a linha -->
-    <polygon class="chart-fill"
-      points="0,65 40,52 80,58 120,38 160,44 200,28 240,34 280,18 320,24 360,12 400,8 400,80 0,80" />
+    <polyline class="chart-line" points="0,65 40,52 80,58 120,38 160,44 200,28 240,34 280,18 320,24 360,12 400,8" />
+    <polygon class="chart-fill" points="0,65 40,52 80,58 120,38 160,44 200,28 240,34 280,18 320,24 360,12 400,8 400,80 0,80" />
   </svg>
-
-  <!-- Conteúdo principal -->
   <div class="pc-inner">
     <div style="position:relative;flex-shrink:0;">
       <div class="pc-avatar" id="pc-avatar">?</div>
@@ -473,8 +371,6 @@
       <div class="pc-ref" id="pc-ref">ID: —</div>
     </div>
   </div>
-
-  <!-- Stats row -->
   <div class="pc-stats-row">
     <div class="pc-stat-item">
       <div class="pc-stat-lbl">Saldo</div>
@@ -530,7 +426,7 @@
 </div>
 
 <div class="logout-section">
-  <button class="btn-logout" onclick="doLogout()">
+  <button class="btn-logout" onclick="confirmLogout()">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
     Terminar Sessão
   </button>
@@ -545,17 +441,24 @@
     <div class="panel-title">Histórico de Movimentos</div>
   </div>
   <div class="panel-body">
-    <div class="filter-row">
-      <input type="date" class="filter-input" id="hist-from" />
-      <input type="date" class="filter-input" id="hist-to" />
-      <button class="filter-btn" onclick="filterHistory()">Filtrar</button>
-    </div>
     <div class="tx-list" id="tx-list">
       <div style="text-align:center;padding:32px;color:var(--muted);font-size:14px;">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="40" height="40" style="margin-bottom:10px;color:#c7d2e0;display:block;margin-left:auto;margin-right:auto;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
         A carregar histórico…
       </div>
     </div>
+  </div>
+</div>
+
+<!-- TX DETAIL MODAL -->
+<div class="tx-modal" id="tx-modal">
+  <div class="tx-modal-header">
+    <button class="panel-back" onclick="closeTxModal()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+    </button>
+    <div class="panel-title">Detalhe da Transacção</div>
+  </div>
+  <div class="tx-modal-body" id="tx-modal-body">
   </div>
 </div>
 
@@ -567,8 +470,28 @@
     </button>
     <div class="panel-title">Levantar Fundos</div>
   </div>
-  <div class="panel-body" id="withdraw-body">
-    <!-- Filled dynamically -->
+  <div class="panel-body" id="withdraw-body"></div>
+</div>
+
+<!-- IBAN POPUP (shown after amount entered) -->
+<div class="iban-popup-overlay" id="iban-popup-overlay" onclick="closeIbanPopupOnBackdrop(event)">
+  <div class="iban-popup" id="iban-popup">
+    <div class="iban-popup-handle"></div>
+    <h3>Dados bancários de destino</h3>
+    <p>Indique a conta onde pretende receber os seus fundos. Confirme bem os dados antes de continuar.</p>
+    <div class="amount-confirm">
+      <span class="lbl">Valor a levantar</span>
+      <span class="val" id="iban-popup-amount">—</span>
+    </div>
+    <div class="iban-field">
+      <label>IBAN / Número de Conta</label>
+      <input type="text" id="wd-iban" placeholder="0000.0000.0000.0000.0000.0" inputmode="numeric" />
+    </div>
+    <div class="iban-field">
+      <label>Titular da Conta</label>
+      <input type="text" id="wd-titular" placeholder="Nome completo do titular" />
+    </div>
+    <button class="btn-primary-full ready danger" style="margin-top:4px;" onclick="submitWithdraw()">Confirmar Levantamento</button>
   </div>
 </div>
 
@@ -593,21 +516,56 @@
     <!-- ACCOUNTS -->
     <div class="deposit-section active" id="dep-accounts">
       <div style="font-size:13px;color:var(--muted);margin-bottom:12px;line-height:1.6;">Escolha uma das contas abaixo e transfira o valor pretendido. Depois envie o comprovativo na aba seguinte.</div>
+
+      <!-- Express Transfer -->
+      <div class="express-card">
+        <div class="express-card-name">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" width="18" height="18"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+          Transferência Express
+          <span class="express-card-tag">⚡ Rápido</span>
+        </div>
+        <div class="express-number-row">
+          <div class="express-number" id="express-number" style="filter:blur(6px);user-select:none;">937359561</div>
+          <button class="btn-copy-express" id="express-copy-btn" onclick="copyExpress()" style="display:none;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            Copiar
+          </button>
+        </div>
+        <div class="express-desc">Transferência via número de telefone — processamento imediato.</div>
+        <button class="btn-reveal" id="express-btn" onclick="revealExpress()" style="margin-top:10px;background:rgba(255,255,255,0.25);border:1.5px solid rgba(255,255,255,0.4);">Ver Número</button>
+        <div class="countdown-text" id="express-countdown" style="display:none;color:rgba(255,255,255,0.8);"></div>
+      </div>
+
+      <!-- BAI -->
       <div class="account-card">
         <div class="account-name">
           <svg viewBox="0 0 24 24" fill="none" stroke="#007bff" stroke-width="2" width="18" height="18"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
           Banco BAI
         </div>
-        <div id="bai-number" style="font-size:13px;color:var(--muted);filter:blur(5px);user-select:none;margin:8px 0;">0040.0000.5823.3661.1013.5</div>
+        <div class="account-number-row">
+          <div class="account-number" id="bai-number" style="filter:blur(5px);user-select:none;">0040.0000.5823.3661.1013.5</div>
+          <button class="btn-copy-iban" id="bai-copy-btn" onclick="copyIban('bai','0040.0000.5823.3661.1013.5')" style="display:none;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            Copiar
+          </button>
+        </div>
         <button class="btn-reveal" id="bai-btn" onclick="revealAccount('bai')">Ver Dados</button>
         <div class="countdown-text" id="bai-countdown" style="display:none;"></div>
       </div>
+
+      <!-- BFA -->
       <div class="account-card">
         <div class="account-name">
           <svg viewBox="0 0 24 24" fill="none" stroke="#2b9348" stroke-width="2" width="18" height="18"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
           Banco BFA
         </div>
-        <div id="bfa-number" style="font-size:13px;color:var(--muted);filter:blur(5px);user-select:none;margin:8px 0;">0006.0000.9095.7416.3015.7</div>
+        <div class="account-number-row">
+          <div class="account-number" id="bfa-number" style="filter:blur(5px);user-select:none;">0006.0000.9095.7416.3015.7</div>
+          <button class="btn-copy-iban" id="bfa-copy-btn" onclick="copyIban('bfa','0006.0000.9095.7416.3015.7')" style="display:none;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            Copiar
+          </button>
+        </div>
         <button class="btn-reveal" id="bfa-btn" onclick="revealAccount('bfa')">Ver Dados</button>
         <div class="countdown-text" id="bfa-countdown" style="display:none;"></div>
       </div>
@@ -622,8 +580,6 @@
           <input type="text" id="dep-amount-input" placeholder="0.00" readonly />
         </div>
       </div>
-
-      <!-- Numpad for deposit -->
       <div class="numpad-grid">
         <button onclick="depNumpad('1')">1</button>
         <button onclick="depNumpad('2')">2</button>
@@ -640,8 +596,6 @@
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><path d="M21 4H8l-7 8 7 8h13a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"/><line x1="18" y1="9" x2="12" y2="15"/><line x1="12" y1="9" x2="18" y2="15"/></svg>
         </button>
       </div>
-
-      <!-- Upload zone: agora abaixo do botão de envio, conforme solicitado -->
       <div class="upload-section">
         <button class="btn-primary-full ready" id="submit-deposit-btn" onclick="submitDeposit()" style="background:var(--green);margin-bottom:18px;">Enviar Pedido de Depósito</button>
         <div class="upload-section-label">
@@ -655,9 +609,7 @@
           <div class="uz-sub" id="uz-sub-text">Toque para seleccionar a foto</div>
         </label>
         <img id="comp-preview" class="upload-preview" src="" alt="" />
-        <div class="upload-progress-wrap" id="upload-progress-wrap">
-          <div class="upload-progress-bar" id="upload-progress-bar"></div>
-        </div>
+        <div class="upload-progress-wrap" id="upload-progress-wrap"><div class="upload-progress-bar" id="upload-progress-bar"></div></div>
         <div class="upload-status-text" id="upload-status-text"></div>
       </div>
     </div>
@@ -665,7 +617,7 @@
     <!-- INSTRUCOES -->
     <div class="deposit-section" id="dep-instrucoes">
       <div class="info-steps">
-        <div class="step-item"><div class="step-num">1</div><div class="step-text"><strong>Escolha a conta</strong> — Vá ao separador "Contas" e clique em "Ver Dados" para revelar o IBAN da conta desejada (BAI ou BFA).</div></div>
+        <div class="step-item"><div class="step-num">1</div><div class="step-text"><strong>Escolha a conta</strong> — Vá ao separador "Contas" e clique em "Ver Dados" para revelar o IBAN da conta desejada (BAI ou BFA) ou use a Transferência Express.</div></div>
         <div class="step-item"><div class="step-num">2</div><div class="step-text"><strong>Faça a transferência</strong> — Transfira o valor desejado para a conta escolhida através do seu banco ou aplicação.</div></div>
         <div class="step-item"><div class="step-num">3</div><div class="step-text"><strong>Envie o comprovativo</strong> — Tire uma foto ou screenshot do comprovativo de pagamento e envie no separador "Comprovativo".</div></div>
         <div class="step-item"><div class="step-num">4</div><div class="step-text"><strong>Aguarde a aprovação</strong> — A nossa equipa irá verificar e aprovar o depósito em <strong>10 minutos a 1 hora</strong>. Receberá uma notificação assim que o saldo for creditado.</div></div>
@@ -695,10 +647,8 @@
             <stop offset="100%" stop-color="#fff" stop-opacity="0"/>
           </linearGradient>
         </defs>
-        <polyline class="ref-line"
-          points="0,58 40,46 80,52 120,32 160,38 200,22 240,28 280,14 320,20 360,8 400,4" />
-        <polygon class="ref-fill"
-          points="0,58 40,46 80,52 120,32 160,38 200,22 240,28 280,14 320,20 360,8 400,4 400,70 0,70" />
+        <polyline class="ref-line" points="0,58 40,46 80,52 120,32 160,38 200,22 240,28 280,14 320,20 360,8 400,4" />
+        <polygon class="ref-fill" points="0,58 40,46 80,52 120,32 160,38 200,22 240,28 280,14 320,20 360,8 400,4 400,70 0,70" />
       </svg>
       <div class="ref-hero-content">
         <div class="ref-pct">10%</div>
@@ -706,14 +656,12 @@
         <p>Convide amigos e receba 10% do valor do primeiro investimento de cada convidado.</p>
       </div>
     </div>
-
     <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:10px;">Confirme antes de partilhar:</div>
     <div class="check-list" id="friend-checks">
       <label class="check-item"><input type="checkbox" onchange="checkFriendReady()" /><div class="custom-chk"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" width="11" height="11"><polyline points="20 6 9 17 4 12"/></svg></div><div class="check-text">Compreendo que a comissão de <strong>10%</strong> só é paga após o primeiro investimento activo do amigo convidado.</div></label>
       <label class="check-item"><input type="checkbox" onchange="checkFriendReady()" /><div class="custom-chk"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" width="11" height="11"><polyline points="20 6 9 17 4 12"/></svg></div><div class="check-text">A comissão é creditada automaticamente na minha carteira após confirmação do investimento do convidado.</div></label>
       <label class="check-item"><input type="checkbox" onchange="checkFriendReady()" /><div class="custom-chk"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" width="11" height="11"><polyline points="20 6 9 17 4 12"/></svg></div><div class="check-text">Não há limite de convidados — posso convidar quantas pessoas quiser.</div></label>
     </div>
-
     <div id="ref-link-section" style="display:none;">
       <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:8px;">O seu link de convite:</div>
       <div class="ref-link-box">
@@ -756,9 +704,7 @@
         <div class="pass-input-wrap">
           <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
           <input type="password" id="pass-current" placeholder="••••••" maxlength="6" inputmode="numeric" />
-          <button class="eye-btn" onclick="togglePassEye('pass-current', this)">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-          </button>
+          <button class="eye-btn" onclick="togglePassEye('pass-current', this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
         </div>
       </div>
       <div class="input-group" style="margin-bottom:14px;">
@@ -766,9 +712,7 @@
         <div class="pass-input-wrap">
           <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
           <input type="password" id="pass-new" placeholder="••••••" maxlength="6" inputmode="numeric" />
-          <button class="eye-btn" onclick="togglePassEye('pass-new', this)">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-          </button>
+          <button class="eye-btn" onclick="togglePassEye('pass-new', this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
         </div>
       </div>
       <div class="input-group" style="margin-bottom:20px;">
@@ -776,12 +720,25 @@
         <div class="pass-input-wrap">
           <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
           <input type="password" id="pass-confirm" placeholder="••••••" maxlength="6" inputmode="numeric" />
-          <button class="eye-btn" onclick="togglePassEye('pass-confirm', this)">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-          </button>
+          <button class="eye-btn" onclick="togglePassEye('pass-confirm', this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
         </div>
       </div>
       <button class="btn-primary-full danger" id="pass-submit-btn" onclick="submitPasswordChange()">Alterar Senha</button>
+    </div>
+  </div>
+</div>
+
+<!-- CUSTOM CONFIRM LOGOUT MODAL -->
+<div class="confirm-overlay" id="confirm-logout-overlay">
+  <div class="confirm-box">
+    <div class="confirm-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+    </div>
+    <h3>Terminar sessão?</h3>
+    <p>Será necessário fazer login novamente para aceder à sua conta. Tem a certeza que pretende sair?</p>
+    <div class="confirm-btns">
+      <button class="confirm-btn cancel" onclick="closeConfirmLogout()">Cancelar</button>
+      <button class="confirm-btn confirm" onclick="doLogout()">Sair</button>
     </div>
   </div>
 </div>
@@ -845,7 +802,7 @@
   let compFile = null;
   let compUploadedUrl = null;
 
-  // Checkbox style for friends/password
+  // Checkbox + ripple styles
   const checkStyle = document.createElement('style');
   checkStyle.textContent = `
     .check-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
@@ -857,18 +814,12 @@
     .custom-chk svg { display: none; }
     .check-text { font-size: 12px; color: var(--muted); line-height: 1.55; flex: 1; }
     .check-text strong { color: var(--text); }
-    .ripple-effect {
-      position: absolute; border-radius: 50%;
-      background: rgba(0,123,255,0.25);
-      transform: scale(0);
-      animation: ripple-anim 0.55s ease-out;
-      pointer-events: none;
-    }
+    .ripple-effect { position: absolute; border-radius: 50%; background: rgba(0,123,255,0.2); transform: scale(0); animation: ripple-anim 0.55s ease-out; pointer-events: none; }
     @keyframes ripple-anim { to { transform: scale(2.8); opacity: 0; } }
   `;
   document.head.appendChild(checkStyle);
 
-  // Efeito ripple ao tocar/clicar em qualquer card (menu-item, account-card, tx-item, ref-stat)
+  // Ripple on menu items
   function attachRippleEffect(selector) {
     document.addEventListener('click', e => {
       const target = e.target.closest(selector);
@@ -900,13 +851,10 @@
     db.collection('users').doc(currentUser.uid).onSnapshot(snap => {
       if (!snap.exists) return;
       userData = snap.data();
-
       const name = userData.name || currentUser.displayName || 'Utilizador';
       const initial = name.charAt(0).toUpperCase();
       const refId = userData.referralId || '—';
       const saldo = userData.saldo || 0;
-
-      // Preencher o card de perfil
       const pcAvatar = document.getElementById('pc-avatar');
       const pcName   = document.getElementById('pc-name');
       const pcRef    = document.getElementById('pc-ref');
@@ -915,14 +863,10 @@
       if (pcName)   pcName.textContent   = name;
       if (pcRef)    pcRef.textContent     = 'ID: ' + refId;
       if (pcSaldo)  pcSaldo.textContent   = fmt(saldo);
-
-      // Link de referência no painel de amigos
       const refLink = `${window.location.origin}/auth.html?ref=${refId}`;
       const refLinkEl = document.getElementById('ref-link-display');
       if (refLinkEl) refLinkEl.textContent = refLink;
     });
-
-    // Contar investimentos activos
     db.collection('investimentos_usuarios')
       .where('userId', '==', currentUser.uid)
       .where('status', '==', 'ativo')
@@ -930,8 +874,6 @@
         const el = document.getElementById('pc-inv-count');
         if (el) el.textContent = snap.size;
       }).catch(() => {});
-
-    // Contar referências (amigos convidados)
     db.collection('users').doc(currentUser.uid).get().then(snap => {
       if (!snap.exists) return;
       const refId = snap.data().referralId || '';
@@ -943,56 +885,50 @@
     }).catch(() => {});
   }
 
-  // Animação de toque suave no card de perfil — bounce + ripple branco
   function profileCardTap(card) {
-    // Bounce
     card.classList.remove('pc-tapped');
     void card.offsetWidth;
     card.classList.add('pc-tapped');
     setTimeout(() => card.classList.remove('pc-tapped'), 500);
   }
 
-  // Ripple branco na posição exata do toque no card de perfil
   document.addEventListener('DOMContentLoaded', () => {
     const card = document.getElementById('profile-card');
-    if (!card) return;
-    card.addEventListener('pointerdown', e => {
-      const rect = card.getBoundingClientRect();
-      const ripple = document.createElement('span');
-      const size = Math.max(rect.width, rect.height) * 0.8;
-      ripple.className = 'pc-ripple';
-      ripple.style.width = ripple.style.height = size + 'px';
-      ripple.style.left = (e.clientX - rect.left - size / 2) + 'px';
-      ripple.style.top  = (e.clientY - rect.top  - size / 2) + 'px';
-      card.appendChild(ripple);
-      setTimeout(() => ripple.remove(), 700);
-    });
+    if (card) {
+      card.addEventListener('pointerdown', e => {
+        const rect = card.getBoundingClientRect();
+        const ripple = document.createElement('span');
+        const size = Math.max(rect.width, rect.height) * 0.8;
+        ripple.className = 'pc-ripple';
+        ripple.style.width = ripple.style.height = size + 'px';
+        ripple.style.left = (e.clientX - rect.left - size / 2) + 'px';
+        ripple.style.top  = (e.clientY - rect.top  - size / 2) + 'px';
+        card.appendChild(ripple);
+        setTimeout(() => ripple.remove(), 700);
+      });
+    }
+    const refCard = document.getElementById('ref-hero-card');
+    if (refCard) {
+      refCard.addEventListener('pointerdown', e => {
+        const rect = refCard.getBoundingClientRect();
+        const ripple = document.createElement('span');
+        const size = Math.max(rect.width, rect.height) * 0.8;
+        ripple.className = 'ref-ripple';
+        ripple.style.width = ripple.style.height = size + 'px';
+        ripple.style.left = (e.clientX - rect.left - size / 2) + 'px';
+        ripple.style.top  = (e.clientY - rect.top  - size / 2) + 'px';
+        refCard.appendChild(ripple);
+        setTimeout(() => ripple.remove(), 700);
+      });
+    }
   });
 
-  // Animação de toque suave no card "Ganhe por cada amigo" — bounce + ripple branco
   function refHeroTap(card) {
     card.classList.remove('ref-tapped');
     void card.offsetWidth;
     card.classList.add('ref-tapped');
     setTimeout(() => card.classList.remove('ref-tapped'), 500);
   }
-
-  // Ripple branco na posição exata do toque no card de amigos/referência
-  document.addEventListener('DOMContentLoaded', () => {
-    const card = document.getElementById('ref-hero-card');
-    if (!card) return;
-    card.addEventListener('pointerdown', e => {
-      const rect = card.getBoundingClientRect();
-      const ripple = document.createElement('span');
-      const size = Math.max(rect.width, rect.height) * 0.8;
-      ripple.className = 'ref-ripple';
-      ripple.style.width = ripple.style.height = size + 'px';
-      ripple.style.left = (e.clientX - rect.left - size / 2) + 'px';
-      ripple.style.top  = (e.clientY - rect.top  - size / 2) + 'px';
-      card.appendChild(ripple);
-      setTimeout(() => ripple.remove(), 700);
-    });
-  });
 
   async function loadTransactions() {
     db.collection('transacoes').where('userId', '==', currentUser.uid)
@@ -1017,10 +953,22 @@
     }).catch(() => {});
   }
 
+  // Status icons (no text labels)
+  function statusIcon(status) {
+    if (status === 'aprovado') {
+      return `<svg viewBox="0 0 24 24" fill="none" stroke="#2b9348" stroke-width="2.5" width="22" height="22"><circle cx="12" cy="12" r="10"/><polyline points="20 6 9 17 4 12"/></svg>`;
+    } else if (status === 'pendente') {
+      return `<svg viewBox="0 0 24 24" fill="none" stroke="#f97316" stroke-width="2.5" width="22" height="22"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`;
+    } else if (status === 'rejeitado' || status === 'falha') {
+      return `<svg viewBox="0 0 24 24" fill="none" stroke="#e53e3e" stroke-width="2.5" width="22" height="22"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>`;
+    }
+    return `<svg viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2" width="22" height="22"><circle cx="12" cy="12" r="10"/></svg>`;
+  }
+
   function renderTransactions(txs) {
     const list = document.getElementById('tx-list');
     if (txs.length === 0) {
-      list.innerHTML = '<div style="text-align:center;padding:32px;color:var(--muted);font-size:13px;">Sem movimentos para o período seleccionado.</div>';
+      list.innerHTML = '<div style="text-align:center;padding:32px;color:var(--muted);font-size:13px;">Sem movimentos registados.</div>';
       return;
     }
     const typeConfig = {
@@ -1038,37 +986,106 @@
       invest: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><rect x="2" y="7" width="20" height="14" rx="2"/></svg>',
       resgate: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>'
     };
-    list.innerHTML = txs.map(tx => {
+    list.innerHTML = txs.map((tx, idx) => {
       const cfg = typeConfig[tx.tipo] || { icon: 'invest', label: tx.tipo || 'Transacção', sign: '' };
       const dt = tx.data?.toDate ? tx.data.toDate() : new Date();
       const dateStr = dt.toLocaleDateString('pt-PT', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
-      const statusMap = { aprovado: 'ok', pendente: 'pending', rejeitado: 'fail', falha: 'fail' };
-      const statusLabel = { aprovado: 'Aprovado', pendente: 'Pendente', rejeitado: 'Rejeitado', falha: 'Falha' };
       const isPos = cfg.sign === '+';
+      const shortId = tx.id ? tx.id.slice(0, 12).toUpperCase() : '—';
       return `
-        <div class="tx-item">
+        <div class="tx-item" onclick="openTxDetail(${idx})" style="animation-delay:${idx * 0.04}s;">
           <div class="tx-icon ${cfg.icon}">${icons[cfg.icon]}</div>
           <div class="tx-info">
             <div class="tx-desc">${cfg.label}</div>
+            <div class="tx-id">#${shortId}</div>
             <div class="tx-date">${dateStr}</div>
-            <span class="tx-status ${statusMap[tx.status] || 'pending'}">${statusLabel[tx.status] || 'Pendente'}</span>
           </div>
+          <div class="tx-status-icon">${statusIcon(tx.status)}</div>
           <div class="tx-val ${isPos ? 'pos' : 'neg'}">${isPos ? '+' : '-'}${fmt(tx.valor || 0)}</div>
         </div>
       `;
     }).join('');
   }
 
-  function filterHistory() {
-    const from = document.getElementById('hist-from').value;
-    const to = document.getElementById('hist-to').value;
-    let filtered = allTransactions;
-    if (from) filtered = filtered.filter(tx => { const d = tx.data?.toDate ? tx.data.toDate() : new Date(); return d >= new Date(from); });
-    if (to) filtered = filtered.filter(tx => { const d = tx.data?.toDate ? tx.data.toDate() : new Date(); return d <= new Date(to + 'T23:59:59'); });
-    renderTransactions(filtered);
+  function openTxDetail(idx) {
+    const tx = allTransactions[idx];
+    if (!tx) return;
+    const typeConfig = {
+      'deposito': { icon: 'deposit', label: 'Depósito', sign: '+' },
+      'levantamento': { icon: 'withdraw', label: 'Levantamento', sign: '-' },
+      'investimento': { icon: 'invest', label: 'Investimento', sign: '-' },
+      'compra-cotas': { icon: 'invest', label: 'Compra de Cotas', sign: '-' },
+      'resgate': { icon: 'resgate', label: 'Resgate', sign: '+' },
+      'resgate_comissao': { icon: 'deposit', label: 'Resgate de Comissão', sign: '+' },
+      'comissao': { icon: 'deposit', label: 'Comissão de Referência', sign: '+' }
+    };
+    const iconColors = { deposit: '#2b9348', withdraw: '#e53e3e', invest: '#007bff', resgate: '#f97316' };
+    const iconBgs   = { deposit: '#dcfce7', withdraw: '#ffe4e2', invest: '#dbeafe', resgate: '#fff7ed' };
+    const icons = {
+      deposit: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="34" height="34"><path d="M12 5v14M5 12l7 7 7-7"/></svg>',
+      withdraw: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="34" height="34"><path d="M12 19V5M5 12l7-7 7 7"/></svg>',
+      invest: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="34" height="34"><rect x="2" y="7" width="20" height="14" rx="2"/></svg>',
+      resgate: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="34" height="34"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>'
+    };
+    const cfg = typeConfig[tx.tipo] || { icon: 'invest', label: tx.tipo || 'Transacção', sign: '' };
+    const isPos = cfg.sign === '+';
+    const dt = tx.data?.toDate ? tx.data.toDate() : new Date();
+    const dateStr = dt.toLocaleDateString('pt-PT', { day: '2-digit', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    const statusMap = { aprovado: 'ok', pendente: 'pending', rejeitado: 'fail', falha: 'fail' };
+    const statusLabel = { aprovado: 'Aprovado', pendente: 'Pendente', rejeitado: 'Rejeitado', falha: 'Falha' };
+    const statusIconsDetail = {
+      aprovado: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="18" height="18"><polyline points="20 6 9 17 4 12"/></svg>',
+      pendente: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="18" height="18"><polyline points="12 6 12 12 16 14"/></svg>',
+      rejeitado: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="18" height="18"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>',
+      falha: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="18" height="18"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>'
+    };
+    const stKey = tx.status || 'pendente';
+    const body = document.getElementById('tx-modal-body');
+    body.innerHTML = `
+      <div class="tx-detail-icon-wrap">
+        <div class="tx-detail-icon" style="background:${iconBgs[cfg.icon]||'#f0f2f8'};color:${iconColors[cfg.icon]||'#333'};">
+          ${icons[cfg.icon]}
+        </div>
+        <div class="tx-detail-amount ${isPos?'pos':'neg'}">${isPos?'+':'-'}${fmt(tx.valor||0)} Kz</div>
+        <div class="tx-detail-label">${cfg.label}</div>
+        <div class="tx-status-badge ${statusMap[stKey]||'pending'}">
+          ${statusIconsDetail[stKey]||statusIconsDetail['pendente']}
+          ${statusLabel[stKey]||'Pendente'}
+        </div>
+      </div>
+      <div class="tx-detail-rows">
+        <div class="tx-detail-row">
+          <span class="tx-detail-row-lbl">ID da Transacção</span>
+          <span class="tx-detail-row-val mono-small">${tx.id || '—'}</span>
+        </div>
+        <div class="tx-detail-row">
+          <span class="tx-detail-row-lbl">Data e hora</span>
+          <span class="tx-detail-row-val">${dateStr}</span>
+        </div>
+        <div class="tx-detail-row">
+          <span class="tx-detail-row-lbl">Tipo</span>
+          <span class="tx-detail-row-val">${cfg.label}</span>
+        </div>
+        <div class="tx-detail-row">
+          <span class="tx-detail-row-lbl">Valor</span>
+          <span class="tx-detail-row-val" style="color:${isPos?'var(--green)':'var(--red)'};">${isPos?'+':'-'}${fmt(tx.valor||0)} Kz</span>
+        </div>
+        ${tx.descricao ? `<div class="tx-detail-row"><span class="tx-detail-row-lbl">Descrição</span><span class="tx-detail-row-val">${tx.descricao}</span></div>` : ''}
+        ${tx.iban ? `<div class="tx-detail-row"><span class="tx-detail-row-lbl">IBAN destino</span><span class="tx-detail-row-val mono-small">${tx.iban}</span></div>` : ''}
+        ${tx.titular ? `<div class="tx-detail-row"><span class="tx-detail-row-lbl">Titular</span><span class="tx-detail-row-val">${tx.titular}</span></div>` : ''}
+        ${tx.comprovanteUrl ? `<div class="tx-detail-row"><span class="tx-detail-row-lbl">Comprovativo</span><span class="tx-detail-row-val"><a href="${tx.comprovanteUrl}" target="_blank" style="color:var(--primary);text-decoration:none;font-weight:700;">Ver imagem ↗</a></span></div>` : ''}
+      </div>
+    `;
+    document.getElementById('tx-modal').classList.add('open');
+    document.body.style.overflow = 'hidden';
   }
 
-  // ===== WITHDRAW PANEL =====
+  function closeTxModal() {
+    document.getElementById('tx-modal').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  // ===== WITHDRAW =====
   function buildWithdrawPanel() {
     const body = document.getElementById('withdraw-body');
     db.collection('investimentos_usuarios').where('userId', '==', currentUser.uid).where('status', '==', 'ativo').get().then(snap => {
@@ -1079,13 +1096,13 @@
               <svg viewBox="0 0 24 24" fill="none" stroke="#e53e3e" stroke-width="1.5" width="36" height="36"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
             </div>
             <div style="font-size:16px;font-weight:800;color:var(--text);">Sem Investimento Activo</div>
-            <div style="font-size:13px;color:var(--muted);line-height:1.65;max-width:280px;">Para solicitar um levantamento é necessário ter pelo menos um investimento em cotas activo na plataforma.</div>
+            <div style="font-size:13px;color:var(--muted);line-height:1.65;max-width:280px;">Para solicitar um levantamento é necessário ter pelo menos um investimento em cotas activo.</div>
             <button onclick="window.location.href='mirae.html'" style="padding:12px 24px;background:var(--primary);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;">Ver Planos de Investimento</button>
           </div>`;
         return;
       }
       if (pendingWithdraw) {
-        body.innerHTML = `<div style="background:#fff;border-radius:12px;padding:16px;box-shadow:var(--shadow);margin-bottom:14px;"><div style="font-size:14px;font-weight:700;color:var(--orange);margin-bottom:6px;">Pedido Pendente</div><div style="font-size:13px;color:var(--muted);">Tem um pedido de levantamento em processamento. Aguarde a aprovação ou rejeição antes de submeter um novo pedido.</div></div>`;
+        body.innerHTML = `<div style="background:#fff;border-radius:12px;padding:16px;box-shadow:var(--shadow);"><div style="font-size:14px;font-weight:700;color:var(--orange);margin-bottom:6px;">Pedido Pendente</div><div style="font-size:13px;color:var(--muted);">Tem um pedido de levantamento em processamento. Aguarde a aprovação antes de submeter um novo.</div></div>`;
         return;
       }
       if (todayWithdrawCount >= 2) {
@@ -1093,7 +1110,7 @@
         return;
       }
       body.innerHTML = buildWithdrawForm();
-      initWithdrawForm();
+      withdrawRawAmount = 0;
     });
   }
 
@@ -1130,19 +1147,10 @@
         <div class="fee-row"><span class="fee-lbl">Banco (1%)</span><span class="fee-val red" id="fc-banco">—</span></div>
         <div class="fee-row"><span class="fee-lbl"><strong>Valor líquido a receber</strong></span><span class="fee-val total" id="fc-liquido">—</span></div>
       </div>
-      <div class="input-group" style="margin-bottom:14px;">
-        <label>IBAN / Conta Bancária Destino</label>
-        <div class="mask-wrap">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
-          <input type="text" id="wd-iban" placeholder="0000.0000.0000.0000.0000.0" style="font-size:13px;font-weight:600;letter-spacing:1px;text-align:left;padding-left:38px;" />
-        </div>
-      </div>
-      <button class="btn-primary-full danger ready" id="wd-submit-btn" onclick="submitWithdraw()" style="opacity:1;pointer-events:auto;">Solicitar Levantamento</button>
+      <button class="btn-primary-full danger ready" id="wd-next-btn" onclick="openIbanPopup()" style="opacity:1;pointer-events:auto;">Continuar</button>
       <div style="text-align:center;margin-top:8px;font-size:11px;color:var(--muted);">Saldo disponível: <strong id="wd-saldo-disp">${fmt(userData.saldo || 0)}</strong></div>
     `;
   }
-
-  function initWithdrawForm() { withdrawRawAmount = 0; }
 
   function wdNumpad(d) {
     withdrawRawAmount = withdrawRawAmount * 10 + parseInt(d === '00' ? '0' : d);
@@ -1171,39 +1179,52 @@
     fc('fc-liquido').style.color = liquido > 0 ? 'var(--green)' : 'var(--red)';
   }
 
+  function openIbanPopup() {
+    const v = withdrawRawAmount / 100;
+    if (v < 1) { showToast('warning', 'Valor inválido', 'O valor mínimo de levantamento é 1.00 Kz'); return; }
+    if (v > (userData.saldo || 0)) { showToast('error', 'Saldo insuficiente', 'O valor solicitado excede o saldo disponível.'); return; }
+    document.getElementById('iban-popup-amount').textContent = fmt(v) + ' Kz';
+    document.getElementById('wd-iban').value = '';
+    document.getElementById('wd-titular').value = '';
+    document.getElementById('iban-popup-overlay').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeIbanPopupOnBackdrop(e) {
+    if (e.target === document.getElementById('iban-popup-overlay')) {
+      document.getElementById('iban-popup-overlay').classList.remove('open');
+    }
+  }
+
   async function submitWithdraw() {
     const v = withdrawRawAmount / 100;
     const iban = (document.getElementById('wd-iban')?.value || '').trim();
-    if (v < 1) { showToast('warning', 'Valor inválido', 'O valor mínimo de levantamento é 1.00'); return; }
-    if (v > (userData.saldo || 0)) { showToast('error', 'Saldo insuficiente', 'O valor solicitado excede o saldo disponível.'); return; }
-    if (!iban) { showToast('warning', 'IBAN necessário', 'Introduza o IBAN da conta de destino.'); return; }
+    const titular = (document.getElementById('wd-titular')?.value || '').trim();
+    if (!iban) { showToast('warning', 'IBAN necessário', 'Introduza o IBAN ou número de conta de destino.'); return; }
+    if (!titular) { showToast('warning', 'Titular necessário', 'Introduza o nome do titular da conta.'); return; }
+    document.getElementById('iban-popup-overlay').classList.remove('open');
     document.getElementById('processing-overlay').classList.add('active');
     try {
       const liquido = v * 0.84;
-
-      // Debitar o saldo imediatamente
       await db.collection('users').doc(currentUser.uid).update({
         saldo: firebase.firestore.FieldValue.increment(-v)
       });
-
       await db.collection('levantamentos').add({
-        userId: currentUser.uid, valorSolicitado: v,
-        valorLiquido: liquido, iban,
+        userId: currentUser.uid, valorSolicitado: v, valorLiquido: liquido,
+        iban, titular,
         taxas: { admissao: v*0.07, juros: v*0.07, manutencao: v*0.01, banco: v*0.01 },
         status: 'pendente',
         data: firebase.firestore.FieldValue.serverTimestamp()
       });
       await db.collection('transacoes').add({
-        userId: currentUser.uid, tipo: 'levantamento',
-        valor: v, descricao: 'Pedido de levantamento', status: 'pendente',
+        userId: currentUser.uid, tipo: 'levantamento', valor: v,
+        descricao: 'Pedido de levantamento', iban, titular,
+        status: 'pendente',
         data: firebase.firestore.FieldValue.serverTimestamp()
       });
-
-      // Atualizar saldo local
       userData.saldo = (userData.saldo || 0) - v;
-
       document.getElementById('processing-overlay').classList.remove('active');
-      showToast('success', 'Pedido enviado!', `Levantamento de ${fmt(v)} submetido. Saldo debitado. Aguarde processamento.`);
+      showToast('success', 'Pedido enviado!', `Levantamento de ${fmt(v)} Kz submetido. Saldo debitado. Aguarde processamento.`);
       closePanel('panel-withdraw');
     } catch(e) {
       document.getElementById('processing-overlay').classList.remove('active');
@@ -1222,8 +1243,10 @@
     const num = document.getElementById(bank + '-number');
     const btn = document.getElementById(bank + '-btn');
     const countdown = document.getElementById(bank + '-countdown');
+    const copyBtn = document.getElementById(bank + '-copy-btn');
     if (revealTimers[bank]) return;
     num.style.filter = 'none';
+    if (copyBtn) copyBtn.style.display = 'flex';
     btn.disabled = true;
     let secs = 10;
     countdown.style.display = 'block';
@@ -1233,13 +1256,47 @@
       if (secs <= 0) {
         clearInterval(revealTimers[bank]); revealTimers[bank] = null;
         num.style.filter = 'blur(5px)';
+        if (copyBtn) copyBtn.style.display = 'none';
         btn.disabled = false;
         countdown.style.display = 'none';
-        btn.textContent = 'Ver Dados';
       } else {
         countdown.textContent = `Disponível novamente em ${secs}s`;
       }
     }, 1000);
+  }
+
+  function revealExpress() {
+    const num = document.getElementById('express-number');
+    const btn = document.getElementById('express-btn');
+    const countdown = document.getElementById('express-countdown');
+    const copyBtn = document.getElementById('express-copy-btn');
+    if (revealTimers['express']) return;
+    num.style.filter = 'none';
+    if (copyBtn) copyBtn.style.display = 'flex';
+    btn.disabled = true;
+    let secs = 10;
+    countdown.style.display = 'block';
+    countdown.textContent = `Disponível novamente em ${secs}s`;
+    revealTimers['express'] = setInterval(() => {
+      secs--;
+      if (secs <= 0) {
+        clearInterval(revealTimers['express']); revealTimers['express'] = null;
+        num.style.filter = 'blur(6px)';
+        if (copyBtn) copyBtn.style.display = 'none';
+        btn.disabled = false;
+        countdown.style.display = 'none';
+      } else {
+        countdown.textContent = `Disponível novamente em ${secs}s`;
+      }
+    }, 1000);
+  }
+
+  function copyIban(bank, val) {
+    navigator.clipboard.writeText(val).then(() => showToast('success', 'IBAN copiado!', val)).catch(() => showToast('warning', 'Copie manualmente', val));
+  }
+
+  function copyExpress() {
+    navigator.clipboard.writeText('937359561').then(() => showToast('success', 'Número copiado!', '937359561')).catch(() => showToast('warning', 'Copie manualmente', '937359561'));
   }
 
   function depNumpad(d) {
@@ -1255,7 +1312,6 @@
     if (inp) inp.value = (depRawAmount / 100).toFixed(2);
   }
 
-  // Pré-visualização local do comprovativo (não faz upload ainda — só guarda o ficheiro escolhido)
   function previewComprovativo(input) {
     if (input.files && input.files[0]) {
       compFile = input.files[0];
@@ -1273,7 +1329,6 @@
     }
   }
 
-  // Faz o upload real do ficheiro para o Firebase Storage, devolvendo a URL pública
   function uploadComprovativo(file, userId) {
     return new Promise((resolve, reject) => {
       const path = `comprovativos/${userId}/${Date.now()}_${file.name}`;
@@ -1285,14 +1340,10 @@
       wrap.style.display = 'block';
       statusText.style.display = 'block';
       statusText.textContent = 'A enviar comprovativo… 0%';
-
-      // Timeout de segurança: se o Storage não responder em 25s, falha de forma controlada
-      // em vez de deixar o usuário preso no ecrã "A processar" para sempre.
       const timeoutId = setTimeout(() => {
         statusText.textContent = 'O envio está a demorar demasiado.';
         reject(new Error('TIMEOUT_UPLOAD'));
       }, 25000);
-
       task.on('state_changed', snap => {
         const pct = Math.round((snap.bytesTransferred / snap.totalBytes) * 100);
         bar.style.width = pct + '%';
@@ -1316,32 +1367,23 @@
     const v = depRawAmount / 100;
     if (v <= 0) { showToast('warning', 'Valor necessário', 'Introduza o valor depositado.'); return; }
     if (!compFile) { showToast('warning', 'Comprovativo necessário', 'Seleccione a foto do comprovativo antes de enviar.'); return; }
-
     const submitBtn = document.getElementById('submit-deposit-btn');
     if (submitBtn) { submitBtn.disabled = true; submitBtn.style.opacity = '0.6'; }
     document.getElementById('processing-overlay').classList.add('active');
     document.getElementById('proc-text').textContent = 'A enviar comprovativo…';
-
     let uploaded = null;
     let uploadFailed = false;
-
     try {
-      // 1. Faz upload real do comprovativo para o Firebase Storage
       uploaded = await uploadComprovativo(compFile, currentUser.uid);
       compUploadedUrl = uploaded.url;
     } catch (uploadErr) {
-      console.error('Erro no upload do comprovativo:', uploadErr);
+      console.error('Erro no upload:', uploadErr);
       uploadFailed = true;
     }
-
     try {
       document.getElementById('proc-text').textContent = 'A registar pedido de depósito…';
-
-      // 2. Cria o pedido de depósito. Se o upload falhou, regista o pedido mesmo assim
-      // (com o nome do ficheiro) para o usuário não ficar bloqueado, e avisa-o do problema.
       const depositoPayload = {
-        userId: currentUser.uid, valor: v,
-        status: 'pendente',
+        userId: currentUser.uid, valor: v, status: 'pendente',
         comprovativo: compFile.name,
         data: firebase.firestore.FieldValue.serverTimestamp()
       };
@@ -1349,44 +1391,40 @@
         depositoPayload.comprovanteUrl = uploaded.url;
         depositoPayload.comprovantePath = uploaded.path;
       }
-
       await db.collection('depositos').add(depositoPayload);
       await db.collection('transacoes').add({
         userId: currentUser.uid, tipo: 'deposito', valor: v,
         descricao: 'Pedido de depósito', status: 'pendente',
+        comprovanteUrl: uploaded?.url || null,
         data: firebase.firestore.FieldValue.serverTimestamp()
       });
-
       document.getElementById('processing-overlay').classList.remove('active');
       if (uploadFailed) {
-        showToast('warning', 'Pedido enviado, comprovativo não anexado', `Depósito de ${fmt(v)} registado, mas a imagem do comprovativo falhou ao enviar. Contacte o suporte via WhatsApp para enviar a foto manualmente.`);
+        showToast('warning', 'Pedido enviado (sem imagem)', `Depósito de ${fmt(v)} Kz registado, mas o comprovativo falhou. Envie a imagem pelo WhatsApp.`);
       } else {
-        showToast('success', 'Pedido enviado!', `Depósito de ${fmt(v)} submetido. Será aprovado em 10min–1h.`);
+        showToast('success', 'Pedido enviado!', `Depósito de ${fmt(v)} Kz submetido. Aprovação em 10min–1h.`);
       }
       resetDepositForm();
       closePanel('panel-deposit');
     } catch(e) {
       document.getElementById('processing-overlay').classList.remove('active');
-      showToast('error', 'Erro', 'Não foi possível registar o pedido de depósito. Tente novamente.');
-      console.error(e);
+      showToast('error', 'Erro', 'Não foi possível registar o pedido. Tente novamente.');
     } finally {
       if (submitBtn) { submitBtn.disabled = false; submitBtn.style.opacity = '1'; }
     }
   }
 
   function resetDepositForm() {
-    depRawAmount = 0;
-    compFile = null;
-    compUploadedUrl = null;
+    depRawAmount = 0; compFile = null; compUploadedUrl = null;
     const inp = document.getElementById('dep-amount-input'); if (inp) inp.value = '';
-    const prev = document.getElementById('comp-preview'); prev.src = ''; prev.style.display = 'none';
-    document.getElementById('comp-upload').value = '';
-    document.getElementById('upload-zone-label').classList.remove('has-file');
-    document.getElementById('uz-title-text').textContent = 'Carregar Comprovativo';
-    document.getElementById('uz-sub-text').textContent = 'Toque para seleccionar a foto';
-    document.getElementById('upload-progress-wrap').style.display = 'none';
-    document.getElementById('upload-progress-bar').style.width = '0%';
-    document.getElementById('upload-status-text').style.display = 'none';
+    const prev = document.getElementById('comp-preview'); if (prev) { prev.src = ''; prev.style.display = 'none'; }
+    const cu = document.getElementById('comp-upload'); if (cu) cu.value = '';
+    const uzl = document.getElementById('upload-zone-label'); if (uzl) uzl.classList.remove('has-file');
+    const utt = document.getElementById('uz-title-text'); if (utt) utt.textContent = 'Carregar Comprovativo';
+    const ust = document.getElementById('uz-sub-text'); if (ust) ust.textContent = 'Toque para seleccionar a foto';
+    const upw = document.getElementById('upload-progress-wrap'); if (upw) upw.style.display = 'none';
+    const upb = document.getElementById('upload-progress-bar'); if (upb) upb.style.width = '0%';
+    const ust2 = document.getElementById('upload-status-text'); if (ust2) ust2.style.display = 'none';
   }
 
   // ===== FRIENDS =====
@@ -1395,25 +1433,21 @@
     const all = Array.from(checks).every(c => c.checked);
     document.getElementById('ref-link-section').style.display = all ? 'block' : 'none';
   }
-
   function copyRefLink() {
     const link = document.getElementById('ref-link-display').textContent;
-    navigator.clipboard.writeText(link).then(() => showToast('success', 'Copiado!', 'Link de convite copiado para a área de transferência.')).catch(() => showToast('warning', 'Copie manualmente', link));
+    navigator.clipboard.writeText(link).then(() => showToast('success', 'Copiado!', 'Link de convite copiado.')).catch(() => showToast('warning', 'Copie manualmente', link));
   }
 
   // ===== PASSWORD =====
   function checkPassReady() {
     const checks = document.querySelectorAll('#pass-checks input[type=checkbox]');
     const all = Array.from(checks).every(c => c.checked);
-    const btn = document.getElementById('pass-submit-btn');
-    btn.classList.toggle('ready', all);
+    document.getElementById('pass-submit-btn').classList.toggle('ready', all);
   }
-
   function togglePassEye(inputId, btn) {
     const inp = document.getElementById(inputId);
     inp.type = inp.type === 'password' ? 'text' : 'password';
   }
-
   async function submitPasswordChange() {
     const cur = document.getElementById('pass-current').value;
     const nw = document.getElementById('pass-new').value;
@@ -1426,16 +1460,16 @@
       await currentUser.reauthenticateWithCredential(cred);
       await currentUser.updatePassword(nw);
       document.getElementById('processing-overlay').classList.remove('active');
-      showToast('success', 'Senha alterada!', 'A sua senha foi actualizada com sucesso.');
+      showToast('success', 'Senha alterada!', 'As suas credenciais foram actualizadas.');
       closePanel('panel-password');
     } catch(e) {
       document.getElementById('processing-overlay').classList.remove('active');
-      if (e.code === 'auth/wrong-password') showToast('error', 'Senha actual incorrecta', 'Verifique a senha actual e tente novamente.');
+      if (e.code === 'auth/wrong-password') showToast('error', 'Senha actual incorrecta', 'Verifique e tente novamente.');
       else showToast('error', 'Erro', 'Não foi possível alterar a senha.');
     }
   }
 
-  // ===== PANEL CONTROLS =====
+  // ===== PANELS =====
   function openPanel(id) {
     document.getElementById(id).classList.add('open');
     document.body.style.overflow = 'hidden';
@@ -1447,9 +1481,17 @@
     document.body.style.overflow = '';
   }
 
-  // ===== LOGOUT =====
+  // ===== LOGOUT (custom confirm) =====
+  function confirmLogout() {
+    document.getElementById('confirm-logout-overlay').classList.add('open');
+  }
+  function closeConfirmLogout() {
+    document.getElementById('confirm-logout-overlay').classList.remove('open');
+  }
   async function doLogout() {
-    if (!confirm('Tem a certeza que pretende terminar a sessão?')) return;
+    closeConfirmLogout();
+    document.getElementById('processing-overlay').classList.add('active');
+    document.getElementById('proc-text').textContent = 'A terminar sessão…';
     await auth.signOut();
     window.location.href = 'auth.html';
   }
