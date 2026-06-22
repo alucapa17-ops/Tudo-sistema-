@@ -205,6 +205,7 @@
     .btn-reveal:hover { background: var(--primary-dark); }
     .btn-reveal:disabled { background: #9ca3af; cursor: not-allowed; }
     .countdown-text { font-size: 12px; color: var(--orange); font-weight: 700; margin-top: 4px; }
+    /* Express transfer card */
     .express-card { background: linear-gradient(135deg, #065f46, #047857); border-radius: 12px; padding: 16px; margin-bottom: 12px; box-shadow: 0 6px 20px rgba(4,120,87,0.35); transition: transform 0.25s ease, box-shadow 0.25s ease; }
     .express-card:hover { transform: translateY(-4px); box-shadow: 0 12px 28px rgba(4,120,87,0.45); }
     .express-card-name { font-size: 14px; font-weight: 800; color: #fff; margin-bottom: 4px; display: flex; align-items: center; gap: 8px; }
@@ -215,6 +216,7 @@
     .btn-copy-express:hover { background: rgba(255,255,255,0.35); }
     .express-desc { font-size: 12px; color: rgba(255,255,255,0.8); line-height: 1.5; margin-top: 4px; }
 
+    /* Numpad */
     .numpad-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 6px; margin-bottom: 18px; }
     .numpad-grid button { padding: 14px; background: var(--bg); border: none; border-radius: 10px; font-size: 17px; font-weight: 700; cursor: pointer; font-family: 'Inter', sans-serif; }
     .numpad-grid button:active { background: #e2e8f0; }
@@ -328,23 +330,6 @@
     #wa-float { position: fixed; bottom: 80px; right: 16px; z-index: 6666; cursor: grab; touch-action: none; user-select: none; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.25)); }
     #wa-float img { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; transition: transform 0.2s; }
     #wa-float:hover img { transform: scale(1.08); }
-
-    /* CHECKLIST (movido para CSS estático, evita FOUC) */
-    .check-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
-    .check-item { display: flex; align-items: flex-start; gap: 10px; padding: 12px; background: #fff; border-radius: 10px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); cursor: pointer; }
-    .check-item input[type="checkbox"] { display: none; }
-    .custom-chk { width: 20px; height: 20px; border: 2px solid #c7d2e0; border-radius: 5px; background: #fff; display: flex; align-items: center; justify-content: center; transition: all 0.2s; flex-shrink: 0; margin-top: 1px; }
-    .check-item input:checked + .custom-chk { background: var(--green); border-color: var(--green); }
-    .check-item input:checked + .custom-chk svg { display: block; }
-    .custom-chk svg { display: none; }
-    .check-text { font-size: 12px; color: var(--muted); line-height: 1.55; flex: 1; }
-    .check-text strong { color: var(--text); }
-    .ripple-effect { position: absolute; border-radius: 50%; background: rgba(0,123,255,0.2); transform: scale(0); animation: ripple-anim 0.55s ease-out; pointer-events: none; }
-    @keyframes ripple-anim { to { transform: scale(2.8); opacity: 0; } }
-
-    /* Estado de erro nos painéis (novo) */
-    .panel-error-box { text-align:center; padding:32px 20px; color:var(--red); font-size:13px; display:flex; flex-direction:column; align-items:center; gap:10px; }
-    .panel-error-box button { margin-top:6px; padding:10px 20px; background:var(--primary); color:#fff; border:none; border-radius:8px; font-size:13px; font-weight:700; cursor:pointer; font-family:'Inter',sans-serif; }
   </style>
 </head>
 <body>
@@ -473,7 +458,8 @@
     </button>
     <div class="panel-title">Detalhe da Transacção</div>
   </div>
-  <div class="tx-modal-body" id="tx-modal-body"></div>
+  <div class="tx-modal-body" id="tx-modal-body">
+  </div>
 </div>
 
 <!-- ===== PANEL: WITHDRAW ===== -->
@@ -484,12 +470,10 @@
     </button>
     <div class="panel-title">Levantar Fundos</div>
   </div>
-  <div class="panel-body" id="withdraw-body">
-    <div style="text-align:center;padding:32px;color:var(--muted);">A verificar…</div>
-  </div>
+  <div class="panel-body" id="withdraw-body"></div>
 </div>
 
-<!-- IBAN POPUP -->
+<!-- IBAN POPUP (shown after amount entered) -->
 <div class="iban-popup-overlay" id="iban-popup-overlay" onclick="closeIbanPopupOnBackdrop(event)">
   <div class="iban-popup" id="iban-popup">
     <div class="iban-popup-handle"></div>
@@ -529,9 +513,11 @@
       <button class="deposit-tab" onclick="switchDepositTab('instrucoes')">Instruções</button>
     </div>
 
+    <!-- ACCOUNTS -->
     <div class="deposit-section active" id="dep-accounts">
       <div style="font-size:13px;color:var(--muted);margin-bottom:12px;line-height:1.6;">Escolha uma das contas abaixo e transfira o valor pretendido. Depois envie o comprovativo na aba seguinte.</div>
 
+      <!-- Express Transfer -->
       <div class="express-card">
         <div class="express-card-name">
           <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" width="18" height="18"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
@@ -550,6 +536,7 @@
         <div class="countdown-text" id="express-countdown" style="display:none;color:rgba(255,255,255,0.8);"></div>
       </div>
 
+      <!-- BAI -->
       <div class="account-card">
         <div class="account-name">
           <svg viewBox="0 0 24 24" fill="none" stroke="#007bff" stroke-width="2" width="18" height="18"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
@@ -566,6 +553,7 @@
         <div class="countdown-text" id="bai-countdown" style="display:none;"></div>
       </div>
 
+      <!-- BFA -->
       <div class="account-card">
         <div class="account-name">
           <svg viewBox="0 0 24 24" fill="none" stroke="#2b9348" stroke-width="2" width="18" height="18"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
@@ -583,6 +571,7 @@
       </div>
     </div>
 
+    <!-- COMPROVATIVO -->
     <div class="deposit-section" id="dep-comprovativo">
       <div class="input-group">
         <label>Valor Depositado</label>
@@ -625,6 +614,7 @@
       </div>
     </div>
 
+    <!-- INSTRUCOES -->
     <div class="deposit-section" id="dep-instrucoes">
       <div class="info-steps">
         <div class="step-item"><div class="step-num">1</div><div class="step-text"><strong>Escolha a conta</strong> — Vá ao separador "Contas" e clique em "Ver Dados" para revelar o IBAN da conta desejada (BAI ou BFA) ou use a Transferência Express.</div></div>
@@ -738,7 +728,7 @@
   </div>
 </div>
 
-<!-- CONFIRM LOGOUT -->
+<!-- CUSTOM CONFIRM LOGOUT MODAL -->
 <div class="confirm-overlay" id="confirm-logout-overlay">
   <div class="confirm-box">
     <div class="confirm-icon">
@@ -811,9 +801,25 @@
   let pendingWithdraw = false;
   let compFile = null;
   let compUploadedUrl = null;
-  let profileLoaded = false;
 
-  // Ripple on cards/items
+  // Checkbox + ripple styles
+  const checkStyle = document.createElement('style');
+  checkStyle.textContent = `
+    .check-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+    .check-item { display: flex; align-items: flex-start; gap: 10px; padding: 12px; background: #fff; border-radius: 10px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); cursor: pointer; }
+    .check-item input[type="checkbox"] { display: none; }
+    .custom-chk { width: 20px; height: 20px; border: 2px solid #c7d2e0; border-radius: 5px; background: #fff; display: flex; align-items: center; justify-content: center; transition: all 0.2s; flex-shrink: 0; margin-top: 1px; }
+    .check-item input:checked + .custom-chk { background: var(--green); border-color: var(--green); }
+    .check-item input:checked + .custom-chk svg { display: block; }
+    .custom-chk svg { display: none; }
+    .check-text { font-size: 12px; color: var(--muted); line-height: 1.55; flex: 1; }
+    .check-text strong { color: var(--text); }
+    .ripple-effect { position: absolute; border-radius: 50%; background: rgba(0,123,255,0.2); transform: scale(0); animation: ripple-anim 0.55s ease-out; pointer-events: none; }
+    @keyframes ripple-anim { to { transform: scale(2.8); opacity: 0; } }
+  `;
+  document.head.appendChild(checkStyle);
+
+  // Ripple on menu items
   function attachRippleEffect(selector) {
     document.addEventListener('click', e => {
       const target = e.target.closest(selector);
@@ -833,8 +839,7 @@
   }
   attachRippleEffect('.menu-item, .account-card, .tx-item, .ref-stat, .step-item');
 
-  // ── AUTH ──────────────────────────────────────────
-  auth.onAuthStateChanged(user => {
+  auth.onAuthStateChanged(async user => {
     if (!user) { window.location.href = 'auth.html'; return; }
     currentUser = user;
     loadProfile();
@@ -842,72 +847,42 @@
     if (window.location.hash === '#depositar') openPanel('panel-deposit');
   });
 
-  // ── PERFIL ────────────────────────────────────────
-  // CORRIGIDO: agora com .catch() para nunca ficar "a carregar" para sempre,
-  // e referrals só é consultado depois do referralId estar disponível.
   function loadProfile() {
     db.collection('users').doc(currentUser.uid).onSnapshot(snap => {
-      if (!snap.exists) {
-        const pcName = document.getElementById('pc-name');
-        if (pcName) pcName.textContent = 'Perfil não encontrado';
-        return;
-      }
+      if (!snap.exists) return;
       userData = snap.data();
-      profileLoaded = true;
       const name = userData.name || currentUser.displayName || 'Utilizador';
       const initial = name.charAt(0).toUpperCase();
       const refId = userData.referralId || '—';
       const saldo = userData.saldo || 0;
-
-      setText('pc-avatar', initial);
-      setText('pc-name', name);
-      setText('pc-ref', 'ID: ' + refId);
-      setText('pc-saldo', fmt(saldo));
-
+      const pcAvatar = document.getElementById('pc-avatar');
+      const pcName   = document.getElementById('pc-name');
+      const pcRef    = document.getElementById('pc-ref');
+      const pcSaldo  = document.getElementById('pc-saldo');
+      if (pcAvatar) pcAvatar.textContent = initial;
+      if (pcName)   pcName.textContent   = name;
+      if (pcRef)    pcRef.textContent     = 'ID: ' + refId;
+      if (pcSaldo)  pcSaldo.textContent   = fmt(saldo);
       const refLink = `${window.location.origin}/auth.html?ref=${refId}`;
       const refLinkEl = document.getElementById('ref-link-display');
       if (refLinkEl) refLinkEl.textContent = refLink;
-
-      // Total ganho em comissões (somatório das transações tipo comissao)
-      const totalComissoes = allTransactions
-        .filter(t => t.tipo === 'comissao')
-        .reduce((s, t) => s + (t.valor || 0), 0);
-      setText('ref-total-earned', fmt(totalComissoes));
-
-      // Carrega contagem de convidados só agora que já temos o referralId
-      if (refId && refId !== '—') {
-        db.collection('users').where('invitedBy', '==', refId).get()
-          .then(r => {
-            setText('pc-refs-count', r.size);
-            setText('ref-total-invited', r.size);
-          })
-          .catch(err => {
-            console.error('Erro ao contar convidados:', err);
-            setText('pc-refs-count', '0');
-          });
-      } else {
-        setText('pc-refs-count', '0');
-      }
-    }, err => {
-      console.error('Erro ao carregar perfil:', err);
-      setText('pc-name', 'Erro ao carregar');
-      showToast('error', 'Erro de ligação', 'Não foi possível carregar o seu perfil. Verifique a internet e recarregue a página.');
     });
-
     db.collection('investimentos_usuarios')
       .where('userId', '==', currentUser.uid)
       .where('status', '==', 'ativo')
       .get().then(snap => {
-        setText('pc-inv-count', snap.size);
-      }).catch(err => {
-        console.error('Erro investimentos:', err);
-        setText('pc-inv-count', '0');
+        const el = document.getElementById('pc-inv-count');
+        if (el) el.textContent = snap.size;
+      }).catch(() => {});
+    db.collection('users').doc(currentUser.uid).get().then(snap => {
+      if (!snap.exists) return;
+      const refId = snap.data().referralId || '';
+      if (!refId) return;
+      db.collection('users').where('invitedBy', '==', refId).get().then(r => {
+        const el = document.getElementById('pc-refs-count');
+        if (el) el.textContent = r.size;
       });
-  }
-
-  function setText(id, val) {
-    const el = document.getElementById(id);
-    if (el) el.textContent = val;
+    }).catch(() => {});
   }
 
   function profileCardTap(card) {
@@ -955,15 +930,9 @@
     setTimeout(() => card.classList.remove('ref-tapped'), 500);
   }
 
-  // ── TRANSAÇÕES ────────────────────────────────────
-  // CORRIGIDO: removido .orderBy('data','desc') da query (exigia índice composto
-  // que não existe -> a query falhava em silêncio e o onSnapshot nunca disparava,
-  // deixando "A carregar histórico…" para sempre). Agora ordena no cliente,
-  // igual à versão antiga que funcionava, e tem tratamento de erro.
-  function loadTransactions() {
-    db.collection('transacoes')
-      .where('userId', '==', currentUser.uid)
-      .limit(100)
+  async function loadTransactions() {
+    db.collection('transacoes').where('userId', '==', currentUser.uid)
+      .orderBy('data', 'desc').limit(50)
       .onSnapshot(snap => {
         allTransactions = [];
         const today = new Date().toDateString();
@@ -977,32 +946,14 @@
             if (d.status === 'pendente') pendingWithdraw = true;
           }
         });
-        // Ordenação feita no cliente (mais recente primeiro)
-        allTransactions.sort((a, b) => {
-          const ta = a.data?.toDate ? a.data.toDate().getTime() : 0;
-          const tb = b.data?.toDate ? b.data.toDate().getTime() : 0;
-          return tb - ta;
-        });
         renderTransactions(allTransactions);
-
-        const totalComissoes = allTransactions
-          .filter(t => t.tipo === 'comissao')
-          .reduce((s, t) => s + (t.valor || 0), 0);
-        setText('ref-total-earned', fmt(totalComissoes));
-      }, err => {
-        console.error('Erro ao carregar transações:', err);
-        const list = document.getElementById('tx-list');
-        if (list) {
-          list.innerHTML = `
-            <div class="panel-error-box">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="36" height="36"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
-              Não foi possível carregar o histórico.
-              <button onclick="loadTransactions()">Tentar novamente</button>
-            </div>`;
-        }
       });
+    db.collection('referrals').where('inviterCode', '==', userData.referralId || '').get().then(snap => {
+      document.getElementById('ref-total-invited').textContent = snap.size;
+    }).catch(() => {});
   }
 
+  // Status icons (no text labels)
   function statusIcon(status) {
     if (status === 'aprovado') {
       return `<svg viewBox="0 0 24 24" fill="none" stroke="#2b9348" stroke-width="2.5" width="22" height="22"><circle cx="12" cy="12" r="10"/><polyline points="20 6 9 17 4 12"/></svg>`;
@@ -1014,37 +965,36 @@
     return `<svg viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2" width="22" height="22"><circle cx="12" cy="12" r="10"/></svg>`;
   }
 
-  const TX_TYPE_CONFIG = {
-    'deposito': { icon: 'deposit', label: 'Depósito', sign: '+' },
-    'levantamento': { icon: 'withdraw', label: 'Levantamento', sign: '-' },
-    'investimento': { icon: 'invest', label: 'Investimento', sign: '-' },
-    'compra-cotas': { icon: 'invest', label: 'Compra de Cotas', sign: '-' },
-    'resgate': { icon: 'resgate', label: 'Resgate', sign: '+' },
-    'resgate_comissao': { icon: 'deposit', label: 'Resgate de Comissão', sign: '+' },
-    'comissao': { icon: 'deposit', label: 'Comissão de Referência', sign: '+' }
-  };
-  const TX_ICONS_SVG = {
-    deposit: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><path d="M12 5v14M5 12l7 7 7-7"/></svg>',
-    withdraw: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><path d="M12 19V5M5 12l7-7 7 7"/></svg>',
-    invest: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><rect x="2" y="7" width="20" height="14" rx="2"/></svg>',
-    resgate: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>'
-  };
-
   function renderTransactions(txs) {
     const list = document.getElementById('tx-list');
     if (txs.length === 0) {
       list.innerHTML = '<div style="text-align:center;padding:32px;color:var(--muted);font-size:13px;">Sem movimentos registados.</div>';
       return;
     }
+    const typeConfig = {
+      'deposito': { icon: 'deposit', label: 'Depósito', sign: '+' },
+      'levantamento': { icon: 'withdraw', label: 'Levantamento', sign: '-' },
+      'investimento': { icon: 'invest', label: 'Investimento', sign: '-' },
+      'compra-cotas': { icon: 'invest', label: 'Compra de Cotas', sign: '-' },
+      'resgate': { icon: 'resgate', label: 'Resgate', sign: '+' },
+      'resgate_comissao': { icon: 'deposit', label: 'Resgate de Comissão', sign: '+' },
+      'comissao': { icon: 'deposit', label: 'Comissão de Referência', sign: '+' }
+    };
+    const icons = {
+      deposit: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><path d="M12 5v14M5 12l7 7 7-7"/></svg>',
+      withdraw: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><path d="M12 19V5M5 12l7-7 7 7"/></svg>',
+      invest: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><rect x="2" y="7" width="20" height="14" rx="2"/></svg>',
+      resgate: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>'
+    };
     list.innerHTML = txs.map((tx, idx) => {
-      const cfg = TX_TYPE_CONFIG[tx.tipo] || { icon: 'invest', label: tx.tipo || 'Transacção', sign: '' };
+      const cfg = typeConfig[tx.tipo] || { icon: 'invest', label: tx.tipo || 'Transacção', sign: '' };
       const dt = tx.data?.toDate ? tx.data.toDate() : new Date();
       const dateStr = dt.toLocaleDateString('pt-PT', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
       const isPos = cfg.sign === '+';
       const shortId = tx.id ? tx.id.slice(0, 12).toUpperCase() : '—';
       return `
-        <div class="tx-item" onclick="openTxDetail(${idx})" style="animation-delay:${Math.min(idx,15) * 0.04}s;">
-          <div class="tx-icon ${cfg.icon}">${TX_ICONS_SVG[cfg.icon]}</div>
+        <div class="tx-item" onclick="openTxDetail(${idx})" style="animation-delay:${idx * 0.04}s;">
+          <div class="tx-icon ${cfg.icon}">${icons[cfg.icon]}</div>
           <div class="tx-info">
             <div class="tx-desc">${cfg.label}</div>
             <div class="tx-id">#${shortId}</div>
@@ -1060,15 +1010,24 @@
   function openTxDetail(idx) {
     const tx = allTransactions[idx];
     if (!tx) return;
+    const typeConfig = {
+      'deposito': { icon: 'deposit', label: 'Depósito', sign: '+' },
+      'levantamento': { icon: 'withdraw', label: 'Levantamento', sign: '-' },
+      'investimento': { icon: 'invest', label: 'Investimento', sign: '-' },
+      'compra-cotas': { icon: 'invest', label: 'Compra de Cotas', sign: '-' },
+      'resgate': { icon: 'resgate', label: 'Resgate', sign: '+' },
+      'resgate_comissao': { icon: 'deposit', label: 'Resgate de Comissão', sign: '+' },
+      'comissao': { icon: 'deposit', label: 'Comissão de Referência', sign: '+' }
+    };
     const iconColors = { deposit: '#2b9348', withdraw: '#e53e3e', invest: '#007bff', resgate: '#f97316' };
     const iconBgs   = { deposit: '#dcfce7', withdraw: '#ffe4e2', invest: '#dbeafe', resgate: '#fff7ed' };
-    const iconsBig = {
+    const icons = {
       deposit: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="34" height="34"><path d="M12 5v14M5 12l7 7 7-7"/></svg>',
       withdraw: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="34" height="34"><path d="M12 19V5M5 12l7-7 7 7"/></svg>',
       invest: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="34" height="34"><rect x="2" y="7" width="20" height="14" rx="2"/></svg>',
       resgate: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="34" height="34"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>'
     };
-    const cfg = TX_TYPE_CONFIG[tx.tipo] || { icon: 'invest', label: tx.tipo || 'Transacção', sign: '' };
+    const cfg = typeConfig[tx.tipo] || { icon: 'invest', label: tx.tipo || 'Transacção', sign: '' };
     const isPos = cfg.sign === '+';
     const dt = tx.data?.toDate ? tx.data.toDate() : new Date();
     const dateStr = dt.toLocaleDateString('pt-PT', { day: '2-digit', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' });
@@ -1085,7 +1044,7 @@
     body.innerHTML = `
       <div class="tx-detail-icon-wrap">
         <div class="tx-detail-icon" style="background:${iconBgs[cfg.icon]||'#f0f2f8'};color:${iconColors[cfg.icon]||'#333'};">
-          ${iconsBig[cfg.icon]}
+          ${icons[cfg.icon]}
         </div>
         <div class="tx-detail-amount ${isPos?'pos':'neg'}">${isPos?'+':'-'}${fmt(tx.valor||0)} Kz</div>
         <div class="tx-detail-label">${cfg.label}</div>
@@ -1095,10 +1054,22 @@
         </div>
       </div>
       <div class="tx-detail-rows">
-        <div class="tx-detail-row"><span class="tx-detail-row-lbl">ID da Transacção</span><span class="tx-detail-row-val mono-small">${tx.id || '—'}</span></div>
-        <div class="tx-detail-row"><span class="tx-detail-row-lbl">Data e hora</span><span class="tx-detail-row-val">${dateStr}</span></div>
-        <div class="tx-detail-row"><span class="tx-detail-row-lbl">Tipo</span><span class="tx-detail-row-val">${cfg.label}</span></div>
-        <div class="tx-detail-row"><span class="tx-detail-row-lbl">Valor</span><span class="tx-detail-row-val" style="color:${isPos?'var(--green)':'var(--red)'};">${isPos?'+':'-'}${fmt(tx.valor||0)} Kz</span></div>
+        <div class="tx-detail-row">
+          <span class="tx-detail-row-lbl">ID da Transacção</span>
+          <span class="tx-detail-row-val mono-small">${tx.id || '—'}</span>
+        </div>
+        <div class="tx-detail-row">
+          <span class="tx-detail-row-lbl">Data e hora</span>
+          <span class="tx-detail-row-val">${dateStr}</span>
+        </div>
+        <div class="tx-detail-row">
+          <span class="tx-detail-row-lbl">Tipo</span>
+          <span class="tx-detail-row-val">${cfg.label}</span>
+        </div>
+        <div class="tx-detail-row">
+          <span class="tx-detail-row-lbl">Valor</span>
+          <span class="tx-detail-row-val" style="color:${isPos?'var(--green)':'var(--red)'};">${isPos?'+':'-'}${fmt(tx.valor||0)} Kz</span>
+        </div>
         ${tx.descricao ? `<div class="tx-detail-row"><span class="tx-detail-row-lbl">Descrição</span><span class="tx-detail-row-val">${tx.descricao}</span></div>` : ''}
         ${tx.iban ? `<div class="tx-detail-row"><span class="tx-detail-row-lbl">IBAN destino</span><span class="tx-detail-row-val mono-small">${tx.iban}</span></div>` : ''}
         ${tx.titular ? `<div class="tx-detail-row"><span class="tx-detail-row-lbl">Titular</span><span class="tx-detail-row-val">${tx.titular}</span></div>` : ''}
@@ -1114,45 +1085,33 @@
     document.body.style.overflow = '';
   }
 
-  // ── LEVANTAMENTO ──────────────────────────────────
+  // ===== WITHDRAW =====
   function buildWithdrawPanel() {
     const body = document.getElementById('withdraw-body');
-    body.innerHTML = '<div style="text-align:center;padding:32px;color:var(--muted);">A verificar…</div>';
-    db.collection('investimentos_usuarios')
-      .where('userId', '==', currentUser.uid)
-      .where('status', '==', 'ativo')
-      .get().then(snap => {
-        if (snap.empty) {
-          body.innerHTML = `
-            <div style="text-align:center;padding:40px 20px;display:flex;flex-direction:column;align-items:center;gap:16px;">
-              <div style="width:72px;height:72px;border-radius:20px;background:#ffe4e2;display:flex;align-items:center;justify-content:center;">
-                <svg viewBox="0 0 24 24" fill="none" stroke="#e53e3e" stroke-width="1.5" width="36" height="36"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
-              </div>
-              <div style="font-size:16px;font-weight:800;color:var(--text);">Sem Investimento Activo</div>
-              <div style="font-size:13px;color:var(--muted);line-height:1.65;max-width:280px;">Para solicitar um levantamento é necessário ter pelo menos um investimento em cotas activo.</div>
-              <button onclick="window.location.href='mirae.html'" style="padding:12px 24px;background:var(--primary);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;">Ver Planos de Investimento</button>
-            </div>`;
-          return;
-        }
-        if (pendingWithdraw) {
-          body.innerHTML = `<div style="background:#fff;border-radius:12px;padding:16px;box-shadow:var(--shadow);"><div style="font-size:14px;font-weight:700;color:var(--orange);margin-bottom:6px;">Pedido Pendente</div><div style="font-size:13px;color:var(--muted);">Tem um pedido de levantamento em processamento. Aguarde a aprovação antes de submeter um novo.</div></div>`;
-          return;
-        }
-        if (todayWithdrawCount >= 2) {
-          body.innerHTML = `<div style="background:#fff;border-radius:12px;padding:16px;box-shadow:var(--shadow);"><div style="font-size:14px;font-weight:700;color:var(--red);margin-bottom:6px;">Limite Diário Atingido</div><div style="font-size:13px;color:var(--muted);">Atingiu o limite de 2 pedidos de levantamento por dia. Tente novamente amanhã.</div></div>`;
-          return;
-        }
-        withdrawRawAmount = 0;
-        body.innerHTML = buildWithdrawForm();
-      }).catch(err => {
-        console.error('Erro ao verificar investimentos:', err);
+    db.collection('investimentos_usuarios').where('userId', '==', currentUser.uid).where('status', '==', 'ativo').get().then(snap => {
+      if (snap.empty) {
         body.innerHTML = `
-          <div class="panel-error-box">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="36" height="36"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
-            Erro ao verificar os seus investimentos.
-            <button onclick="buildWithdrawPanel()">Tentar novamente</button>
+          <div style="text-align:center;padding:40px 20px;display:flex;flex-direction:column;align-items:center;gap:16px;">
+            <div style="width:72px;height:72px;border-radius:20px;background:#ffe4e2;display:flex;align-items:center;justify-content:center;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#e53e3e" stroke-width="1.5" width="36" height="36"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
+            </div>
+            <div style="font-size:16px;font-weight:800;color:var(--text);">Sem Investimento Activo</div>
+            <div style="font-size:13px;color:var(--muted);line-height:1.65;max-width:280px;">Para solicitar um levantamento é necessário ter pelo menos um investimento em cotas activo.</div>
+            <button onclick="window.location.href='mirae.html'" style="padding:12px 24px;background:var(--primary);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;">Ver Planos de Investimento</button>
           </div>`;
-      });
+        return;
+      }
+      if (pendingWithdraw) {
+        body.innerHTML = `<div style="background:#fff;border-radius:12px;padding:16px;box-shadow:var(--shadow);"><div style="font-size:14px;font-weight:700;color:var(--orange);margin-bottom:6px;">Pedido Pendente</div><div style="font-size:13px;color:var(--muted);">Tem um pedido de levantamento em processamento. Aguarde a aprovação antes de submeter um novo.</div></div>`;
+        return;
+      }
+      if (todayWithdrawCount >= 2) {
+        body.innerHTML = `<div style="background:#fff;border-radius:12px;padding:16px;box-shadow:var(--shadow);"><div style="font-size:14px;font-weight:700;color:var(--red);margin-bottom:6px;">Limite Diário Atingido</div><div style="font-size:13px;color:var(--muted);">Atingiu o limite de 2 pedidos de levantamento por dia. Tente novamente amanhã.</div></div>`;
+        return;
+      }
+      body.innerHTML = buildWithdrawForm();
+      withdrawRawAmount = 0;
+    });
   }
 
   function buildWithdrawForm() {
@@ -1188,7 +1147,7 @@
         <div class="fee-row"><span class="fee-lbl">Banco (1%)</span><span class="fee-val red" id="fc-banco">—</span></div>
         <div class="fee-row"><span class="fee-lbl"><strong>Valor líquido a receber</strong></span><span class="fee-val total" id="fc-liquido">—</span></div>
       </div>
-      <button class="btn-primary-full danger ready" id="wd-next-btn" onclick="openIbanPopup()">Continuar</button>
+      <button class="btn-primary-full danger ready" id="wd-next-btn" onclick="openIbanPopup()" style="opacity:1;pointer-events:auto;">Continuar</button>
       <div style="text-align:center;margin-top:8px;font-size:11px;color:var(--muted);">Saldo disponível: <strong id="wd-saldo-disp">${fmt(userData.saldo || 0)}</strong></div>
     `;
   }
@@ -1222,7 +1181,7 @@
 
   function openIbanPopup() {
     const v = withdrawRawAmount / 100;
-    if (v < 1) { showToast('warning', 'Valor inválido', 'Introduza um valor válido para levantar.'); return; }
+    if (v < 1) { showToast('warning', 'Valor inválido', 'O valor mínimo de levantamento é 1.00 Kz'); return; }
     if (v > (userData.saldo || 0)) { showToast('error', 'Saldo insuficiente', 'O valor solicitado excede o saldo disponível.'); return; }
     document.getElementById('iban-popup-amount').textContent = fmt(v) + ' Kz';
     document.getElementById('wd-iban').value = '';
@@ -1234,7 +1193,6 @@
   function closeIbanPopupOnBackdrop(e) {
     if (e.target === document.getElementById('iban-popup-overlay')) {
       document.getElementById('iban-popup-overlay').classList.remove('open');
-      document.body.style.overflow = '';
     }
   }
 
@@ -1245,9 +1203,7 @@
     if (!iban) { showToast('warning', 'IBAN necessário', 'Introduza o IBAN ou número de conta de destino.'); return; }
     if (!titular) { showToast('warning', 'Titular necessário', 'Introduza o nome do titular da conta.'); return; }
     document.getElementById('iban-popup-overlay').classList.remove('open');
-    document.body.style.overflow = '';
     document.getElementById('processing-overlay').classList.add('active');
-    document.getElementById('proc-text').textContent = 'A processar levantamento…';
     try {
       const liquido = v * 0.84;
       await db.collection('users').doc(currentUser.uid).update({
@@ -1266,17 +1222,17 @@
         status: 'pendente',
         data: firebase.firestore.FieldValue.serverTimestamp()
       });
+      userData.saldo = (userData.saldo || 0) - v;
       document.getElementById('processing-overlay').classList.remove('active');
       showToast('success', 'Pedido enviado!', `Levantamento de ${fmt(v)} Kz submetido. Saldo debitado. Aguarde processamento.`);
       closePanel('panel-withdraw');
     } catch(e) {
-      console.error('Erro no levantamento:', e);
       document.getElementById('processing-overlay').classList.remove('active');
-      showToast('error', 'Erro', 'Não foi possível submeter o pedido. Tente novamente.');
+      showToast('error', 'Erro', 'Não foi possível submeter o pedido.');
     }
   }
 
-  // ── DEPÓSITO ──────────────────────────────────────
+  // ===== DEPOSIT =====
   function switchDepositTab(tab) {
     document.querySelectorAll('.deposit-tab').forEach((b, i) => b.classList.toggle('active', ['accounts','comprovativo','instrucoes'][i] === tab));
     document.querySelectorAll('.deposit-section').forEach(s => s.classList.remove('active'));
@@ -1338,6 +1294,7 @@
   function copyIban(bank, val) {
     navigator.clipboard.writeText(val).then(() => showToast('success', 'IBAN copiado!', val)).catch(() => showToast('warning', 'Copie manualmente', val));
   }
+
   function copyExpress() {
     navigator.clipboard.writeText('937359561').then(() => showToast('success', 'Número copiado!', '937359561')).catch(() => showToast('warning', 'Copie manualmente', '937359561'));
   }
@@ -1345,13 +1302,14 @@
   function depNumpad(d) {
     depRawAmount = depRawAmount * 10 + parseInt(d === '00' ? '0' : d);
     if (d === '00') depRawAmount = depRawAmount * 10;
+    const v = (depRawAmount / 100).toFixed(2);
     const inp = document.getElementById('dep-amount-input');
-    if (inp) inp.value = (depRawAmount / 100).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    if (inp) inp.value = parseFloat(v).toLocaleString('pt-PT', { minimumFractionDigits: 2 });
   }
   function depNumpadDel() {
     depRawAmount = Math.floor(depRawAmount / 10);
     const inp = document.getElementById('dep-amount-input');
-    if (inp) inp.value = (depRawAmount / 100).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    if (inp) inp.value = (depRawAmount / 100).toFixed(2);
   }
 
   function previewComprovativo(input) {
@@ -1449,7 +1407,6 @@
       resetDepositForm();
       closePanel('panel-deposit');
     } catch(e) {
-      console.error('Erro ao registar depósito:', e);
       document.getElementById('processing-overlay').classList.remove('active');
       showToast('error', 'Erro', 'Não foi possível registar o pedido. Tente novamente.');
     } finally {
@@ -1470,7 +1427,7 @@
     const ust2 = document.getElementById('upload-status-text'); if (ust2) ust2.style.display = 'none';
   }
 
-  // ── AMIGOS ────────────────────────────────────────
+  // ===== FRIENDS =====
   function checkFriendReady() {
     const checks = document.querySelectorAll('#friend-checks input[type=checkbox]');
     const all = Array.from(checks).every(c => c.checked);
@@ -1481,13 +1438,13 @@
     navigator.clipboard.writeText(link).then(() => showToast('success', 'Copiado!', 'Link de convite copiado.')).catch(() => showToast('warning', 'Copie manualmente', link));
   }
 
-  // ── SENHA ─────────────────────────────────────────
+  // ===== PASSWORD =====
   function checkPassReady() {
     const checks = document.querySelectorAll('#pass-checks input[type=checkbox]');
     const all = Array.from(checks).every(c => c.checked);
     document.getElementById('pass-submit-btn').classList.toggle('ready', all);
   }
-  function togglePassEye(inputId) {
+  function togglePassEye(inputId, btn) {
     const inp = document.getElementById(inputId);
     inp.type = inp.type === 'password' ? 'text' : 'password';
   }
@@ -1498,7 +1455,6 @@
     if (!/^\d{6}$/.test(nw)) { showToast('error', 'Senha inválida', 'A nova senha deve ter exactamente 6 dígitos numéricos.'); return; }
     if (nw !== cf) { showToast('error', 'Senhas diferentes', 'A nova senha e a confirmação não coincidem.'); return; }
     document.getElementById('processing-overlay').classList.add('active');
-    document.getElementById('proc-text').textContent = 'A alterar senha…';
     try {
       const cred = firebase.auth.EmailAuthProvider.credential(currentUser.email, cur);
       await currentUser.reauthenticateWithCredential(cred);
@@ -1507,17 +1463,17 @@
       showToast('success', 'Senha alterada!', 'As suas credenciais foram actualizadas.');
       closePanel('panel-password');
     } catch(e) {
-      console.error('Erro ao alterar senha:', e);
       document.getElementById('processing-overlay').classList.remove('active');
       if (e.code === 'auth/wrong-password') showToast('error', 'Senha actual incorrecta', 'Verifique e tente novamente.');
       else showToast('error', 'Erro', 'Não foi possível alterar a senha.');
     }
   }
 
-  // ── PAINÉIS ───────────────────────────────────────
+  // ===== PANELS =====
   function openPanel(id) {
     document.getElementById(id).classList.add('open');
     document.body.style.overflow = 'hidden';
+    if (id === 'panel-history') loadTransactions();
     if (id === 'panel-withdraw') buildWithdrawPanel();
   }
   function closePanel(id) {
@@ -1525,7 +1481,7 @@
     document.body.style.overflow = '';
   }
 
-  // ── LOGOUT ────────────────────────────────────────
+  // ===== LOGOUT (custom confirm) =====
   function confirmLogout() {
     document.getElementById('confirm-logout-overlay').classList.add('open');
   }
@@ -1540,7 +1496,7 @@
     window.location.href = 'auth.html';
   }
 
-  // ── UTILS ─────────────────────────────────────────
+  // ===== UTILS =====
   function fmt(v) { return parseFloat(v || 0).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, '.'); }
 
   function showToast(type, title, msg) {
@@ -1557,14 +1513,7 @@
     setTimeout(() => { t.classList.add('removing'); setTimeout(() => t.remove(), 380); }, 5000);
   }
 
-  // Aviso de timeout global: se após 12s o perfil ainda não carregou, avisa o utilizador
-  setTimeout(() => {
-    if (!profileLoaded) {
-      showToast('warning', 'A demorar mais que o normal', 'Verifique a sua ligação à internet. Se persistir, recarregue a página.');
-    }
-  }, 12000);
-
-  // WA arrastável
+  // Draggable WA
   const wa = document.getElementById('wa-float');
   wa.addEventListener('mousedown', e => {
     const r = wa.getBoundingClientRect(); let il = r.left, it = r.top, sx = e.clientX, sy = e.clientY;
@@ -1574,4 +1523,4 @@
   });
 </script>
 </body>
-  </html>
+</html>
