@@ -906,41 +906,52 @@
   });
 
   function loadProfile() {
+    // --- Perfil principal via onSnapshot (tempo real) ---
     db.collection('users').doc(currentUser.uid).onSnapshot(snap => {
-      if (!snap.exists) return;
+      if (!snap.exists) {
+        console.warn('Documento do utilizador não encontrado:', currentUser.uid);
+        return;
+      }
       userData = snap.data();
-      const name = userData.name || currentUser.displayName || 'Utilizador';
+      const name    = userData.name || currentUser.displayName || 'Utilizador';
       const initial = name.charAt(0).toUpperCase();
-      const refId = userData.referralId || '—';
-      const saldo = userData.saldo || 0;
-      const pcAvatar = document.getElementById('pc-avatar');
-      const pcName   = document.getElementById('pc-name');
-      const pcRef    = document.getElementById('pc-ref');
-      const pcSaldo  = document.getElementById('pc-saldo');
-      if (pcAvatar) pcAvatar.textContent = initial;
-      if (pcName)   pcName.textContent   = name;
-      if (pcRef)    pcRef.textContent     = 'ID: ' + refId;
-      if (pcSaldo)  pcSaldo.textContent   = fmt(saldo);
-      const refLink = `${window.location.origin}/auth.html?ref=${refId}`;
+      const refId   = userData.referralId || '—';
+      const saldo   = userData.saldo || 0;
+
+      const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+      set('pc-avatar', initial);
+      set('pc-name',   name);
+      set('pc-ref',    'ID: ' + refId);
+      set('pc-saldo',  fmt(saldo));
+
       const refLinkEl = document.getElementById('ref-link-display');
-      if (refLinkEl) refLinkEl.textContent = refLink;
+      if (refLinkEl) refLinkEl.textContent = window.location.origin + '/auth.html?ref=' + refId;
+
+      // Contar investimentos activos — query simples, apenas userId
+      // (filtramos por status no cliente para evitar índice composto)
+      db.collection('investimentos_usuarios')
+        .where('userId', '==', currentUser.uid)
+        .get()
+        .then(invSnap => {
+          const ativos = invSnap.docs.filter(d => (d.data().status || '') === 'ativo').length;
+          set('pc-inv-count', ativos);
+        })
+        .catch(err => { console.error('Erro ao contar investimentos:', err); set('pc-inv-count', '0'); });
+
+      // Contar convidados — só se tiver referralId válido
+      if (refId && refId !== '—') {
+        db.collection('users')
+          .where('invitedBy', '==', refId)
+          .get()
+          .then(r => set('pc-refs-count', r.size))
+          .catch(err => { console.error('Erro ao contar convidados:', err); set('pc-refs-count', '0'); });
+      } else {
+        set('pc-refs-count', '0');
+      }
+    }, err => {
+      console.error('Erro ao carregar perfil:', err);
+      showToast('error', 'Erro', 'Não foi possível carregar os dados do perfil.');
     });
-    db.collection('investimentos_usuarios')
-      .where('userId', '==', currentUser.uid)
-      .where('status', '==', 'ativo')
-      .get().then(snap => {
-        const el = document.getElementById('pc-inv-count');
-        if (el) el.textContent = snap.size;
-      }).catch(() => {});
-    db.collection('users').doc(currentUser.uid).get().then(snap => {
-      if (!snap.exists) return;
-      const refId = snap.data().referralId || '';
-      if (!refId) return;
-      db.collection('users').where('invitedBy', '==', refId).get().then(r => {
-        const el = document.getElementById('pc-refs-count');
-        if (el) el.textContent = r.size;
-      });
-    }).catch(() => {});
   }
 
   function profileCardTap(card) {
@@ -989,8 +1000,9 @@
   }
 
   async function loadTransactions() {
-    db.collection('transacoes').where('userId', '==', currentUser.uid)
-      .orderBy('data', 'desc').limit(50)
+    db.collection('transacoes')
+      .where('userId', '==', currentUser.uid)
+      .limit(50)
       .onSnapshot(snap => {
         allTransactions = [];
         const today = new Date().toDateString();
@@ -1004,11 +1016,23 @@
             if (d.status === 'pendente') pendingWithdraw = true;
           }
         });
+        // Ordenar por data descendente no cliente (evita índice composto)
+        allTransactions.sort((a, b) => {
+          const ta = a.data?.toDate ? a.data.toDate().getTime() : 0;
+          const tb = b.data?.toDate ? b.data.toDate().getTime() : 0;
+          return tb - ta;
+        });
         renderTransactions(allTransactions);
+      }, err => {
+        console.error('Erro ao carregar transacções:', err);
       });
-    db.collection('referrals').where('inviterCode', '==', userData.referralId || '').get().then(snap => {
-      document.getElementById('ref-total-invited').textContent = snap.size;
-    }).catch(() => {});
+    // Referrals count
+    if (userData.referralId) {
+      db.collection('referrals').where('inviterCode', '==', userData.referralId).get().then(snap => {
+        const el = document.getElementById('ref-total-invited');
+        if (el) el.textContent = snap.size;
+      }).catch(() => {});
+    }
   }
 
   // Status icons (no text labels)
@@ -1146,30 +1170,40 @@
   // ===== WITHDRAW =====
   function buildWithdrawPanel() {
     const body = document.getElementById('withdraw-body');
-    db.collection('investimentos_usuarios').where('userId', '==', currentUser.uid).where('status', '==', 'ativo').get().then(snap => {
-      if (snap.empty) {
-        body.innerHTML = `
-          <div style="text-align:center;padding:40px 20px;display:flex;flex-direction:column;align-items:center;gap:16px;">
-            <div style="width:72px;height:72px;border-radius:20px;background:#ffe4e2;display:flex;align-items:center;justify-content:center;">
-              <svg viewBox="0 0 24 24" fill="none" stroke="#e53e3e" stroke-width="1.5" width="36" height="36"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
-            </div>
-            <div style="font-size:16px;font-weight:800;color:var(--text);">Sem Investimento Activo</div>
-            <div style="font-size:13px;color:var(--muted);line-height:1.65;max-width:280px;">Para solicitar um levantamento é necessário ter pelo menos um investimento em cotas activo.</div>
-            <button onclick="window.location.href='mirae.html'" style="padding:12px 24px;background:var(--primary);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;">Ver Planos de Investimento</button>
-          </div>`;
-        return;
-      }
-      if (pendingWithdraw) {
-        body.innerHTML = `<div style="background:#fff;border-radius:12px;padding:16px;box-shadow:var(--shadow);"><div style="font-size:14px;font-weight:700;color:var(--orange);margin-bottom:6px;">Pedido Pendente</div><div style="font-size:13px;color:var(--muted);">Tem um pedido de levantamento em processamento. Aguarde a aprovação antes de submeter um novo.</div></div>`;
-        return;
-      }
-      if (todayWithdrawCount >= 2) {
-        body.innerHTML = `<div style="background:#fff;border-radius:12px;padding:16px;box-shadow:var(--shadow);"><div style="font-size:14px;font-weight:700;color:var(--red);margin-bottom:6px;">Limite Diário Atingido</div><div style="font-size:13px;color:var(--muted);">Atingiu o limite de 2 pedidos de levantamento por dia. Tente novamente amanhã.</div></div>`;
-        return;
-      }
-      body.innerHTML = buildWithdrawForm();
-      withdrawRawAmount = 0;
-    });
+    body.innerHTML = '<div style="text-align:center;padding:32px;color:var(--muted);font-size:13px;">A verificar...</div>';
+    // Query só por userId (sem índice composto), filtra status no cliente
+    db.collection('investimentos_usuarios')
+      .where('userId', '==', currentUser.uid)
+      .get()
+      .then(snap => {
+        const ativos = snap.docs.filter(d => (d.data().status || '') === 'ativo');
+        if (ativos.length === 0) {
+          body.innerHTML = `
+            <div style="text-align:center;padding:40px 20px;display:flex;flex-direction:column;align-items:center;gap:16px;">
+              <div style="width:72px;height:72px;border-radius:20px;background:#ffe4e2;display:flex;align-items:center;justify-content:center;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#e53e3e" stroke-width="1.5" width="36" height="36"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
+              </div>
+              <div style="font-size:16px;font-weight:800;color:var(--text);">Sem Investimento Activo</div>
+              <div style="font-size:13px;color:var(--muted);line-height:1.65;max-width:280px;">Para solicitar um levantamento é necessário ter pelo menos um investimento em cotas activo.</div>
+              <button onclick="window.location.href='mirae.html'" style="padding:12px 24px;background:var(--primary);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;">Ver Planos de Investimento</button>
+            </div>`;
+          return;
+        }
+        if (pendingWithdraw) {
+          body.innerHTML = `<div style="background:#fff;border-radius:12px;padding:16px;box-shadow:var(--shadow);"><div style="font-size:14px;font-weight:700;color:var(--orange);margin-bottom:6px;">Pedido Pendente</div><div style="font-size:13px;color:var(--muted);">Tem um pedido de levantamento em processamento. Aguarde a aprovação antes de submeter um novo.</div></div>`;
+          return;
+        }
+        if (todayWithdrawCount >= 2) {
+          body.innerHTML = `<div style="background:#fff;border-radius:12px;padding:16px;box-shadow:var(--shadow);"><div style="font-size:14px;font-weight:700;color:var(--red);margin-bottom:6px;">Limite Diário Atingido</div><div style="font-size:13px;color:var(--muted);">Atingiu o limite de 2 pedidos de levantamento por dia. Tente novamente amanhã.</div></div>`;
+          return;
+        }
+        body.innerHTML = buildWithdrawForm();
+        withdrawRawAmount = 0;
+      })
+      .catch(err => {
+        console.error('Erro ao verificar investimentos:', err);
+        body.innerHTML = `<div style="background:#fff;border-radius:12px;padding:16px;box-shadow:var(--shadow);"><div style="font-size:13px;color:var(--red);">Erro ao carregar dados. Tente novamente.</div></div>`;
+      });
   }
 
   function buildWithdrawForm() {
@@ -1493,30 +1527,4 @@
   }
   function copyRefLink() {
     const link = document.getElementById('ref-link-display').textContent;
-    navigator.clipboard.writeText(link).then(() => showToast('success', 'Copiado!', 'Link de convite copiado.')).catch(() => showToast('warning', 'Copie manualmente', link));
-  }
-
-  // ===== PASSWORD =====
-  function checkPassReady() {
-    const checks = document.querySelectorAll('#pass-checks input[type=checkbox]');
-    const all = Array.from(checks).every(c => c.checked);
-    document.getElementById('pass-submit-btn').classList.toggle('ready', all);
-  }
-  function togglePassEye(inputId, btn) {
-    const inp = document.getElementById(inputId);
-    inp.type = inp.type === 'password' ? 'text' : 'password';
-  }
-  async function submitPasswordChange() {
-    const cur = document.getElementById('pass-current').value;
-    const nw = document.getElementById('pass-new').value;
-    const cf = document.getElementById('pass-confirm').value;
-    if (!/^\d{6}$/.test(nw)) { showToast('error', 'Senha inválida', 'A nova senha deve ter exactamente 6 dígitos numéricos.'); return; }
-    if (nw !== cf) { showToast('error', 'Senhas diferentes', 'A nova senha e a confirmação não coincidem.'); return; }
-    document.getElementById('processing-overlay').classList.add('active');
-    try {
-      const cred = firebase.auth.EmailAuthProvider.credential(currentUser.email, cur);
-      await currentUser.reauthenticateWithCredential(cred);
-      await currentUser.updatePassword(nw);
-      document.getElementById('processing-overlay').classList.remove('active');
-      showToast('success', 'Senha alterada!', 'As suas credenciais foram actualizadas.');
-      c
+    navigator.clipboard.writeText(link).then(() => showToast('success', 'Copiado!', 'Link de convite copiado.')).catch(() => showToast(
