@@ -330,6 +330,29 @@
     #wa-float { position: fixed; bottom: 80px; right: 16px; z-index: 6666; cursor: grab; touch-action: none; user-select: none; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.25)); }
     #wa-float img { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; transition: transform 0.2s; }
     #wa-float:hover img { transform: scale(1.08); }
+
+    /* GIFTS */
+    .gift-hero { background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%); border-radius: 20px; padding: 24px 20px 20px; margin-bottom: 16px; text-align: center; position: relative; overflow: hidden; box-shadow: 0 8px 28px rgba(124,58,237,0.4); animation: card-in 0.5s cubic-bezier(0.16,1,0.3,1) both; }
+    .gift-hero-emoji { font-size: 48px; margin-bottom: 8px; display: block; animation: gift-bounce 2s ease-in-out infinite; }
+    @keyframes gift-bounce { 0%,100%{transform:translateY(0) rotate(-3deg);} 50%{transform:translateY(-8px) rotate(3deg);} }
+    .gift-hero h3 { font-size: 18px; font-weight: 800; color: #fff; margin-bottom: 6px; }
+    .gift-hero p { font-size: 13px; color: rgba(255,255,255,0.8); line-height: 1.6; }
+    .gift-pin-section { background: #fff; border-radius: 16px; padding: 22px; box-shadow: var(--shadow); margin-bottom: 14px; }
+    .gift-pin-label { font-size: 12px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; display: block; }
+    .gift-pin-row { display: flex; gap: 8px; }
+    .gift-pin-input { flex: 1; padding: 14px; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 22px; font-weight: 800; color: #7c3aed; background: #faf5ff; outline: none; font-family: 'Inter', sans-serif; letter-spacing: 4px; text-align: center; transition: border-color 0.2s; }
+    .gift-pin-input:focus { border-color: #7c3aed; }
+    .btn-redeem { padding: 14px 20px; background: linear-gradient(135deg,#7c3aed,#a855f7); color: #fff; border: none; border-radius: 10px; font-size: 14px; font-weight: 800; cursor: pointer; font-family: 'Inter', sans-serif; transition: opacity 0.2s; white-space: nowrap; }
+    .btn-redeem:hover { opacity: 0.88; }
+    .gift-history { margin-top: 8px; }
+    .gift-history-title { font-size: 12px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; }
+    .gift-item { background: #fff; border-radius: 12px; padding: 14px; box-shadow: 0 2px 6px rgba(0,0,0,0.07); display: flex; align-items: center; gap: 12px; margin-bottom: 8px; animation: card-in 0.3s ease both; }
+    .gift-item-icon { width: 44px; height: 44px; border-radius: 14px; background: linear-gradient(135deg,#ede9fe,#ddd6fe); display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+    .gift-item-info { flex: 1; }
+    .gift-item-desc { font-size: 13px; font-weight: 700; color: var(--text); }
+    .gift-item-date { font-size: 11px; color: var(--muted); margin-top: 2px; }
+    .gift-item-val { font-size: 16px; font-weight: 800; color: #7c3aed; }
+
   </style>
 </head>
 <body>
@@ -404,6 +427,11 @@
     <div class="menu-item" id="nav-depositar" onclick="openPanel('panel-deposit')">
       <div class="menu-icon" style="background:#dcfce7;"><svg viewBox="0 0 24 24" fill="none" stroke="#2b9348" stroke-width="2"><path d="M12 5v14M5 12l7 7 7-7"/></svg></div>
       <div class="menu-text"><div class="title">Carregar / Depositar</div><div class="sub">Adicionar saldo à conta</div></div>
+      <div class="menu-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></div>
+    </div>
+    <div class="menu-item" onclick="openPanel('panel-gifts')">
+      <div class="menu-icon" style="background:#ede9fe;"><svg viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg></div>
+      <div class="menu-text"><div class="title">Presentes</div><div class="sub">Resgatar presente com PIN</div></div>
       <div class="menu-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></div>
     </div>
     <div class="menu-item" onclick="openPanel('panel-friends')">
@@ -622,6 +650,36 @@
         <div class="step-item"><div class="step-num">3</div><div class="step-text"><strong>Envie o comprovativo</strong> — Tire uma foto ou screenshot do comprovativo de pagamento e envie no separador "Comprovativo".</div></div>
         <div class="step-item"><div class="step-num">4</div><div class="step-text"><strong>Aguarde a aprovação</strong> — A nossa equipa irá verificar e aprovar o depósito em <strong>10 minutos a 1 hora</strong>. Receberá uma notificação assim que o saldo for creditado.</div></div>
         <div class="step-item"><div class="step-num">5</div><div class="step-text"><strong>Valor mínimo</strong>: não existe valor mínimo definido. Transfira o valor que desejar investir.</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== PANEL: GIFTS ===== -->
+<div class="panel" id="panel-gifts">
+  <div class="panel-header">
+    <button class="panel-back" onclick="closePanel('panel-gifts')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+    </button>
+    <div class="panel-title">Presentes</div>
+  </div>
+  <div class="panel-body">
+    <div class="gift-hero">
+      <span class="gift-hero-emoji">🎁</span>
+      <h3>Resgatar Presente</h3>
+      <p>Introduza o PIN fornecido pelo administrador para resgatar o seu presente e creditá-lo na sua conta.</p>
+    </div>
+    <div class="gift-pin-section">
+      <span class="gift-pin-label">PIN do Presente</span>
+      <div class="gift-pin-row">
+        <input class="gift-pin-input" type="text" id="gift-pin-input" placeholder="XXXX" maxlength="8" autocomplete="off" />
+        <button class="btn-redeem" onclick="redeemGift()">Resgatar</button>
+      </div>
+    </div>
+    <div class="gift-history">
+      <div class="gift-history-title">Histórico de Presentes</div>
+      <div id="gift-history-list">
+        <div style="text-align:center;padding:24px;color:var(--muted);font-size:13px;">Sem presentes resgatados ainda.</div>
       </div>
     </div>
   </div>
@@ -1046,7 +1104,7 @@
         <div class="tx-detail-icon" style="background:${iconBgs[cfg.icon]||'#f0f2f8'};color:${iconColors[cfg.icon]||'#333'};">
           ${icons[cfg.icon]}
         </div>
-        <div class="tx-detail-amount ${isPos?'pos':'neg'}">${isPos?'+':'-'}${fmt(tx.valor||0)} Kz</div>
+        <div class="tx-detail-amount ${isPos?'pos':'neg'}">${isPos?'+':'-'}${fmt(tx.valor||0)}</div>
         <div class="tx-detail-label">${cfg.label}</div>
         <div class="tx-status-badge ${statusMap[stKey]||'pending'}">
           ${statusIconsDetail[stKey]||statusIconsDetail['pendente']}
@@ -1068,7 +1126,7 @@
         </div>
         <div class="tx-detail-row">
           <span class="tx-detail-row-lbl">Valor</span>
-          <span class="tx-detail-row-val" style="color:${isPos?'var(--green)':'var(--red)'};">${isPos?'+':'-'}${fmt(tx.valor||0)} Kz</span>
+          <span class="tx-detail-row-val" style="color:${isPos?'var(--green)':'var(--red)'};">${isPos?'+':'-'}${fmt(tx.valor||0)}</span>
         </div>
         ${tx.descricao ? `<div class="tx-detail-row"><span class="tx-detail-row-lbl">Descrição</span><span class="tx-detail-row-val">${tx.descricao}</span></div>` : ''}
         ${tx.iban ? `<div class="tx-detail-row"><span class="tx-detail-row-lbl">IBAN destino</span><span class="tx-detail-row-val mono-small">${tx.iban}</span></div>` : ''}
@@ -1181,9 +1239,9 @@
 
   function openIbanPopup() {
     const v = withdrawRawAmount / 100;
-    if (v < 1) { showToast('warning', 'Valor inválido', 'O valor mínimo de levantamento é 1.00 Kz'); return; }
+    if (v < 700) { showToast('warning', 'Valor inválido', 'O valor mínimo de levantamento é 700.00'); return; }
     if (v > (userData.saldo || 0)) { showToast('error', 'Saldo insuficiente', 'O valor solicitado excede o saldo disponível.'); return; }
-    document.getElementById('iban-popup-amount').textContent = fmt(v) + ' Kz';
+    document.getElementById('iban-popup-amount').textContent = fmt(v);
     document.getElementById('wd-iban').value = '';
     document.getElementById('wd-titular').value = '';
     document.getElementById('iban-popup-overlay').classList.add('open');
@@ -1224,7 +1282,7 @@
       });
       userData.saldo = (userData.saldo || 0) - v;
       document.getElementById('processing-overlay').classList.remove('active');
-      showToast('success', 'Pedido enviado!', `Levantamento de ${fmt(v)} Kz submetido. Saldo debitado. Aguarde processamento.`);
+      showToast('success', 'Pedido enviado!', `Levantamento de ${fmt(v)} submetido. Saldo debitado. Aguarde processamento.`);
       closePanel('panel-withdraw');
     } catch(e) {
       document.getElementById('processing-overlay').classList.remove('active');
@@ -1400,9 +1458,9 @@
       });
       document.getElementById('processing-overlay').classList.remove('active');
       if (uploadFailed) {
-        showToast('warning', 'Pedido enviado (sem imagem)', `Depósito de ${fmt(v)} Kz registado, mas o comprovativo falhou. Envie a imagem pelo WhatsApp.`);
+        showToast('warning', 'Pedido enviado (sem imagem)', `Depósito de ${fmt(v)} registado, mas o comprovativo falhou. Envie a imagem pelo WhatsApp.`);
       } else {
-        showToast('success', 'Pedido enviado!', `Depósito de ${fmt(v)} Kz submetido. Aprovação em 10min–1h.`);
+        showToast('success', 'Pedido enviado!', `Depósito de ${fmt(v)} submetido. Aprovação em 10min–1h.`);
       }
       resetDepositForm();
       closePanel('panel-deposit');
@@ -1461,66 +1519,4 @@
       await currentUser.updatePassword(nw);
       document.getElementById('processing-overlay').classList.remove('active');
       showToast('success', 'Senha alterada!', 'As suas credenciais foram actualizadas.');
-      closePanel('panel-password');
-    } catch(e) {
-      document.getElementById('processing-overlay').classList.remove('active');
-      if (e.code === 'auth/wrong-password') showToast('error', 'Senha actual incorrecta', 'Verifique e tente novamente.');
-      else showToast('error', 'Erro', 'Não foi possível alterar a senha.');
-    }
-  }
-
-  // ===== PANELS =====
-  function openPanel(id) {
-    document.getElementById(id).classList.add('open');
-    document.body.style.overflow = 'hidden';
-    if (id === 'panel-history') loadTransactions();
-    if (id === 'panel-withdraw') buildWithdrawPanel();
-  }
-  function closePanel(id) {
-    document.getElementById(id).classList.remove('open');
-    document.body.style.overflow = '';
-  }
-
-  // ===== LOGOUT (custom confirm) =====
-  function confirmLogout() {
-    document.getElementById('confirm-logout-overlay').classList.add('open');
-  }
-  function closeConfirmLogout() {
-    document.getElementById('confirm-logout-overlay').classList.remove('open');
-  }
-  async function doLogout() {
-    closeConfirmLogout();
-    document.getElementById('processing-overlay').classList.add('active');
-    document.getElementById('proc-text').textContent = 'A terminar sessão…';
-    await auth.signOut();
-    window.location.href = 'auth.html';
-  }
-
-  // ===== UTILS =====
-  function fmt(v) { return parseFloat(v || 0).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, '.'); }
-
-  function showToast(type, title, msg) {
-    const icons = {
-      success: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="20" height="20"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>',
-      error: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="20" height="20"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>',
-      warning: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="20" height="20"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>'
-    };
-    const t = document.createElement('div');
-    t.className = `toast ${type}`;
-    t.innerHTML = `<div class="toast-icon">${icons[type]}</div><div class="toast-body"><div class="toast-title">${title}</div><div class="toast-msg">${msg}</div></div>`;
-    t.onclick = () => { t.classList.add('removing'); setTimeout(() => t.remove(), 380); };
-    document.getElementById('toast-container').appendChild(t);
-    setTimeout(() => { t.classList.add('removing'); setTimeout(() => t.remove(), 380); }, 5000);
-  }
-
-  // Draggable WA
-  const wa = document.getElementById('wa-float');
-  wa.addEventListener('mousedown', e => {
-    const r = wa.getBoundingClientRect(); let il = r.left, it = r.top, sx = e.clientX, sy = e.clientY;
-    wa.style.cssText = `position:fixed;right:auto;bottom:auto;left:${il}px;top:${it}px;z-index:6666;`;
-    document.onmousemove = ev => { wa.style.left=(il+ev.clientX-sx)+'px'; wa.style.top=(it+ev.clientY-sy)+'px'; };
-    document.onmouseup = () => document.onmousemove = null;
-  });
-</script>
-</body>
-</html>
+      c
